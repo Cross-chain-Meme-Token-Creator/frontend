@@ -1,1 +1,1 @@
-export * from "./public.config"
+export * from "./app.config"

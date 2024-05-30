@@ -1,5 +1,13 @@
 "use client"
-import { Input, Textarea } from "@nextui-org/react"
+import {
+    Card,
+    CardBody,
+    CardFooter,
+    CardHeader,
+    Input,
+    Link,
+    Textarea,
+} from "@nextui-org/react"
 import { Button } from "@nextui-org/button"
 
 import React, { useContext } from "react"
@@ -8,12 +16,17 @@ import {
     CreateTokenFormContext,
     CreateTokenFormProvider,
 } from "./CreateTokenFormProvider"
+import { BaseChainSelect } from "./BaseChainSelect"
+import { baseAxios } from "@services"
 
 const WrappedCreateTokenForm = () => {
     const { formik } = useContext(CreateTokenFormContext)!
     return (
-        <div className="grid gap-6 p-12 max-w-[500px]">
-            <div className="grid gap-4">
+        <Card className="max-w-[560px] mx-auto my-12">
+            <CardHeader className="font-semibold text-xl p-6 pb-2">
+                Create Token
+            </CardHeader>
+            <CardBody className="grid gap-4 p-6">
                 <Input
                     id="name"
                     onBlur={formik.handleBlur}
@@ -56,15 +69,19 @@ const WrappedCreateTokenForm = () => {
                 <div className="grid gap-2">
                     <div className="text-sm">Icon Url</div>
                     <Dropzone
-                        onDrop={async (acceptedFiles) => {
+                        accept={{
+                            "image/jpeg": [".jpeg", ".png"],
+                        }}
+                        onDrop={async (acceptedFiles: Array<File>) => {
                             const file = acceptedFiles.at(0)
-                            const arrayBuffer = await file?.arrayBuffer()
-                            if (!arrayBuffer) return
-                            const buffer = Buffer.from(arrayBuffer)
-                            formik.setFieldValue(
-                                "iconUrl",
-                                buffer.toString("base64")
+                            if (!file) return
+                            const formData = new FormData()
+                            formData.append("file", file)
+                            const { data } = await baseAxios.post<string>(
+                                "/api",
+                                formData
                             )
+                            formik.setFieldValue("iconUrl", data)
                         }}
                     >
                         {({ getRootProps, getInputProps }) => (
@@ -79,8 +96,7 @@ const WrappedCreateTokenForm = () => {
                                             )}...`
                                         ) : (
                                             <span className="text-foreground-500">
-                                                {" "}
-                                                Drop your file here or upload{" "}
+                                                Drop your file here or upload
                                             </span>
                                         )}
                                     </div>
@@ -88,12 +104,35 @@ const WrappedCreateTokenForm = () => {
                             </section>
                         )}
                     </Dropzone>
+                    {formik.values.iconUrl ? (
+                        <Link
+                            showAnchorIcon
+                            isExternal
+                            href={formik.values.iconUrl}
+                            size="sm"
+                        >
+                            View
+                        </Link>
+                    ) : null}
                 </div>
-            </div>
-            <Button type="submit" color="primary">
-                Create
-            </Button>
-        </div>
+                <Input
+                    id="totalSupply"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    value={formik.values.totalSupply}
+                    isRequired
+                    placeholder="10000000000"
+                    labelPlacement="outside"
+                    label="Total Supply"
+                />
+                <BaseChainSelect />
+            </CardBody>
+            <CardFooter className="p-6 pt-2">
+                <Button type="submit" color="primary" className="w-full">
+                    Create
+                </Button>
+            </CardFooter>
+        </Card>
     )
 }
 

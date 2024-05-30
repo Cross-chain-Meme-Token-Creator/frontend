@@ -1,5 +1,5 @@
 {
-  "name": "meme-token-wormhole",
+  "name": "cross-chain-meme-creator-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,14 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@certusone/wormhole-sdk": "^0.10.16",
     "@mysten/dapp-kit": "^0.13.2",
-    "@mysten/sui.js": "^0.54.1",
-    "@mysten/wallet-kit": "^0.8.6",
+    "@mysten/sui.js": "^0.51.2",
     "@nextui-org/button": "^2.0.31",
     "@nextui-org/react": "^2.3.6",
     "@nextui-org/system": "^2.1.2",
     "@nextui-org/theme": "^2.2.3",
+    "@perawallet/connect": "^1.3.4",
+    "@pinata/sdk": "^2.1.0",
     "@suiet/wallet-kit": "^0.2.24",
+    "ethers": "^5.7.2",
     "formik": "^2.4.6",
     "framer-motion": "^11.2.6",
     "next": "14.2.3",
@@ -24,6 +27,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
     "start": "^5.1.0",
+    "uuid": "^9.0.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {
@@ -31,6 +35,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.2.3",
     "eslint-plugin-react": "^7.34.1",

@@ -11,7 +11,9 @@ import { ConnectWalletsModal } from "./ConnectWalletsModal"
 
 export const Navbar = () => {
     return (
-        <NextUINavbar isBordered>
+        <NextUINavbar isBordered classNames={{
+            wrapper: "max-w-full"
+        }}>
             <NavbarBrand>
                 <p className="font-bold text-inherit">ACME</p>
             </NavbarBrand>

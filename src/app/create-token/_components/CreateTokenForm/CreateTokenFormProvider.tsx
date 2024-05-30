@@ -1,6 +1,6 @@
 import { Form, Formik, FormikProps } from "formik"
 import React, { ReactNode, createContext, useMemo } from "react"
-import { createCurrencyTx } from "@features"
+import { getCreateSuiTokenTransactionBlock } from "@services"
 import { useWallet } from "@suiet/wallet-kit"
 
 interface FormikValue {
@@ -9,6 +9,7 @@ interface FormikValue {
     description: string,
     decimals: number,
     iconUrl: string,
+    totalSupply: string
 }
 
 interface CreateTokenFormContextValue {
@@ -16,11 +17,12 @@ interface CreateTokenFormContextValue {
 }
 
 const initialValues: FormikValue = {
-    symbol: "",
-    name: "",
+    symbol: "USDT",
+    name: "UST Tether",
     description: "",
-    decimals: 9,
-    iconUrl: ""
+    decimals: 8,
+    iconUrl: "",
+    totalSupply: "10000000000"
 }
 
 export const CreateTokenFormContext = createContext<CreateTokenFormContextValue | null>(
@@ -45,34 +47,29 @@ const renderBody = (
 }
 
 export const CreateTokenFormProvider = ({ children }: { children: ReactNode }) => {
-    const { address } = useWallet()
-
     const {
+        address,
         signAndExecuteTransactionBlock
-        // ... other methods
     } = useWallet()
 
     return (
         <Formik
             initialValues={initialValues}
             //validationSchema={}
-            onSubmit={async ({name, symbol, decimals, description, iconUrl}) => {
-                console.log(address)
+            onSubmit={async ({name, symbol, decimals, description, iconUrl, totalSupply }) => {
                 if (!address) return
-                const tx = createCurrencyTx({
-                    currency: {
+                const tx = await getCreateSuiTokenTransactionBlock({
                         decimals,
                         description,
                         name,
                         symbol,
-                        iconUrl
-                    },
-                    currentAddr: address
+                        iconUrl,
+                        totalSupply
                 })
-                if (!tx) return 
-                await signAndExecuteTransactionBlock({
+                const result = await signAndExecuteTransactionBlock({
                     transactionBlock: tx,
                 })
+                console.log(result)
             }}
         >
             {(_props) => renderBody(_props, children)}
