@@ -2,7 +2,7 @@ import { Button } from "@nextui-org/button"
 import { Spacer, Image, Link } from "@nextui-org/react"
 import React from "react"
 import { truncateString } from "@common"
-import { useSDK } from "@metamask/sdk-react"
+import { useSDK } from "@metamask/sdk-react-ui"
 
 export const BscTab = () => {
     const { account: bscAddress, sdk } = useSDK()

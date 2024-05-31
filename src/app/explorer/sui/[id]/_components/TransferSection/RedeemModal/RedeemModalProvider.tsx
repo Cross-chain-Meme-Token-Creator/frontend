@@ -2,7 +2,7 @@ import { Form, Formik, FormikProps } from "formik"
 import React, { ReactNode, createContext, useContext, useMemo } from "react"
 import { useWallet } from "@suiet/wallet-kit"
 import { ExplorerSuiIdContext } from "../../../_hooks"
-import { useSDK } from "@metamask/sdk-react"
+import { useSDK } from "@metamask/sdk-react-ui"
 
 import {
     SupportedChainName,

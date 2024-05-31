@@ -6,7 +6,7 @@ import React from "react"
 import { NextUIProvider } from "@nextui-org/react"
 import { SuiWallet, SuietWallet, WalletProvider } from "@suiet/wallet-kit"
 import { Navbar } from "./_components"
-import { MetaMaskProvider } from "@metamask/sdk-react"
+import { MetaMaskProvider } from "@metamask/sdk-react-ui"
 import { RootProvider } from "./_hooks"
 import { NotificationModal, NotificationModalProvider } from "./_components"
 

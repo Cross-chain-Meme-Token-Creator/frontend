@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@metamask/sdk-react": "^0.20.2",
+    "@metamask/sdk-react-ui-ui": "^0.20.2",
     "@mysten/dapp-kit": "^0.13.2",
     "@mysten/sui.js": "^0.51.2",
     "@nextui-org/button": "^2.0.31",

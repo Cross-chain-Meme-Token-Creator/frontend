@@ -1,4 +1,4 @@
-import { useSDK } from "@metamask/sdk-react"
+import { useSDK } from "@metamask/sdk-react-ui"
 import { Link } from "@nextui-org/react"
 import { Chain, chainToPlatform } from "@wormhole-foundation/sdk-base"
 import { Erc20Contract } from "@services"
