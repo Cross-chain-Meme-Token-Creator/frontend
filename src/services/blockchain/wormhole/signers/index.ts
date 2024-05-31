@@ -1,4 +1,4 @@
-import { SDKState } from "@metamask/sdk-react-ui"
+import { SDKState } from "@metamask/sdk-react"
 import { MetaMaskWalletSigner } from "../signers"
 import { WalletContextState } from "@suiet/wallet-kit"
 import { Chain, chainToPlatform } from "@wormhole-foundation/sdk-base"

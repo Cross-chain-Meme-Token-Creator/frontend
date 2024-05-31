@@ -1,4 +1,4 @@
-import { SDKState } from "@metamask/sdk-react-ui"
+import { SDKState } from "@metamask/sdk-react"
 import { Network } from "@wormhole-foundation/sdk-base"
 import {
     SignAndSendSigner,

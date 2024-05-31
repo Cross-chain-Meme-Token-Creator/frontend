@@ -8,7 +8,7 @@ import {
 } from "@services"
 import { useWallet } from "@suiet/wallet-kit"
 import { ExplorerSuiIdContext } from "../../../_hooks"
-import {  useSDK } from "@metamask/sdk-react-ui"
+import {  useSDK } from "@metamask/sdk-react"
 import { createWrapped } from "@services"
 import { getInnerType } from "@common"
 import { Chain } from "@wormhole-foundation/sdk"

@@ -6,7 +6,7 @@ import React from "react"
 import { NextUIProvider } from "@nextui-org/react"
 import { SuiWallet, SuietWallet, WalletProvider } from "@suiet/wallet-kit"
 import { Navbar } from "./_components"
-import { MetaMaskUIProvider } from "@metamask/sdk-react-ui"
+import { MetaMaskProvider } from "@metamask/sdk-react"
 import { RootProvider } from "./_hooks"
 import { NotificationModal, NotificationModalProvider } from "./_components"
 
@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                         <WalletProvider
                             defaultWallets={[SuietWallet, SuiWallet]}
                         >
-                            <MetaMaskUIProvider
+                            <MetaMaskProvider
                                 sdkOptions={{
                                     dappMetadata: {
                                         name: "Example React UI Dapp",
@@ -33,7 +33,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                                     <Navbar />
                                     {children}
                                 </NotificationModalProvider>
-                            </MetaMaskUIProvider>
+                            </MetaMaskProvider>
                         </WalletProvider>
                     </NextUIProvider>
                 </RootProvider>
