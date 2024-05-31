@@ -1,3 +1,5 @@
+import { BridgedChainInfo } from "@services"
+import { Chain } from "@wormhole-foundation/sdk-base"
 import { useReducer } from "react"
 
 export interface TokenSuiInfo {
@@ -6,11 +8,18 @@ export interface TokenSuiInfo {
     symbol?: string
     description?: string
     decimals?: number
-    type?: string
+    tokenType?: string
 }
+
 export interface ExplorerSuiIdState {
-    token: TokenSuiInfo,
-    balance: number,
+    token: TokenSuiInfo
+    balance: number
+    id?: string
+    bridgedChainInfos?: Array<BridgedChainInfo<Chain>>
+    keys: {
+        fetchBalanceKey: number
+    }
+   
 }
 
 export interface SetTokenNameAction {
@@ -53,7 +62,19 @@ export interface SetTokenBalanceAction {
     payload: number
 }
 
+export interface SetIdAction {
+    type: "SET_ID"
+    payload: string
+}
 
+export interface SetBridgedChainInfosAction {
+    type: "SET_BRIDGED_CHAINS_INFO"
+    payload: Array<BridgedChainInfo>
+}
+
+export interface TriggerFetchBalanceAction {
+    type: "TRIGGER_FETCH_BALANCE"
+}
 
 export type ExplorerSuiIdAction =
     | SetTokenNameAction
@@ -64,10 +85,17 @@ export type ExplorerSuiIdAction =
     | SetTokenAllAction
     | SetTokenBalanceAction
     | SetTokenTypeAction
+    | SetIdAction
+    | SetBridgedChainInfosAction
+    | TriggerFetchBalanceAction
 
 export const initialState: ExplorerSuiIdState = {
     token: {},
-    balance: 0
+    balance: 0,
+    keys: {
+        fetchBalanceKey: 0,
+    }
+    
 }
 
 export const reducer = (
@@ -112,25 +140,42 @@ export const reducer = (
                 ...state,
                 token: {
                     ...state.token,
-                    decimals: action.payload
-                }
+                    decimals: action.payload,
+                },
             }
         case "SET_TOKEN_ALL":
             return {
                 ...state,
-                token: action.payload
+                token: action.payload,
             }
         case "SET_TOKEN_BALANCE":
             return {
                 ...state,
-                balance: action.payload
+                balance: action.payload,
             }
         case "SET_TOKEN_TYPE":
             return {
                 ...state,
                 token: {
                     ...state.token,
-                    type: action.payload
+                    tokenType: action.payload,
+                },
+            }
+        case "SET_ID":
+            return {
+                ...state,
+                id: action.payload,
+            }
+        case "SET_BRIDGED_CHAINS_INFO":
+            return {
+                ...state,
+                bridgedChainInfos: action.payload,
+            }
+        case "TRIGGER_FETCH_BALANCE":
+            return {
+                ...state,
+                keys: {
+                    fetchBalanceKey: state.keys.fetchBalanceKey + 1,
                 }
             }
         default:

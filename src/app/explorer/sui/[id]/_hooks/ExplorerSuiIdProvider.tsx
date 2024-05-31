@@ -1,5 +1,11 @@
 "use client"
-import React, { ReactNode, createContext, useEffect, useMemo } from "react"
+import React, {
+    ReactNode,
+    createContext,
+    useCallback,
+    useEffect,
+    useMemo,
+} from "react"
 import {
     ExplorerSuiIdAction,
     ExplorerSuiIdState,
@@ -7,11 +13,17 @@ import {
 } from "./useExplorerSuiIdReducer"
 import { useParams } from "next/navigation"
 import { SuiClient } from "@mysten/sui.js/client"
-import { SupportedChainName, supportedChains } from "@services"
-import { useWallet } from "@suiet/wallet-kit"
+import {
+    SupportedChainName,
+    getBridgedChainInfos,
+    supportedChains,
+} from "@services"
 
 export interface ExplorerSuiIdContextValue {
     reducer: [ExplorerSuiIdState, React.Dispatch<ExplorerSuiIdAction>]
+    functions: {
+        triggerFetchBalance: () => void
+    }
 }
 
 export const ExplorerSuiIdContext =
@@ -23,7 +35,7 @@ export const ExplorerSuiIdProvider = ({
     children: ReactNode
 }) => {
     const reducer = useExplorerSuiIdReducer()
-    const [state, dispatch] = reducer
+    const [, dispatch] = reducer
 
     const params = useParams()
     const id = params.id as string
@@ -31,8 +43,6 @@ export const ExplorerSuiIdProvider = ({
     const suiClient = new SuiClient({
         url: supportedChains[SupportedChainName.Sui].rpcUrl,
     })
-
-    const { address } = useWallet()
 
     useEffect(() => {
         const handleEffect = async () => {
@@ -54,31 +64,59 @@ export const ExplorerSuiIdProvider = ({
                 symbol,
             } = (content as any).fields
 
-            const {
-                type
-            } = content as any
+            const { type: tokenType } = content as any
 
             dispatch({
                 type: "SET_TOKEN_ALL",
-                payload: { decimals, name, description, iconUrl, symbol, type },
+                payload: {
+                    decimals,
+                    name,
+                    description,
+                    iconUrl,
+                    symbol,
+                    tokenType,
+                },
             })
 
-            console.log(content)
-
-            if (!address) return
-            // const balance = suiClient.getBalance()
+            dispatch({
+                type: "SET_ID",
+                payload: id,
+            })
         }
         handleEffect()
     }, [])
 
-    console.log(state)
+    const triggerFetchBalance = useCallback(
+        () =>
+            dispatch({
+                type: "TRIGGER_FETCH_BALANCE",
+            }),
+        []
+    )
 
     const ExplorerSuiIdContextValue: ExplorerSuiIdContextValue = useMemo(
         () => ({
             reducer,
+            functions: {
+                triggerFetchBalance,
+            },
         }),
         [reducer]
     )
+
+    useEffect(() => {
+        const handleEffect = async () => {
+            const bridgedChainInfos = await getBridgedChainInfos({
+                mainChainName: "Sui",
+                tokenAddress: id,
+            })
+            dispatch({
+                type: "SET_BRIDGED_CHAINS_INFO",
+                payload: bridgedChainInfos,
+            })
+        }
+        handleEffect()
+    }, [])
 
     return (
         <ExplorerSuiIdContext.Provider value={ExplorerSuiIdContextValue}>

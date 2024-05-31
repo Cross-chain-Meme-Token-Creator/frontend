@@ -8,6 +8,7 @@ import { SuiWallet, SuietWallet, WalletProvider } from "@suiet/wallet-kit"
 import { Navbar } from "./_components"
 import { MetaMaskUIProvider } from "@metamask/sdk-react-ui"
 import { RootProvider } from "./_hooks"
+import { NotificationModal, NotificationModalProvider } from "./_components"
 
 const font = Open_Sans({ subsets: ["latin"] })
 
@@ -27,8 +28,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                                     },
                                 }}
                             >
-                                <Navbar />
-                                {children}
+                                <NotificationModalProvider>
+                                    <NotificationModal/>
+                                    <Navbar />
+                                    {children}
+                                </NotificationModalProvider>
                             </MetaMaskUIProvider>
                         </WalletProvider>
                     </NextUIProvider>

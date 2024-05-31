@@ -6,7 +6,7 @@ export const DisplayTokenInfo = () => {
     const { reducer } = useContext(ExplorerSuiIdContext)!
     const [state] = reducer
     const { token } = state
-    const { decimals, description, iconUrl, name, symbol, type } = token
+    const { decimals, description, iconUrl, name, symbol, tokenType } = token
 
     return (
         <div>
@@ -17,7 +17,7 @@ export const DisplayTokenInfo = () => {
                         <div className="text-4xl font-semibold">{name}</div>
                     </div>
                     <Spacer y={4}/>
-                    <Snippet size="sm">{`Type: ${type}`}</Snippet>
+                    <Snippet size="sm">{`Type: ${tokenType}`}</Snippet>
                 </div>
             </div>
         </div>

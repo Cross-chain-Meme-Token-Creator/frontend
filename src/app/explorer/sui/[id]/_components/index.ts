@@ -1,2 +1,3 @@
 export * from "./DisplayTokenInfo"
-export * from "./SendToEvmButton"
+export * from "./TransferSection"
+export * from "./BridgedChainsTable"

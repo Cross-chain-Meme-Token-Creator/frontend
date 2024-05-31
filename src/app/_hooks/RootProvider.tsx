@@ -5,7 +5,7 @@ import { PeraWalletConnect } from "@perawallet/connect"
 
 export interface RootContextValue {
     wallets: {
-        pera: PeraWalletConnect
+        peraWallet: PeraWalletConnect
     }
     reducer: [RootState, React.Dispatch<RootAction>]
 }
@@ -15,18 +15,19 @@ export const RootContext = createContext<RootContextValue | null>(null)
 export const RootProvider = ({ children }: { children: ReactNode }) => {
     const reducer = useRootReducer()
 
-    const pera = new PeraWalletConnect({
+    const peraWallet = new PeraWalletConnect({
         shouldShowSignTxnToast: true,
     })
+
 
     const rootContextValue: RootContextValue = useMemo(
         () => ({
             wallets: {
-                pera,
+                peraWallet,
             },
             reducer,
         }),
-        [reducer, pera]
+        [reducer, peraWallet]
     )
 
     return (

@@ -119,7 +119,7 @@ const WrappedCreateTokenForm = () => {
                     id="totalSupply"
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    value={formik.values.totalSupply}
+                    value={formik.values.totalSupply.toString()}
                     isRequired
                     placeholder="10000000000"
                     labelPlacement="outside"

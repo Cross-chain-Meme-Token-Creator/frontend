@@ -1,10 +1,12 @@
 
 import { useReducer } from "react"
-import { SupportedChainName } from "@services"
 
 export interface RootState {
     wallets: {
-        pera: {
+        peraWallet: {
+            address?: string
+        },
+        phantomWallet: {
             address?: string
         }
     }
@@ -15,12 +17,21 @@ export interface SetPeraWalletAddressAction {
     payload: string | undefined
 }
 
+export interface SetPhantomWalletAddressAction {
+    type: "SET_PHANTOM_WALLET_ADDRESS"
+    payload: string | undefined
+}
+
 export type RootAction =
     | SetPeraWalletAddressAction
+    | SetPhantomWalletAddressAction
 
 export const initialState: RootState = {
     wallets: {
-        pera: {
+        peraWallet: {
+            address: undefined
+        },
+        phantomWallet: {
             address: undefined
         }
     }
@@ -34,7 +45,15 @@ export const reducer = (
         case "SET_PERA_WALLET_ADDRESS":
             return {
                 ...state, wallets: {
-                    ...state.wallets, pera: {
+                    ...state.wallets, peraWallet: {
+                        address: action.payload
+                    }
+                }
+            }
+        case "SET_PHANTOM_WALLET_ADDRESS":
+            return {
+                ...state, wallets: {
+                    ...state.wallets, phantomWallet: {
                         address: action.payload
                     }
                 }
