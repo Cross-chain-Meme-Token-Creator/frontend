@@ -5,3 +5,4 @@ const BACKEND_PRODUCTION_URL = process.env.NEXT_PUBLIC_BACKEND_PRODUCTION_URL
 
 export const backendUrl = () =>
     appConfig.inProduction ? BACKEND_PRODUCTION_URL : BACKEND_DEVELOPMENT_URL
+ 
