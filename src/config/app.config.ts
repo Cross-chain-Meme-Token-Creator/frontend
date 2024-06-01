@@ -4,5 +4,6 @@ export enum NodeEnv {
 }
 
 export const appConfig = {
-    inProduction: process.env.NODE_ENV as NodeEnv === NodeEnv.Production,
+    inProduction: false,
+    //process.env.NODE_ENV as NodeEnv === NodeEnv.Production,
 }
