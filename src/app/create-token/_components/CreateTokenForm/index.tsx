@@ -21,6 +21,9 @@ import { baseAxios } from "@services"
 
 const WrappedCreateTokenForm = () => {
     const { formik } = useContext(CreateTokenFormContext)!
+    
+    console.log(formik.values)
+
     return (
         <Card className="max-w-[560px] mx-auto my-12">
             <CardHeader className="font-semibold text-xl p-6 pb-2">
