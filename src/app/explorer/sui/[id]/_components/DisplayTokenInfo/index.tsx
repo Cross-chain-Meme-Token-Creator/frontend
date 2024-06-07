@@ -2,11 +2,12 @@
 import React, { useContext } from "react"
 import { ExplorerSuiIdContext } from "../../_hooks"
 import { Avatar, Snippet, Spacer } from "@nextui-org/react"
+
 export const DisplayTokenInfo = () => {
     const { reducer } = useContext(ExplorerSuiIdContext)!
     const [state] = reducer
     const { token } = state
-    const { decimals, description, iconUrl, name, symbol, tokenType } = token
+    const { iconUrl, name, tokenType } = token
 
     return (
         <div>
@@ -16,7 +17,7 @@ export const DisplayTokenInfo = () => {
                         <Avatar src={iconUrl} />
                         <div className="text-4xl font-semibold">{name}</div>
                     </div>
-                    <Spacer y={4}/>
+                    <Spacer y={4} />
                     <Snippet size="sm">{`Type: ${tokenType}`}</Snippet>
                 </div>
             </div>

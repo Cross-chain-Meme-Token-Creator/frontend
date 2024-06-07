@@ -103,83 +103,83 @@ export const reducer = (
     action: ExplorerSuiIdAction
 ): ExplorerSuiIdState => {
     switch (action.type) {
-        case "SET_TOKEN_NAME":
-            return {
-                ...state,
-                token: {
-                    ...state.token,
-                    name: action.payload,
-                },
+    case "SET_TOKEN_NAME":
+        return {
+            ...state,
+            token: {
+                ...state.token,
+                name: action.payload,
+            },
+        }
+    case "SET_TOKEN_SYMBOL":
+        return {
+            ...state,
+            token: {
+                ...state.token,
+                symbol: action.payload,
+            },
+        }
+    case "SET_TOKEN_ICON_URL":
+        return {
+            ...state,
+            token: {
+                ...state.token,
+                iconUrl: action.payload,
+            },
+        }
+    case "SET_TOKEN_DESCRIPTION":
+        return {
+            ...state,
+            token: {
+                ...state.token,
+                description: action.payload,
+            },
+        }
+    case "SET_TOKEN_DECIMALS":
+        return {
+            ...state,
+            token: {
+                ...state.token,
+                decimals: action.payload,
+            },
+        }
+    case "SET_TOKEN_ALL":
+        return {
+            ...state,
+            token: action.payload,
+        }
+    case "SET_TOKEN_BALANCE":
+        return {
+            ...state,
+            balance: action.payload,
+        }
+    case "SET_TOKEN_TYPE":
+        return {
+            ...state,
+            token: {
+                ...state.token,
+                tokenType: action.payload,
+            },
+        }
+    case "SET_ID":
+        return {
+            ...state,
+            id: action.payload,
+        }
+    case "SET_BRIDGED_CHAINS_INFO":
+        return {
+            ...state,
+            bridgedChainInfos: action.payload,
+        }
+    case "TRIGGER_FETCH_BALANCE":
+        return {
+            ...state,
+            keys: {
+                fetchBalanceKey: state.keys.fetchBalanceKey + 1,
             }
-        case "SET_TOKEN_SYMBOL":
-            return {
-                ...state,
-                token: {
-                    ...state.token,
-                    symbol: action.payload,
-                },
-            }
-        case "SET_TOKEN_ICON_URL":
-            return {
-                ...state,
-                token: {
-                    ...state.token,
-                    iconUrl: action.payload,
-                },
-            }
-        case "SET_TOKEN_DESCRIPTION":
-            return {
-                ...state,
-                token: {
-                    ...state.token,
-                    description: action.payload,
-                },
-            }
-        case "SET_TOKEN_DECIMALS":
-            return {
-                ...state,
-                token: {
-                    ...state.token,
-                    decimals: action.payload,
-                },
-            }
-        case "SET_TOKEN_ALL":
-            return {
-                ...state,
-                token: action.payload,
-            }
-        case "SET_TOKEN_BALANCE":
-            return {
-                ...state,
-                balance: action.payload,
-            }
-        case "SET_TOKEN_TYPE":
-            return {
-                ...state,
-                token: {
-                    ...state.token,
-                    tokenType: action.payload,
-                },
-            }
-        case "SET_ID":
-            return {
-                ...state,
-                id: action.payload,
-            }
-        case "SET_BRIDGED_CHAINS_INFO":
-            return {
-                ...state,
-                bridgedChainInfos: action.payload,
-            }
-        case "TRIGGER_FETCH_BALANCE":
-            return {
-                ...state,
-                keys: {
-                    fetchBalanceKey: state.keys.fetchBalanceKey + 1,
-                }
-            }
-        default:
-            return state
+        }
+    default:
+        return state
     }
 }
 

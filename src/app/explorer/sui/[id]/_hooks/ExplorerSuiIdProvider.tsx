@@ -12,12 +12,7 @@ import {
     useExplorerSuiIdReducer,
 } from "./useExplorerSuiIdReducer"
 import { useParams } from "next/navigation"
-import { SuiClient } from "@mysten/sui.js/client"
-import {
-    SupportedChainName,
-    getBridgedChainInfos,
-    supportedChains,
-} from "@services"
+import { getBridgedChainInfos, getSuiClient } from "@services"
 
 export interface ExplorerSuiIdContextValue {
     reducer: [ExplorerSuiIdState, React.Dispatch<ExplorerSuiIdAction>]
@@ -29,6 +24,18 @@ export interface ExplorerSuiIdContextValue {
 export const ExplorerSuiIdContext =
     createContext<ExplorerSuiIdContextValue | null>(null)
 
+export interface SuiObjectContentFields {
+    decimals: number
+    name: string
+    description: string
+    icon_url: string
+    symbol: string
+}
+
+export interface SuiObjectContent {
+    fields: SuiObjectContentFields,
+    type: string
+}
 export const ExplorerSuiIdProvider = ({
     children,
 }: {
@@ -39,10 +46,9 @@ export const ExplorerSuiIdProvider = ({
 
     const params = useParams()
     const id = params.id as string
-
-    const suiClient = new SuiClient({
-        url: supportedChains[SupportedChainName.Sui].rpcUrl,
-    })
+    console.log(id)
+    
+    const suiClient = getSuiClient()
 
     useEffect(() => {
         const handleEffect = async () => {
@@ -56,15 +62,15 @@ export const ExplorerSuiIdProvider = ({
             const { content } = data
             if (!content) return
 
+            const { fields, type: tokenType } = content as unknown as SuiObjectContent
+
             const {
                 decimals,
                 name,
                 description,
                 icon_url: iconUrl,
                 symbol,
-            } = (content as any).fields
-
-            const { type: tokenType } = content as any
+            } = fields
 
             dispatch({
                 type: "SET_TOKEN_ALL",

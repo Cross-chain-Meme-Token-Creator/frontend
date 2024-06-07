@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React from "react"
 import {
     Modal,
     ModalContent,
@@ -8,25 +8,48 @@ import {
     useDisclosure,
     Tabs,
     Tab,
-    Image,
 } from "@nextui-org/react"
 import { Button } from "@nextui-org/button"
 import { SuiTab } from "./SuiTab"
-import { CeloTab } from "./CeloTab"
-import { BscTab } from "./BscTab"
+import { EvmTab } from "./EvmTab"
 import { AlgorandTab } from "./AlgorandTab"
-import { supportedChains, SupportedChainName } from "@services"
-// import { SolanaTab } from "./SolanaTab"
+import { SupportedPlatform } from "@services"
 
 export const ConnectWalletsModal = () => {
     const { isOpen, onOpen, onOpenChange } = useDisclosure()
+
+    interface Tab {
+        key: SupportedPlatform
+        title: string
+        content: JSX.Element
+    }
+
+    const tabs: Array<Tab> = [
+        {
+            key: "Evm",
+            title: "EVM",
+            content: <EvmTab />,
+        },
+        {
+            key: "Sui",
+            title: "Sui",
+            content: <SuiTab />,
+        },
+        {
+            key: "Algorand",
+            title: "Algorand",
+            content: <AlgorandTab />,
+        },
+    ]
 
     return (
         <>
             <Button color="primary" onPress={onOpen}>
                 Connect Wallets
             </Button>
-            <Modal isOpen={isOpen} size="xl" onOpenChange={onOpenChange}>
+            <Modal classNames={{
+            
+            }} isOpen={isOpen} size="xl" onOpenChange={onOpenChange} isDismissable={false}>
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -40,122 +63,14 @@ export const ConnectWalletsModal = () => {
                                         panel: "px-0",
                                         tabList: "px-0",
                                         tab: "px-4",
-                                        cursor: "w-full bg-primary",
+                                        cursor: "w-full bg-primary"
                                     }}
                                 >
-                                    <Tab
-                                        key={
-                                            supportedChains[
-                                                SupportedChainName.Sui
-                                            ].chainId
-                                        }
-                                        title={
-                                            <div className="flex items-center gap-2">
-                                                <Image
-                                                    src={
-                                                        supportedChains[
-                                                            SupportedChainName
-                                                                .Sui
-                                                        ].imageUrl
-                                                    }
-                                                    removeWrapper
-                                                    className="w-3.5"
-                                                />
-                                                {
-                                                    supportedChains[
-                                                        SupportedChainName.Sui
-                                                    ].name
-                                                }
-                                            </div>
-                                        }
-                                    >
-                                        <SuiTab />
-                                    </Tab>
-                                    <Tab
-                                        key={
-                                            supportedChains[
-                                                SupportedChainName.Celo
-                                            ].chainId
-                                        }
-                                        title={
-                                            <div className="flex items-center gap-2">
-                                                <Image
-                                                    src={
-                                                        supportedChains[
-                                                            SupportedChainName
-                                                                .Celo
-                                                        ].imageUrl
-                                                    }
-                                                    removeWrapper
-                                                    className="w-3.5"
-                                                />
-                                                {
-                                                    supportedChains[
-                                                        SupportedChainName.Celo
-                                                    ].name
-                                                }
-                                            </div>
-                                        }
-                                    >
-                                        <CeloTab />
-                                    </Tab>
-                                    <Tab
-                                        key={
-                                            supportedChains[
-                                                SupportedChainName.Bsc
-                                            ].chainId
-                                        }
-                                        title={
-                                            <div className="flex items-center gap-2">
-                                                <Image
-                                                    src={
-                                                        supportedChains[
-                                                            SupportedChainName
-                                                                .Bsc
-                                                        ].imageUrl
-                                                    }
-                                                    removeWrapper
-                                                    className="w-3.5"
-                                                />
-                                                {
-                                                    supportedChains[
-                                                        SupportedChainName.Bsc
-                                                    ].name
-                                                }
-                                            </div>
-                                        }
-                                    >
-                                        <BscTab />
-                                    </Tab>
-                                    <Tab
-                                        key={
-                                            supportedChains[
-                                                SupportedChainName.Algorand
-                                            ].chainId
-                                        }
-                                        title={
-                                            <div className="flex items-center gap-2">
-                                                <Image
-                                                    src={
-                                                        supportedChains[
-                                                            SupportedChainName
-                                                                .Algorand
-                                                        ].imageUrl
-                                                    }
-                                                    removeWrapper
-                                                    className="w-3.5"
-                                                />
-                                                {
-                                                    supportedChains[
-                                                        SupportedChainName
-                                                            .Algorand
-                                                    ].name
-                                                }
-                                            </div>
-                                        }
-                                    >
-                                        <AlgorandTab />
-                                    </Tab>
+                                    {tabs.map(({ key, title, content }) => (
+                                        <Tab key={key} title={title}>
+                                            {content}
+                                        </Tab>
+                                    ))}
                                 </Tabs>
                             </ModalBody>
                             <ModalFooter>
@@ -165,9 +80,6 @@ export const ConnectWalletsModal = () => {
                                     onPress={onClose}
                                 >
                                     Close
-                                </Button>
-                                <Button color="primary" onPress={onClose}>
-                                    Action
                                 </Button>
                             </ModalFooter>
                         </>

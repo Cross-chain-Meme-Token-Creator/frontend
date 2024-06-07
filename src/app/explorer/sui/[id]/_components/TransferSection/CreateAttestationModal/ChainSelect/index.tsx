@@ -2,7 +2,6 @@
 import React, { useContext } from "react"
 import { Select, SelectItem, Image } from "@nextui-org/react"
 import { SupportedChainName, supportedChains } from "@services"
-import { CheckIcon } from "@heroicons/react/24/outline"
 import { CreateAttestationModalContext } from "../CreateAttestationModalProvider"
 
 export const ChainSelect = () => {

@@ -9,6 +9,7 @@ import {
 } from "@nextui-org/react"
 import { ConnectWalletsModal } from "./ConnectWalletsModal"
 import { useRouter } from "next/navigation"
+import { NetworkSelect } from "./NetworkSelect"
 
 export const Navbar = () => {
     const { push } = useRouter()
@@ -37,6 +38,7 @@ export const Navbar = () => {
                 </NavbarItem>
             </NavbarContent>
             <NavbarContent justify="end">
+                <NetworkSelect/>
                 <NavbarItem>
                     <ConnectWalletsModal />
                 </NavbarItem>

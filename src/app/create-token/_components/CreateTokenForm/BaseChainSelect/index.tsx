@@ -1,9 +1,8 @@
 "use client"
 import React, { useContext } from "react"
-import { Select, SelectItem, Image, CheckboxIcon } from "@nextui-org/react"
+import { Select, SelectItem, Image } from "@nextui-org/react"
 import { SupportedChainName, supportedChains } from "@services"
 import { CreateTokenContext } from "../../../_hooks"
-import { CheckIcon } from "@heroicons/react/24/outline"
 
 export const BaseChainSelect = () => {
     const { reducer } = useContext(CreateTokenContext)!
@@ -36,11 +35,6 @@ export const BaseChainSelect = () => {
                                 className="w-3.5 h-3.5"
                                 src={imageUrl}
                             />
-                        }
-                        endContent={
-                            chainName === selectedChainName ? (
-                                <CheckIcon className="w-3.5 h-3.5" />
-                            ) : null
                         }
                         key={chainName}
                     >

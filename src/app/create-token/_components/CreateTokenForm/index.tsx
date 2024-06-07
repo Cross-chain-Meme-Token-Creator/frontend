@@ -6,6 +6,7 @@ import {
     CardHeader,
     Input,
     Link,
+    Spinner,
     Textarea,
 } from "@nextui-org/react"
 import { Button } from "@nextui-org/button"
@@ -17,11 +18,11 @@ import {
     CreateTokenFormProvider,
 } from "./CreateTokenFormProvider"
 import { BaseChainSelect } from "./BaseChainSelect"
-import { baseAxios } from "@services"
 
 const WrappedCreateTokenForm = () => {
-    const { formik } = useContext(CreateTokenFormContext)!
-    
+    const { formik, swrs } = useContext(CreateTokenFormContext)!
+    const { iconUrlSwr } = swrs
+
     console.log(formik.values)
 
     return (
@@ -39,6 +40,8 @@ const WrappedCreateTokenForm = () => {
                     placeholder="USD Tether"
                     labelPlacement="outside"
                     label="Name"
+                    isInvalid={!!(formik.touched.name && formik.errors.name)}
+                    errorMessage={formik.touched.name && formik.errors.name}
                 />
                 <Input
                     id="symbol"
@@ -49,6 +52,8 @@ const WrappedCreateTokenForm = () => {
                     placeholder="USDT"
                     labelPlacement="outside"
                     label="Symbol"
+                    isInvalid={!!(formik.touched.symbol && formik.errors.symbol)}
+                    errorMessage={formik.touched.symbol && formik.errors.symbol}
                 />
                 <Input
                     id="decimals"
@@ -59,6 +64,8 @@ const WrappedCreateTokenForm = () => {
                     placeholder="6"
                     labelPlacement="outside"
                     label="Decimals"
+                    isInvalid={!!(formik.touched.decimals && formik.errors.decimals)}
+                    errorMessage={formik.touched.decimals && formik.errors.decimals}
                 />
                 <Textarea
                     id="description"
@@ -68,6 +75,8 @@ const WrappedCreateTokenForm = () => {
                     placeholder=""
                     labelPlacement="outside"
                     label="Description"
+                    isInvalid={!!(formik.touched.description && formik.errors.description)}
+                    errorMessage={formik.touched.description && formik.errors.description}
                 />
                 <div className="grid gap-2">
                     <div className="text-sm">Icon Url</div>
@@ -78,13 +87,9 @@ const WrappedCreateTokenForm = () => {
                         onDrop={async (acceptedFiles: Array<File>) => {
                             const file = acceptedFiles.at(0)
                             if (!file) return
-                            const formData = new FormData()
-                            formData.append("file", file)
-                            const { data } = await baseAxios.post<string>(
-                                "/api",
-                                formData
-                            )
-                            formik.setFieldValue("iconUrl", data)
+                            console.log(file)
+                            formik.setFieldValue("iconFile", file)
+                            iconUrlSwr.mutate()
                         }}
                     >
                         {({ getRootProps, getInputProps }) => (
@@ -108,14 +113,28 @@ const WrappedCreateTokenForm = () => {
                         )}
                     </Dropzone>
                     {formik.values.iconUrl ? (
-                        <Link
-                            showAnchorIcon
-                            isExternal
-                            href={formik.values.iconUrl}
-                            size="sm"
-                        >
-                            View
-                        </Link>
+                        !iconUrlSwr.isValidating ? (
+                            <Link
+                                showAnchorIcon
+                                isExternal
+                                href={formik.values.iconUrl}
+                                size="sm"
+                            >
+                                View
+                            </Link>
+                        ) : (
+                            <Spinner
+                                className="flex flex-row w-fit"
+                                classNames={{
+                                    wrapper: "w-3.5 h-3.5",
+                                    circle1: "w-3.5 h-3.5",
+                                    circle2: "w-3.5 h-3.5",
+                                    label: "text-sm",
+                                }}
+                            >
+                                Loading
+                            </Spinner>
+                        )
                     ) : null}
                 </div>
                 <Input
@@ -127,6 +146,8 @@ const WrappedCreateTokenForm = () => {
                     placeholder="10000000000"
                     labelPlacement="outside"
                     label="Total Supply"
+                    isInvalid={!!(formik.touched.totalSupply && formik.errors.totalSupply)}
+                    errorMessage={formik.touched.totalSupply && formik.errors.totalSupply}
                 />
                 <BaseChainSelect />
             </CardBody>

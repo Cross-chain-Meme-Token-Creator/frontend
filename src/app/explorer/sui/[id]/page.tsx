@@ -1,8 +1,7 @@
 "use client"
 import React from "react"
-import { TransferSection, DisplayTokenInfo } from "./_components"
 import { Spacer } from "@nextui-org/react"
-import { BridgedChainsTable } from "./_components"
+import { BridgedChainsTable, DisplayTokenInfo, TransferSection } from "./_components"
 
 const Page = () => {
     return (
@@ -10,10 +9,10 @@ const Page = () => {
             <DisplayTokenInfo />
             <Spacer y={12} />
             <TransferSection />
-            <Spacer y={12} />
+            <Spacer y={12} /> 
             <BridgedChainsTable />
         </div>
     )
-}
+} 
 
 export default Page

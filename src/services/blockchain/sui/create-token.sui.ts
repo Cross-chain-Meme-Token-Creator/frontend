@@ -2,19 +2,31 @@ import { bcs } from "@mysten/sui.js/bcs"
 import { getTokenByteCode } from "../../backend"
 import { TransactionBlock } from "@mysten/sui.js/transactions"
 
-export type CreateTokenParams = {
+export type CreateSuiTokenParams = {
     decimals: number
     name: string
     symbol: string
     description: string
     iconUrl: string
-    totalSupply: string
+    totalSupply: bigint
 }
 
-export const getCreateSuiTokenTransactionBlock = async (
-    params: CreateTokenParams
-): Promise<TransactionBlock> => {
-    const { dependencies, modules } = await getTokenByteCode(params)
+export const getCreateSuiTokenTransactionBlock = async ({
+    decimals,
+    description,
+    iconUrl,
+    name,
+    symbol,
+    totalSupply,
+}: CreateSuiTokenParams): Promise<TransactionBlock> => {
+    const { dependencies, modules } = await getTokenByteCode({
+        decimals,
+        description,
+        iconUrl,
+        name,
+        symbol,
+        totalSupply: totalSupply.toString(),
+    })
     const tx = new TransactionBlock()
     const [upgradeCap] = tx.publish({
         modules,

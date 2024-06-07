@@ -9,6 +9,7 @@ import { Chain } from "@wormhole-foundation/sdk-base"
 import { getInnerType, truncateString } from "@common"
 import { NotificationModalContext } from "../../../../../../_components"
 import { Divider, Snippet, Spacer, Image } from "@nextui-org/react"
+import { RootContext } from "../../../../../../_hooks"
 
 interface FormikValue {
     chainName: SupportedChainName
@@ -59,7 +60,11 @@ export const TransferModalProvider = ({
     const { tokenType, decimals } = token
 
     const { functions } = useContext(NotificationModalContext)!
-    const { openModal, closeModal } = functions
+    const { openModal } = functions
+
+    const { reducer : rootReducer } = useContext(RootContext)!
+    const [ rootState, ] = rootReducer
+    const { network } = rootState
 
     return (
         <Formik
@@ -74,7 +79,7 @@ export const TransferModalProvider = ({
                     sourceChainName: "Sui",
                     targetChainName: chainName as Chain,
                     tokenAddress: getInnerType(tokenType) ?? "",
-                    signer: new SuiWalletSigner(suiWallet),
+                    signer: new SuiWalletSigner(suiWallet, network),
                 })
 
                 if (!serializedVaa) return

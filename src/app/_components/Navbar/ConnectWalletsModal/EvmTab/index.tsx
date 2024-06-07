@@ -2,59 +2,52 @@ import {
     Spacer,
     Image,
     Link,
+    Card,
     CardBody,
     CardFooter,
-    Card,
 } from "@nextui-org/react"
-import React, { useContext } from "react"
+import React from "react"
 import { truncateString } from "@common"
-import {
-    AlgorandSelectedSigner,
-    AlgorandSignerContext,
-    useAlgorandSigner,
-} from "../../../../_hooks"
+import { EvmSelectedSigner, useEvmSigner } from "../../../../_hooks"
 import { publicConfig } from "@config"
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline"
 
-export const AlgorandTab = () => {
-    const { reducer } = useContext(AlgorandSignerContext)!
-    const { connectPera, disconnectPera, address } = useAlgorandSigner()
-
-    const [state] = reducer
-    const { selectedSigner } = state
+export const EvmTab = () => {
+    const { selectedSigner, address, connectMetaMask, disconnectMetaMask } =
+        useEvmSigner()
 
     const renderWallet = () => {
-        if (!selectedSigner) return null
-        const peraToWallet: Record<AlgorandSelectedSigner, JSX.Element> = {
-            pera: (
+        if (!selectedSigner) return
+        const evmToWallet: Record<EvmSelectedSigner, JSX.Element> = {
+            metaMask: (
                 <div className="flex items-center gap-2">
                     <Image
                         removeWrapper
-                        src={publicConfig.icons.pera}
-                        radius="full"
+                        src={publicConfig.icons.metamask}
+                        radius="none"
                         className="w-3.5 h-3.5"
                     />
-                    <div className="text-sm">Pera</div>
+                    <div className="text-sm">Metamask</div>
                 </div>
             ),
         }
-        return peraToWallet[selectedSigner]
+        return evmToWallet[selectedSigner]
     }
 
     return (
         <div>
             <div className="gap-4 flex">
                 <div className="grid gap-1 place-items-center w-fit">
-                    <Card isPressable onPress={() => connectPera()}>
+                    <Card isPressable onPress={connectMetaMask}>
                         <CardBody className="p-4 items-center">
                             <Image
-                                radius="full"
-                                src={publicConfig.icons.pera}
+                                radius="none"
+                                src={publicConfig.icons.metamask}
                                 className="w-12 h-12"
                             />
                         </CardBody>
                         <CardFooter className="p-4 pt-0 text-sm justify-center">
-                            Pera
+                            Metamask
                         </CardFooter>
                     </Card>
                 </div>
@@ -68,7 +61,7 @@ export const AlgorandTab = () => {
                     <Link
                         className="text-sm"
                         as="button"
-                        onPress={() => disconnectPera()}
+                        onPress={disconnectMetaMask}
                     >
                         Disconnect
                     </Link>

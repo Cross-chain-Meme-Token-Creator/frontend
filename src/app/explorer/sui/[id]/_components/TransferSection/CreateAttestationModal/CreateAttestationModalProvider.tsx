@@ -4,14 +4,13 @@ import {
     SuiWalletSigner,
     SupportedChainName,
     createAttestation,
-    getSigner,
 } from "@services"
 import { useWallet } from "@suiet/wallet-kit"
 import { ExplorerSuiIdContext } from "../../../_hooks"
-import {  useSDK } from "@metamask/sdk-react-ui"
 import { createWrapped } from "@services"
 import { getInnerType } from "@common"
 import { Chain } from "@wormhole-foundation/sdk"
+import { RootContext, useGenericSigner } from "../../../../../../_hooks"
 interface FormikValue {
     chainName: SupportedChainName
 }
@@ -59,10 +58,12 @@ export const CreateAttestationModalProvider = ({
     const { token } = state
     const { tokenType } = token
 
-    const metamaskWallet = useSDK()
+    const { getGenericSigner } = useGenericSigner()
 
-    console.log(tokenType)
-    
+    const { reducer : rootReducer } = useContext(RootContext)!
+    const [ rootState, ] = rootReducer
+    const { network } = rootState
+
     return (
         <Formik
             initialValues={initialValues}
@@ -73,15 +74,13 @@ export const CreateAttestationModalProvider = ({
                 const vaa = await createAttestation<"Sui">({
                     chainName: "Sui",
                     tokenAddress: getInnerType(tokenType) ?? "",
-                    signer: new SuiWalletSigner(suiWallet)
+                    signer: new SuiWalletSigner(suiWallet, network)
                 })
 
                 if (!vaa) return
                 
-                const signer = getSigner(chainName as Chain, {
-                    metamaskWallet,
-                    suiWallet
-                }) 
+                const signer = getGenericSigner(chainName)
+
                 if (!signer) return
 
                 const txId = await createWrapped({

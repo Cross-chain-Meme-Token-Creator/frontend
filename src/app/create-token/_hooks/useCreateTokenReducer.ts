@@ -23,10 +23,10 @@ export const reducer = (
     action: CreateTokenAction
 ): CreateTokenState => {
     switch (action.type) {
-        case "SET_SELECTED_CHAIN_ID":
-            return { ...state, selectedChainName: action.payload }
-        default:
-            return state
+    case "SET_SELECTED_CHAIN_ID":
+        return { ...state, selectedChainName: action.payload }
+    default:
+        return state
     }
 }
 

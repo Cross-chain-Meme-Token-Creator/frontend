@@ -1,7 +1,9 @@
 
 import { useReducer } from "react"
+import { SupportedNetwork } from "@common"
 
-export type Network = "testnet" | "mainnet" 
+export type EvmSelectedSigner = "metaMask"
+export type AlgorandSelectedSigner = "pera"
 
 export interface RootState {
     wallets: {
@@ -12,28 +14,44 @@ export interface RootState {
             address?: string
         }
     },
-    network: Network
+    selectedSigner: {
+        evm?: EvmSelectedSigner,
+        algorand?: AlgorandSelectedSigner
+    },
+    network: SupportedNetwork
 }
 
 export interface SetPeraWalletAddressAction {
     type: "SET_PERA_WALLET_ADDRESS"
-    payload: string | undefined
+    payload?: string
 }
 
 export interface SetPhantomWalletAddressAction {
     type: "SET_PHANTOM_WALLET_ADDRESS"
-    payload: string | undefined
+    payload?: string
 }
 
 export interface SetNetworkAction {
     type: "SET_NETWORK_ACTION"
-    payload: Network
+    payload: SupportedNetwork
+}
+
+export interface SetAlgorandSelectedSignerAction {
+    type: "SET_ALGORAND_SELECTED_SIGNER"
+    payload?: AlgorandSelectedSigner
+}
+
+export interface SetEvmSelectedSignerAction {
+    type: "SET_EVM_SELECTED_SIGNER"
+    payload?: EvmSelectedSigner
 }
 
 export type RootAction =
     | SetPeraWalletAddressAction
     | SetPhantomWalletAddressAction
     | SetNetworkAction
+    | SetAlgorandSelectedSignerAction
+    | SetEvmSelectedSignerAction
 
 export const initialState: RootState = {
     wallets: {
@@ -44,7 +62,8 @@ export const initialState: RootState = {
             address: undefined
         }
     },
-    network: "testnet"
+    selectedSigner: {},
+    network: "Testnet"
 }
 
 export const reducer = (
@@ -52,29 +71,41 @@ export const reducer = (
     action: RootAction
 ): RootState => {
     switch (action.type) {
-        case "SET_PERA_WALLET_ADDRESS":
-            return {
-                ...state, wallets: {
-                    ...state.wallets, peraWallet: {
-                        address: action.payload
-                    }
+    case "SET_PERA_WALLET_ADDRESS":
+        return {
+            ...state, wallets: {
+                ...state.wallets, peraWallet: {
+                    address: action.payload
                 }
             }
-        case "SET_PHANTOM_WALLET_ADDRESS":
-            return {
-                ...state, wallets: {
-                    ...state.wallets, phantomWallet: {
-                        address: action.payload
-                    }
+        }
+    case "SET_PHANTOM_WALLET_ADDRESS":
+        return {
+            ...state, wallets: {
+                ...state.wallets, phantomWallet: {
+                    address: action.payload
                 }
             }
-        case "SET_NETWORK_ACTION": 
-            return {
-                ...state,
-                network: action.payload
+        }
+    case "SET_NETWORK_ACTION":
+        return {
+            ...state,
+            network: action.payload
+        }
+    case "SET_ALGORAND_SELECTED_SIGNER":
+        return {
+            ...state, selectedSigner: {
+                ...state.selectedSigner, algorand: action.payload
             }
-        default:
-            return state
+        }
+    case "SET_EVM_SELECTED_SIGNER":
+        return {
+            ...state, selectedSigner: {
+                ...state.selectedSigner, evm: action.payload
+            }
+        }
+    default:
+        return state
     }
 }
 

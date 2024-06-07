@@ -1,6 +1,6 @@
 "use client"
 import React, { useContext } from "react"
-import { Select, SelectItem, Image, CheckboxIcon } from "@nextui-org/react"
+import { Select, SelectItem, Image } from "@nextui-org/react"
 import { SupportedChainName, supportedChains } from "@services"
 import { RedeemModalContext } from "../RedeemModalProvider"
 

@@ -1,25 +1,41 @@
 import type {
     Network,
-    SignOnlySigner,
     SignedTx,
-    Signer,
     UnsignedTransaction,
 } from "@wormhole-foundation/sdk-connect"
 import { PeraWalletConnect } from "@perawallet/connect"
-import { AlgorandChains, AlgorandUnsignedTransaction } from "@wormhole-foundation/sdk-algorand"
-import { TxHash } from "@wormhole-foundation/sdk-definitions"
-import { Algodv2 } from "algosdk"
+import {
+    AlgorandChains,
+    AlgorandUnsignedTransaction,
+} from "@wormhole-foundation/sdk-algorand"
+import { SignAndSendSigner, TxHash } from "@wormhole-foundation/sdk-definitions"
+import { Algodv2, waitForConfirmation } from "algosdk"
+import { getAlgodClient } from "../../algorand"
 
-export class AlgorandSigner<N extends Network, C extends AlgorandChains>
-    implements SignOnlySigner<N, C>
+export class PeraWalletSigner<N extends Network, C extends AlgorandChains>
+implements SignAndSendSigner<N, C>
 {
-    private algod : Algodv2
+    private _algodClient: Algodv2
 
     constructor(
         private _peraWallet: PeraWalletConnect,
         private _algorandAddress: string,
+        private _network: N,
         private _debug: boolean = false
     ) {
+        switch (this._network) {
+        case "Testnet": {
+            this._algodClient = getAlgodClient("Testnet")
+            return
+        }
+        case "Mainnet": {
+            this._algodClient = getAlgodClient("Mainnet")
+            return
+        }
+        default: {
+            throw new Error("Devnet is not supported")
+        }
+        }
     }
 
     chain(): C {
@@ -30,21 +46,34 @@ export class AlgorandSigner<N extends Network, C extends AlgorandChains>
         return this._algorandAddress
     }
 
-    async sign(txns: UnsignedTransaction[]): Promise<SignedTx[]> {
-        const txids: TxHash[] = [];
+    async signAndSend(txns: UnsignedTransaction[]): Promise<SignedTx[]> {
+        if (!this._peraWallet.isConnected)
+            throw new Error("Pera Wallet is not connected")
+
+        const txids: TxHash[] = []
         for (const txn of txns) {
-            const { description, transaction } = txn as AlgorandUnsignedTransaction<N, C>;
-            if (this._debug) console.log(`Signing ${description} for ${this.address()}`);
-            
+            const { description, transaction } =
+                txn as AlgorandUnsignedTransaction<N, C>
+            if (this._debug)
+                console.log(`Signing ${description} for ${this.address()}`)
+
             const { tx } = transaction
-            const signedTxGroups = await this._peraWallet.signTransaction([[
-                {
-                    txn: tx,
-                    signers: [ this.address() ]
-                }
-            ]])
-            const {txId} = await sendRawTransaction(signedTxnGroup).do();
+            const signedTxns = await this._peraWallet.signTransaction([
+                [
+                    {
+                        txn: tx,
+                        signers: [this.address()],
+                    },
+                ],
+            ])
+            const { txId } = await this._algodClient
+                .sendRawTransaction(signedTxns)
+                .do()
+            await waitForConfirmation(this._algodClient, txId, 3)
+
+            txids.push(txId)
         }
-        
+
+        return txids
     }
 }

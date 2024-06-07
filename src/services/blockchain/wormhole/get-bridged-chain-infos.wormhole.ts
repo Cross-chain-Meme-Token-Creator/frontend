@@ -1,4 +1,4 @@
-import { Chain, chainToPlatform } from "@wormhole-foundation/sdk-base"
+import { Chain } from "@wormhole-foundation/sdk-base"
 import { getWormhole } from "./base.wormhole"
 import { NativeAddress, toNative, toUniversal } from "@wormhole-foundation/sdk-definitions"
 import { supportedChains } from "./constants.wormhole"
@@ -23,7 +23,6 @@ export const getBridgedChainInfos = async <ChainName extends Chain>({
     const allSupportedChainNamesExceptMainChain: Array<Chain> = (
         Object.keys(supportedChains) as Array<Chain>
     ).filter((chain) => chain !== mainChainName)
-    console.log(allSupportedChainNamesExceptMainChain)
 
     const promises: Array<Promise<void>> = []
     for (const chainName of allSupportedChainNamesExceptMainChain) {
@@ -33,26 +32,20 @@ export const getBridgedChainInfos = async <ChainName extends Chain>({
                     const chain = wormhole.getChain(chainName)
                     const tokenBridge = await chain.getTokenBridge()
 
-                    const { address : wrappedAddress } = await tokenBridge.getWrappedAsset({
+                    const { address: wrappedAddress } = await tokenBridge.getWrappedAsset({
                         chain: mainChainName,
                         address: toUniversal(chainName, tokenAddress),
                     })
 
-                    switch (chainToPlatform(chainName)) {
-                        case "Evm":
-                        default: {
-                            const bridgedChain: BridgedChainInfo<typeof chainName> = {
-                                chainName,
-                                chainAddress: toNative(chainName, wrappedAddress as string)
-                            }
-
-                            bridgedChains.push(bridgedChain)
-                        }
+                    const bridgedChain: BridgedChainInfo<typeof chainName> = {
+                        chainName,
+                        chainAddress: toNative(chainName, wrappedAddress as string)
                     }
+                    bridgedChains.push(bridgedChain)
                 } catch (ex) {
                     // do nothing
                 }
-            })()
+            }) ()
         )
     }
     await Promise.all(promises)

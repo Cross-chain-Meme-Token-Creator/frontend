@@ -1,25 +1,25 @@
-import { Contract, EthExecutionAPI, SupportedProviders, Web3 } from "web3";
-import { abi } from "./abi.erc20";
+import { Contract, EthExecutionAPI, SupportedProviders, Web3 } from "web3"
+import { abi } from "./abi.erc20"
 
-export class Erc20Contract {
+export class ERC20Contract {
     private contract: Contract<typeof abi>
 
     constructor(
-        _provider: SupportedProviders<EthExecutionAPI>,
-        _contractAddress: string
+        _contractAddress: string,
+        _provider: SupportedProviders<EthExecutionAPI>,  
     ) {
 
         const web3Object = new Web3(_provider)
         this.contract = new Contract(abi, _contractAddress, web3Object)
     }
 
-    balanceOf = {
-        call: async (address: string) => {
+    balanceOf = (address: string) => ({
+        call: async () => {
             return await this.contract.methods.balanceOf(address).call<bigint>()
         }
-    }
+    })
 
-    decimals = {
+    decimals = () => ({
         call: async () => Number(await this.contract.methods.decimals().call())
-    }
+    })
 }

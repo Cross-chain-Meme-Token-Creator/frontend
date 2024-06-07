@@ -8,14 +8,14 @@ import {
 import { EvmChains, EvmUnsignedTransaction } from "@wormhole-foundation/sdk-evm"
 import { ethers } from "ethers"
 
-export class MetaMaskWalletSigner<N extends Network, C extends EvmChains>
-    implements SignAndSendSigner<N, C>
-{
+export class MetamaskWalletSigner<N extends Network, C extends EvmChains>
+implements SignAndSendSigner<N, C> {
     constructor(
         private _chain: C,
         private _metamaskWallet: SDKState,
+        private _network: N,
         private _debug?: boolean
-    ) {}
+    ) { }
 
     chain(): C {
         return this._chain

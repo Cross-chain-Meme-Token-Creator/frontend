@@ -19,7 +19,7 @@ export const BridgedChainsTable = () => {
     const [state] = reducer
     const { bridgedChainInfos } = state
 
-    const loadingState = !bridgedChainInfos ? "loading" : "idle";
+    const loadingState = !bridgedChainInfos ? "loading" : "idle"
 
     return (
         <Table removeWrapper aria-label="Example static collection table">
@@ -59,7 +59,7 @@ export const BridgedChainsTable = () => {
                         </TableCell>
                     </TableRow>
                 )
-            }
+                }
             </TableBody>
         </Table>
     )

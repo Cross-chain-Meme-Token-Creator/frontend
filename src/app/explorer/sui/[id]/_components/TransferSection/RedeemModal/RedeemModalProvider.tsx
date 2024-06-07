@@ -1,18 +1,16 @@
 import { Form, Formik, FormikProps } from "formik"
 import React, { ReactNode, createContext, useContext, useMemo } from "react"
-import { useWallet } from "@suiet/wallet-kit"
 import { ExplorerSuiIdContext } from "../../../_hooks"
-import { useSDK } from "@metamask/sdk-react-ui"
 
 import {
     SupportedChainName,
-    getSigner,
     redeem,
 } from "@services"
 
 import { Chain } from "@wormhole-foundation/sdk-base"
 import { useDisclosure } from "@nextui-org/react"
 import { DisclosureType } from "@common"
+import { useGenericSigner } from "../../../../../../_hooks"
 
 interface FormikValue {
     chainName: SupportedChainName
@@ -60,17 +58,16 @@ const renderBody = (
 }
 
 export const RedeemModalProvider = ({ children }: { children: ReactNode }) => {
-    const suiWallet = useWallet()
-    const metamaskWallet = useSDK()
-
     const { reducer, functions } = useContext(ExplorerSuiIdContext)!
     const { triggerFetchBalance } = functions
-    const [state, dispatch] = reducer
+    const [state ] = reducer
     const { token } = state
     const { tokenType, decimals } = token
 
     const baseDiscloresure = useDisclosure()
     const { onClose } = baseDiscloresure
+
+    const { getGenericSigner } = useGenericSigner()
 
     return (
         <Formik
@@ -79,10 +76,7 @@ export const RedeemModalProvider = ({ children }: { children: ReactNode }) => {
             onSubmit={async ({ chainName, passphrase }) => {
                 if (!tokenType || !decimals) return
 
-                const signer = getSigner(chainName as Chain, {
-                    metamaskWallet,
-                    suiWallet,
-                })
+                const signer = getGenericSigner(chainName as Chain)
                 console.log(passphrase)
 
                 if (!signer) return
