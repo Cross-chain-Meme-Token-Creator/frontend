@@ -1,22 +1,8 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
 import { WalletContextState } from "@suiet/wallet-kit";
-import { Network, PlatformToChains, SignAndSendSigner, TxHash } from "@wormhole-foundation/sdk";
-import { UnsignedTransaction, } from "@wormhole-foundation/sdk"
+import { Network, PlatformToChains, SignAndSendSigner, TxHash, UnsignedTransaction } from "@wormhole-foundation/sdk";
+import { SuiChains, SuiUnsignedTransaction } from "@wormhole-foundation/sdk-sui";
 
-export const _platform: "Sui" = "Sui";
-export type SuiPlatformType = typeof _platform;
-export type SuiChains = PlatformToChains<SuiPlatformType>;
-
-export class SuiUnsignedTransaction<N extends Network, C extends SuiChains>
-    implements UnsignedTransaction<N, C> {
-    constructor(
-        readonly transaction: TransactionBlock,
-        readonly network: N,
-        readonly chain: C,
-        readonly description: string,
-        readonly parallelizable: boolean = false,
-    ) { }
-}
 
 export class SuiWalletSigner<N extends Network, C extends SuiChains> implements SignAndSendSigner<N, C> {
     constructor(

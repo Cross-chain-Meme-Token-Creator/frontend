@@ -1,6 +1,8 @@
 
 import { useReducer } from "react"
 
+export type Network = "testnet" | "mainnet" 
+
 export interface RootState {
     wallets: {
         peraWallet: {
@@ -9,7 +11,8 @@ export interface RootState {
         phantomWallet: {
             address?: string
         }
-    }
+    },
+    network: Network
 }
 
 export interface SetPeraWalletAddressAction {
@@ -22,9 +25,15 @@ export interface SetPhantomWalletAddressAction {
     payload: string | undefined
 }
 
+export interface SetNetworkAction {
+    type: "SET_NETWORK_ACTION"
+    payload: Network
+}
+
 export type RootAction =
     | SetPeraWalletAddressAction
     | SetPhantomWalletAddressAction
+    | SetNetworkAction
 
 export const initialState: RootState = {
     wallets: {
@@ -34,7 +43,8 @@ export const initialState: RootState = {
         phantomWallet: {
             address: undefined
         }
-    }
+    },
+    network: "testnet"
 }
 
 export const reducer = (
@@ -57,6 +67,11 @@ export const reducer = (
                         address: action.payload
                     }
                 }
+            }
+        case "SET_NETWORK_ACTION": 
+            return {
+                ...state,
+                network: action.payload
             }
         default:
             return state
