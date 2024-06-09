@@ -10,7 +10,7 @@ import {
 import { Chain } from "@wormhole-foundation/sdk-base"
 import { useDisclosure } from "@nextui-org/react"
 import { DisclosureType } from "@common"
-import { useGenericSigner } from "../../../../../../_hooks"
+import { useGenericSigner } from "../../../../_hooks"
 
 interface FormikValue {
     chainName: SupportedChainName

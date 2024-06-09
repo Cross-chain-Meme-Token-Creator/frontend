@@ -3,7 +3,7 @@ import { Chain, chainToPlatform } from "@wormhole-foundation/sdk-base"
 import { ERC20Contract, SupportedEvmChains, httpProvider } from "@services"
 import React, { useContext, useEffect, useState } from "react"
 import { ExplorerSuiIdContext } from "../../../_hooks"
-import { RootContext, useEvmSigner } from "../../../../../../_hooks"
+import { RootContext, useEvmSigner } from "../../../../_hooks"
 
 interface BalanceInfoProps {
     chainName: Chain

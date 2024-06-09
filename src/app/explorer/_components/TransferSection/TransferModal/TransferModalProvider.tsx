@@ -7,9 +7,9 @@ import QRCode from "qrcode"
 import { SuiWalletSigner, SupportedChainName, transfer } from "@services"
 import { Chain } from "@wormhole-foundation/sdk-base"
 import { getInnerType, truncateString } from "@common"
-import { NotificationModalContext } from "../../../../../../_components"
+import { NotificationModalContext } from "../../../../_components"
 import { Divider, Snippet, Spacer, Image } from "@nextui-org/react"
-import { RootContext } from "../../../../../../_hooks"
+import { RootContext } from "../../../../_hooks"
 
 interface FormikValue {
     chainName: SupportedChainName

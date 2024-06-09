@@ -6,48 +6,37 @@ import React, {
     useEffect,
     useMemo,
 } from "react"
-import {
-    ExplorerSuiIdAction,
-    ExplorerSuiIdState,
-    useExplorerSuiIdReducer,
-} from "./useExplorerSuiIdReducer"
-import { useParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { getBridgedChainInfos, getSuiClient } from "@services"
+import { Chain, isChain } from "@wormhole-foundation/sdk-base"
+import { ExplorerAction, ExplorerState, useExplorerReducer } from "./useExplorerReducer"
 
-export interface ExplorerSuiIdContextValue {
-    reducer: [ExplorerSuiIdState, React.Dispatch<ExplorerSuiIdAction>]
-    functions: {
-        triggerFetchBalance: () => void
-    }
+export interface ExplorerContextValue {
+    reducer: [ExplorerState, React.Dispatch<ExplorerAction>]
 }
 
-export const ExplorerSuiIdContext =
-    createContext<ExplorerSuiIdContextValue | null>(null)
+export const ExplorerContext =
+    createContext<ExplorerContextValue | null>(null)
 
-export interface SuiObjectContentFields {
-    decimals: number
-    name: string
-    description: string
-    icon_url: string
-    symbol: string
-}
-
-export interface SuiObjectContent {
-    fields: SuiObjectContentFields,
-    type: string
-}
-export const ExplorerSuiIdProvider = ({
+export const ExplorerProvider = ({
     children,
 }: {
     children: ReactNode
 }) => {
-    const reducer = useExplorerSuiIdReducer()
+    const reducer = useExplorerReducer()
     const [, dispatch] = reducer
 
-    const params = useParams()
-    const id = params.id as string
-    console.log(id)
-    
+    useEffect(() => {
+        
+    }, [])
+
+    const searchParams = useSearchParams()
+
+    const contractAddress = searchParams.get("contractAddress")
+
+    let chainName = (searchParams.get("chainName") as Chain) ?? "Sui"
+    if (!isChain(chainName)) chainName = "Sui"
+
     const suiClient = getSuiClient()
 
     useEffect(() => {
@@ -62,7 +51,8 @@ export const ExplorerSuiIdProvider = ({
             const { content } = data
             if (!content) return
 
-            const { fields, type: tokenType } = content as unknown as SuiObjectContent
+            const { fields, type: tokenType } =
+                content as unknown as SuiObjectContent
 
             const {
                 decimals,

@@ -10,7 +10,7 @@ import { ExplorerSuiIdContext } from "../../../_hooks"
 import { createWrapped } from "@services"
 import { getInnerType } from "@common"
 import { Chain } from "@wormhole-foundation/sdk"
-import { RootContext, useGenericSigner } from "../../../../../../_hooks"
+import { RootContext, useGenericSigner } from "../../../../_hooks"
 interface FormikValue {
     chainName: SupportedChainName
 }
