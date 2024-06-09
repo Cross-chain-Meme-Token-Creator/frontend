@@ -26,17 +26,17 @@ export const ConnectWalletsModal = () => {
 
     const tabs: Array<Tab> = [
         {
-            key: "Evm",
+            key: SupportedPlatform.Evm,
             title: "EVM",
             content: <EvmTab />,
         },
         {
-            key: "Sui",
+            key: SupportedPlatform.Sui,
             title: "Sui",
             content: <SuiTab />,
         },
         {
-            key: "Algorand",
+            key: SupportedPlatform.Algorand,
             title: "Algorand",
             content: <AlgorandTab />,
         },

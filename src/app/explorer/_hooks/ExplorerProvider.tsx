@@ -2,121 +2,77 @@
 import React, {
     ReactNode,
     createContext,
-    useCallback,
     useEffect,
     useMemo,
 } from "react"
 import { useSearchParams } from "next/navigation"
-import { getBridgedChainInfos, getSuiClient } from "@services"
+import {
+    SupportedChainName,
+    defaultSupportedChainName,
+    tryMapChainNameToSupportedChainName,
+} from "@services"
 import { Chain, isChain } from "@wormhole-foundation/sdk-base"
-import { ExplorerAction, ExplorerState, useExplorerReducer } from "./useExplorerReducer"
+import {
+    ExplorerAction,
+    ExplorerState,
+    useExplorerReducer,
+} from "./useExplorerReducer"
 
 export interface ExplorerContextValue {
+    searchParams: {
+        contractAddress: string
+        chainName: SupportedChainName
+    }
     reducer: [ExplorerState, React.Dispatch<ExplorerAction>]
 }
 
-export const ExplorerContext =
-    createContext<ExplorerContextValue | null>(null)
+export const ExplorerContext = createContext<ExplorerContextValue | null>(null)
 
-export const ExplorerProvider = ({
-    children,
-}: {
-    children: ReactNode
-}) => {
+export const ExplorerProvider = ({ children }: { children: ReactNode }) => {
     const reducer = useExplorerReducer()
     const [, dispatch] = reducer
 
-    useEffect(() => {
-        
-    }, [])
-
     const searchParams = useSearchParams()
 
-    const contractAddress = searchParams.get("contractAddress")
+    const contractAddress = searchParams.get("contractAddress") ?? ""
 
-    let chainName = (searchParams.get("chainName") as Chain) ?? "Sui"
-    if (!isChain(chainName)) chainName = "Sui"
-
-    const suiClient = getSuiClient()
+    let _chainName =
+        (searchParams.get("chainName") as Chain) ?? defaultSupportedChainName
+    if (!isChain(_chainName)) _chainName = defaultSupportedChainName
+    const chainName = tryMapChainNameToSupportedChainName(_chainName)
 
     useEffect(() => {
-        const handleEffect = async () => {
-            const { data } = await suiClient.getObject({
-                id,
-                options: {
-                    showContent: true,
-                },
-            })
-            if (!data) return
-            const { content } = data
-            if (!content) return
-
-            const { fields, type: tokenType } =
-                content as unknown as SuiObjectContent
-
-            const {
-                decimals,
-                name,
-                description,
-                icon_url: iconUrl,
-                symbol,
-            } = fields
-
+        if (chainName) {
             dispatch({
-                type: "SET_TOKEN_ALL",
-                payload: {
-                    decimals,
-                    name,
-                    description,
-                    iconUrl,
-                    symbol,
-                    tokenType,
-                },
-            })
-
-            dispatch({
-                type: "SET_ID",
-                payload: id,
+                type: "SET_CHAIN_NAME",
+                payload: chainName,
             })
         }
-        handleEffect()
-    }, [])
+    }, [chainName])
 
-    const triggerFetchBalance = useCallback(
-        () =>
+    useEffect(() => {
+        if (contractAddress) {
             dispatch({
-                type: "TRIGGER_FETCH_BALANCE",
-            }),
-        []
-    )
+                type: "SET_CONTRACT_ADDRESS",
+                payload: contractAddress,
+            })
+        }
+    }, [contractAddress])
 
-    const ExplorerSuiIdContextValue: ExplorerSuiIdContextValue = useMemo(
+    const explorerContextValue: ExplorerContextValue = useMemo(
         () => ({
             reducer,
-            functions: {
-                triggerFetchBalance,
+            searchParams: {
+                chainName,
+                contractAddress,
             },
         }),
-        [reducer]
+        [reducer, chainName, contractAddress]
     )
 
-    useEffect(() => {
-        const handleEffect = async () => {
-            const bridgedChainInfos = await getBridgedChainInfos({
-                mainChainName: "Sui",
-                tokenAddress: id,
-            })
-            dispatch({
-                type: "SET_BRIDGED_CHAINS_INFO",
-                payload: bridgedChainInfos,
-            })
-        }
-        handleEffect()
-    }, [])
-
     return (
-        <ExplorerSuiIdContext.Provider value={ExplorerSuiIdContextValue}>
+        <ExplorerContext.Provider value={explorerContextValue}>
             {children}
-        </ExplorerSuiIdContext.Provider>
+        </ExplorerContext.Provider>
     )
 }

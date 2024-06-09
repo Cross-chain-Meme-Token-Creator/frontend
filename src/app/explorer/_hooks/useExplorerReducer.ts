@@ -1,9 +1,9 @@
-import { Chain } from "@wormhole-foundation/sdk-base"
 import { useReducer } from "react"
+import { SupportedChainName, defaultSupportedChainName } from "@services"
 
 export interface ExplorerState {
     contractAddress?: string
-    chainName: Chain
+    chainName: SupportedChainName
 }
 
 export interface SetContractAddressAction {
@@ -13,13 +13,13 @@ export interface SetContractAddressAction {
 
 export interface SetChainNameAction {
     type: "SET_CHAIN_NAME"
-    payload: Chain
+    payload: SupportedChainName
 }
 
 export type ExplorerAction = SetContractAddressAction | SetChainNameAction
 
 export const initialState: ExplorerState = {
-    chainName: "Sui",
+    chainName: defaultSupportedChainName,
 }
 
 export const reducer = (

@@ -1,8 +1,8 @@
 "use client"
 import React from "react"
-import { ExplorerSuiIdProvider } from "./_hooks"
+import { ExplorerProvider } from "./_hooks"
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    return (<ExplorerSuiIdProvider> {children} </ExplorerSuiIdProvider>)
+    return <ExplorerProvider> {children} </ExplorerProvider>
 }
 export default Layout

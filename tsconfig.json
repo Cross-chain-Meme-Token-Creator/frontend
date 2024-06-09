@@ -20,7 +20,8 @@
     "paths": {
       "@config": ["./src/config"],
       "@common": ["./src/common"],
-      "@services": ["./src/services"]
+      "@services": ["./src/services"],
+      "@shared": ["./src/shared"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

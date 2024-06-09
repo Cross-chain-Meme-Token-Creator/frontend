@@ -7,14 +7,13 @@ import {
     NavbarItem,
     Link,
 } from "@nextui-org/react"
-import { ConnectWalletsModal } from "./ConnectWalletsModal"
 import { useRouter } from "next/navigation"
-import { NetworkSelect } from "./NetworkSelect"
+import { SearchBar } from "./SearchBar"
 
 export const Navbar = () => {
     const { push } = useRouter()
     return (
-        <NextUINavbar isBordered classNames={{
+        <NextUINavbar isBlurred={false} isBordered classNames={{
             wrapper: "max-w-full"
         }}>
             <NavbarBrand>
@@ -38,11 +37,18 @@ export const Navbar = () => {
                 </NavbarItem>
             </NavbarContent>
             <NavbarContent justify="end">
-                <NetworkSelect/>
                 <NavbarItem>
-                    <ConnectWalletsModal />
+                    <SearchBar/>
                 </NavbarItem>
             </NavbarContent>
         </NextUINavbar>
     )
+}
+
+export interface FoundTokenInfo {
+    decimals: number,
+    name: string,
+    description: string,
+    iconUrl: string,
+    symbol: string,
 }

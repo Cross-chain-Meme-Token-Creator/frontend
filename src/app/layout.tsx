@@ -5,7 +5,7 @@ import "./globals.css"
 import React from "react"
 import { NextUIProvider } from "@nextui-org/react"
 import { SuietWallet, WalletProvider } from "@suiet/wallet-kit"
-import { Navbar } from "./_components"
+import { Header, Navbar } from "./_components"
 import { MetaMaskProvider } from "@metamask/sdk-react-ui"
 import { AlgorandSignerProvider, EvmSignerProvider, RootProvider } from "./_hooks"
 import { NotificationModal, NotificationModalProvider } from "./_components"
@@ -32,6 +32,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                                     >
                                         <NotificationModalProvider>
                                             <NotificationModal />
+                                            <Header />
                                             <Navbar />
                                             {children}
                                         </NotificationModalProvider>
