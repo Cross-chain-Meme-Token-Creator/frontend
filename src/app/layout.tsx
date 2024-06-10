@@ -20,10 +20,10 @@ const font = Open_Sans({ subsets: ["latin"] })
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <Suspense>   
-            <RootProvider>
-                <html lang="en" className={font.className}>
-                    <body>
+        <html lang="en" className={font.className}>
+            <body>
+                <Suspense>
+                    <RootProvider>
                         <NextUIProvider>
                             <NextThemesProvider
                                 attribute="class"
@@ -53,10 +53,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                                 </EvmSignerProvider>
                             </NextThemesProvider>
                         </NextUIProvider>
-                    </body>
-                </html>
-            </RootProvider>
-        </Suspense>
+                    </RootProvider>
+                </Suspense>
+            </body>
+        </html>
     )
 }
 

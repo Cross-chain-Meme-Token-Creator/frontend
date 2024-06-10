@@ -1,5 +1,5 @@
 "use client"
-import { Divider, Snippet, Spacer, Button } from "@nextui-org/react"
+import { Divider, Snippet, Spacer, Button, Card, CardBody } from "@nextui-org/react"
 import { VAA, serialize } from "@wormhole-foundation/sdk-definitions"
 import React from "react"
 import { QRCodeSVG } from "qrcode.react"
@@ -40,22 +40,27 @@ export const PassphraseAndQRCodeContent = ({
                     {qrNote ?? "QR"}
                 </div>
                 <Spacer y={4} />
-                <QRCodeSVG
-                    id={qrCodeId}
-                    value={serializedVaa}
-                    bgColor={"#ffffff"}
-                    fgColor={"#000000"}
-                    level={"L"}
-                    includeMargin={false}
-                    // imageSettings={{
-                    //     src: "https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/316301705_114932571436049_549628509009748365_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHaIKEt134Xa2ZjdJrvilRUrDdtxUGd03esN23FQZ3Td7fMEvFORvSbm5TKvy8qC_fb1km34ZjkOpjj4ioMFklQ&_nc_ohc=qiWierkmR7oQ7kNvgGTQb69&_nc_ht=scontent.fsgn5-12.fna&oh=00_AYDCBANCtJySEBIaMM1W7Hmj7snvx3wBqM-ar6WzH6AsAQ&oe=666D11CA",
-                    //     x: undefined,
-                    //     y: undefined,
-                    //     height: 50,
-                    //     width: 50,
-                    //     excavate: true,
-                    // }}
-                />
+                <Card className="border border-divider w-fit" shadow="none">
+                    <CardBody className="p-2">
+                        <QRCodeSVG
+                            id={qrCodeId}
+                            value={serializedVaa}
+                            bgColor={"#ffffff"}
+                            fgColor={"#000000"}
+                            level={"L"}
+                            includeMargin={false}
+                            // imageSettings={{
+                            //     src: "https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/316301705_114932571436049_549628509009748365_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHaIKEt134Xa2ZjdJrvilRUrDdtxUGd03esN23FQZ3Td7fMEvFORvSbm5TKvy8qC_fb1km34ZjkOpjj4ioMFklQ&_nc_ohc=qiWierkmR7oQ7kNvgGTQb69&_nc_ht=scontent.fsgn5-12.fna&oh=00_AYDCBANCtJySEBIaMM1W7Hmj7snvx3wBqM-ar6WzH6AsAQ&oe=666D11CA",
+                            //     x: undefined,
+                            //     y: undefined,
+                            //     height: 50,
+                            //     width: 50,
+                            //     excavate: true,
+                            // }}
+                        />
+                    </CardBody>
+                </Card>
+              
                 <Spacer y={4} />
                 <div className="flex gap-4">
                     <Button
