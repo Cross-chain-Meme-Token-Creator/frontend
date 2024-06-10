@@ -28,7 +28,7 @@ export const NotificationModalProvider = ({
     children: ReactNode
 }) => {
     const reducer = useNotificationModalReducer()
-    const [state, dispatch] = reducer
+    const [, dispatch] = reducer
 
     const baseDiscloresure = useDisclosure()
     const { onOpen, onClose } = baseDiscloresure

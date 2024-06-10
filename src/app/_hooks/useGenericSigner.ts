@@ -72,10 +72,7 @@ export const useGenericSigner = () => {
         chainName: C
     ) => {
         const evmSigner = getEvmSigner(chainName as EvmChains)
-        if (!evmSigner) return
-
         const algorandSigner = getAlgorandSigner()
-        if (!algorandSigner) return
 
         const chainToSigner: Record<
             SupportedPlatform,
@@ -86,7 +83,6 @@ export const useGenericSigner = () => {
             Sui: getSuiSigner() as unknown as SignAndSendSigner<N, C>,
             Solana: getSuiSigner() as unknown as SignAndSendSigner<N, C>,
         }
-
         return chainToSigner[chainToPlatform(chainName) as SupportedPlatform]
     }
 

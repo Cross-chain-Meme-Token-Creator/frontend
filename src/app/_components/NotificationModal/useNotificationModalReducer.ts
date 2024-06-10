@@ -53,42 +53,42 @@ export const reducer = (
     action: NotificationModalAction
 ): NotificationModalState => {
     switch (action.type) {
-        case "SET_TITLE":
-            return {
-                ...state,
-                title: action.payload
-            }
-        case "SET_INNER_HTML":
-            return {
-                ...state,
-                innerHtml: action.payload
-            }
-        case "OPEN":
-            {
-
-                return {
-                    ...state,
-                    innerHtml: action.payload.innerHtml,
-                    title: action.payload.title,
-                    size: action.payload.size
-                }
-            }
-        case "CLOSE":
-            {
-                return {
-                    ...state,
-                    innerHtml: undefined,
-                    title: undefined
-                }
-            }
-        case "SET_SIZE": {
-            return {
-                ...state,
-                size: action.payload
-            }
+    case "SET_TITLE":
+        return {
+            ...state,
+            title: action.payload
         }
-        default:
-            return state
+    case "SET_INNER_HTML":
+        return {
+            ...state,
+            innerHtml: action.payload
+        }
+    case "OPEN":
+    {
+
+        return {
+            ...state,
+            innerHtml: action.payload.innerHtml,
+            title: action.payload.title,
+            size: action.payload.size
+        }
+    }
+    case "CLOSE":
+    {
+        return {
+            ...state,
+            innerHtml: undefined,
+            title: undefined
+        }
+    }
+    case "SET_SIZE": {
+        return {
+            ...state,
+            size: action.payload
+        }
+    }
+    default:
+        return state
     }
 }
 

@@ -1,28 +1,56 @@
 "use client"
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { Select, SelectItem, Image } from "@nextui-org/react"
 import { SupportedChainName, supportedChains } from "@services"
 
-interface SharedChainSelectProps {
+interface ChainSelectProps {
+    firstAsDefault?: boolean
     className?: string
-    chainName: SupportedChainName
+    chainName: SupportedChainName,
     setChainName: (chainName: SupportedChainName) => void
     label?: string
+    excludes?: Array<SupportedChainName>
 }
 
-export const ChainSelect = (props: SharedChainSelectProps) => {
-    const { chainName, setChainName, className, label } = props
+export const ChainSelect = (props: ChainSelectProps) => {
+    const {
+        firstAsDefault,
+        chainName,
+        setChainName,
+        className,
+        label,
+        excludes,
+    } = props
+
+    const hasMounted = useRef(false)
+    
+    const _chainName =
+        firstAsDefault && !hasMounted.current
+            ? Object.entries(supportedChains)
+                .filter(
+                    ([supportedChainName]) =>
+                        !excludes?.includes(
+                              supportedChainName as SupportedChainName
+                        )
+                )
+                .at(0)?.[0] as SupportedChainName
+            : chainName
+
+    useEffect(() => {
+        hasMounted.current = true
+    }, [])
+
     return (
         <Select
             className={className}
-            selectedKeys={[chainName]}
+            selectedKeys={[_chainName]}
             showScrollIndicators
             startContent={
                 <Image
                     alt="chain-logo"
                     removeWrapper
                     className="w-3.5 h-3.5"
-                    src={supportedChains[chainName].imageUrl}
+                    src={supportedChains[_chainName].imageUrl}
                 />
             }
             labelPlacement="outside"
@@ -32,14 +60,17 @@ export const ChainSelect = (props: SharedChainSelectProps) => {
                     0
                 ) as SupportedChainName
 
-                if (!currentChainName) return 
+                if (!currentChainName) return
                 setChainName(currentChainName)
             }}
             selectionMode="single"
             label={label ?? ""}
         >
-            {Object.entries(supportedChains).map(
-                ([chainName, { imageUrl, name }]) => (
+            {Object.entries(supportedChains)
+                .filter(([key]) => {
+                    return !excludes?.includes(key as SupportedChainName)
+                })
+                .map(([chainName, { imageUrl, name }]) => (
                     <SelectItem
                         startContent={
                             <Image
@@ -52,8 +83,7 @@ export const ChainSelect = (props: SharedChainSelectProps) => {
                     >
                         {name}
                     </SelectItem>
-                )
-            )}
+                ))}
         </Select>
     )
 }

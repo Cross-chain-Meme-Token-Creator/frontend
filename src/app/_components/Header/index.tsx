@@ -17,9 +17,9 @@ export const Header = () => {
 
     return (
         <NextUINavbar
-            isBordered
+            className="bg-primary-100"
             classNames={{
-                wrapper: "max-w-full",
+                wrapper: "max-w-[1280px]",
             }}
         >
             <NavbarContent justify="start">

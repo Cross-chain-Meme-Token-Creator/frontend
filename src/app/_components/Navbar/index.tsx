@@ -14,24 +14,24 @@ export const Navbar = () => {
     const { push } = useRouter()
     return (
         <NextUINavbar isBlurred={false} isBordered classNames={{
-            wrapper: "max-w-full"
+            wrapper: "max-w-[1280px]"
         }}>
             <NavbarBrand>
                 <p className="font-bold text-inherit">Cross-chain Meme Creator</p>
             </NavbarBrand>
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
                 <NavbarItem>
-                    <Link color="foreground" onPress={() => push("/create-token")}>
+                    <Link color="foreground" onPress={() => push("/create-token")} size="sm">
                         Create Token
                     </Link>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link href="#" aria-current="page">
+                    <Link href="#" aria-current="page" size="sm">
                         Explorer
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
-                    <Link color="foreground" href="#">
+                    <Link color="foreground" href="#" size="sm">
                         More
                     </Link>
                 </NavbarItem>

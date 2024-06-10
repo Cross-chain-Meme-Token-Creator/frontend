@@ -1,37 +1,38 @@
 "use client"
 import { useContext, useEffect } from "react"
-import { RootContext } from "../../../../_hooks"
+import { RootContext } from "../../../_hooks"
 import {
     SuiObjectTokenContent,
     SupportedChainName,
     getSuiClient,
 } from "@services"
-import { appConfig } from "@config"
-import { FoundTokenContext } from "./FoundTokenProvider"
+import { TokenContext } from "."
 
-export const useFoundSuiToken = () => {
+export const useSuiToken = () => {
     const { reducer } = useContext(RootContext)!
     const [state] = reducer
-    const { selectedChainName, network, searchValue } = state
+    const { selectedChainName, network } = state
 
     const suiClient = getSuiClient(network)
 
-    const { reducer: foundTokenReducer } = useContext(FoundTokenContext)!
-    const [, foundTokenDispatch] = foundTokenReducer
+    const { reducer: tokenReducer } = useContext(TokenContext)!
+    const [ tokenState, tokenDispatch ] = tokenReducer
 
-    useEffect(() => { 
+    const { tokenAddress } = tokenState
+
+    useEffect(() => {  
         if (selectedChainName !== SupportedChainName.Sui) return
-        if (searchValue) {
-            foundTokenDispatch({
-                type: "SET_IS_LOADING",
-                payload: true
-            })
-        }
+        if (!tokenAddress) return
+        
+        tokenDispatch({
+            type: "SET_IS_LOADING",
+            payload: true
+        })
 
         const handleEffect = async () => {
             try {
                 const { data } = await suiClient.getObject({
-                    id: searchValue,
+                    id: tokenAddress.toString(),
                     options: {
                         showContent: true,
                     },
@@ -41,7 +42,7 @@ export const useFoundSuiToken = () => {
                 const { content } = data
                 if (!content) throw Error()
 
-                const { fields } =
+                const { fields, type : tokenType } =
                     content as unknown as SuiObjectTokenContent
 
                 const {
@@ -52,35 +53,28 @@ export const useFoundSuiToken = () => {
                     symbol,
                 } = fields
 
-                console.log(decimals)
-
-                foundTokenDispatch({
-                    type: "SET_FOUND_TOKEN_INFO",
+                tokenDispatch({
+                    type: "SET_TOKEN_INFO",
                     payload: {
                         decimals,
                         name,
                         description,
                         iconUrl,
                         symbol,
+                        tokenType
                     },
                 })
             } catch (ex) {
-                foundTokenDispatch({
-                    type: "SET_FOUND_TOKEN_INFO",
+                tokenDispatch({
+                    type: "SET_TOKEN_INFO",
                 })
             } finally {
-                foundTokenDispatch({
+                tokenDispatch({
                     type: "SET_IS_LOADING",
                     payload: false
                 })
             }
         }
-
-        const delayedFunction = setTimeout(
-            handleEffect,
-            appConfig.timeOuts.searchTimeout
-        )
-
-        return () => clearTimeout(delayedFunction)
-    }, [searchValue])
+        handleEffect()
+    }, [tokenAddress])
 }
