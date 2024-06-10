@@ -1,6 +1,7 @@
 import { Form, Formik, FormikProps } from "formik"
 import React, { ReactNode, createContext, useContext, useMemo } from "react"
 import {
+    SupportedChainName,
     baseAxios,
     getCreateSuiTokenTransactionBlock,
     getMakeAlgorandAssetTransaction,
@@ -12,8 +13,7 @@ import { useRouter } from "next/navigation"
 import useSwr, { SWRResponse } from "swr"
 import * as Yup from "yup"
 import { computeNumberMultipeBigInt, computePow } from "@common"
-import { CreateTokenContext } from "../../_hooks"
-import { useAlgorandSigner } from "../../../_hooks"
+import { RootContext, useAlgorandSigner } from "../../../_hooks"
 import { useWallet } from "@suiet/wallet-kit"
 
 interface FormikValue {
@@ -97,7 +97,7 @@ export const CreateTokenFormProvider = ({
     const { openModal, closeModal } = functions
     const router = useRouter()
 
-    const { reducer } = useContext(CreateTokenContext)!
+    const { reducer } = useContext(RootContext)!
     const [state] = reducer
     const { selectedChainName } = state
 
@@ -127,7 +127,8 @@ export const CreateTokenFormProvider = ({
                 let contractAddress: string
 
                 switch (selectedChainName) {
-                case "Sui": {
+
+                case SupportedChainName.Sui: {
                     if (!suiAddress) {
                         await select("Suiet")
                         return
@@ -164,7 +165,7 @@ export const CreateTokenFormProvider = ({
                     contractAddress = objectId
                     break
                 }
-                case "Algorand": {
+                case SupportedChainName.Algorand: {
                     if (!algorandAddress) {
                         connectPera()
                         return

@@ -31,6 +31,7 @@ export const getBridgedChainInfos = async <N extends Network, ChainName extends 
         Object.keys(supportedChains) as Array<Chain>
     ).filter((chain) => chain !== mainChainName)
 
+    console.log(allSupportedChainNamesExceptMainChain)
     const promises: Array<Promise<void>> = []
     for (const chainName of allSupportedChainNamesExceptMainChain) {
         promises.push(
@@ -38,12 +39,14 @@ export const getBridgedChainInfos = async <N extends Network, ChainName extends 
                 try {
                     const chain = wormhole.getChain(chainName)
                     const tokenBridge = await chain.getTokenBridge()
+                    console.log(tokenBridge)
 
                     const { address: nativeWrappedAddress } =
                         await tokenBridge.getWrappedAsset({
                             chain: mainChainName,
                             address: tokenAddress,
                         })
+                    console.log(nativeWrappedAddress)
 
                     const bridgedChain: BridgedChainInfo<typeof chainName> = {
                         chainName,
@@ -54,6 +57,7 @@ export const getBridgedChainInfos = async <N extends Network, ChainName extends 
                     }
                     bridgedChains.push(bridgedChain)
                 } catch (ex) {
+                    console.log(ex)
                     // do nothing
                 }
             })()

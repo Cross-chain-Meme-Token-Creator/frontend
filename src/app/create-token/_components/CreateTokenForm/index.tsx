@@ -17,20 +17,17 @@ import {
     CreateTokenFormContext,
     CreateTokenFormProvider,
 } from "./CreateTokenFormProvider"
-import { BaseChainSelect } from "./BaseChainSelect"
 
 const WrappedCreateTokenForm = () => {
     const { formik, swrs } = useContext(CreateTokenFormContext)!
     const { iconUrlSwr } = swrs
 
-    console.log(formik.values)
-
     return (
-        <Card className="max-w-[560px] mx-auto my-12">
-            <CardHeader className="font-semibold text-xl p-6 pb-2">
+        <Card className="max-w-[500px] mx-auto mt-12 border border-divider" shadow="none">
+            <CardHeader className="font-bold p-4 pb-0">
                 Create Token
             </CardHeader>
-            <CardBody className="grid gap-4 p-6">
+            <CardBody className="grid gap-4 p-4">
                 <Input
                     id="name"
                     onBlur={formik.handleBlur}
@@ -149,9 +146,8 @@ const WrappedCreateTokenForm = () => {
                     isInvalid={!!(formik.touched.totalSupply && formik.errors.totalSupply)}
                     errorMessage={formik.touched.totalSupply && formik.errors.totalSupply}
                 />
-                <BaseChainSelect />
             </CardBody>
-            <CardFooter className="p-6 pt-2">
+            <CardFooter className="p-4 pt-0">
                 <Button type="submit" color="primary" className="w-full">
                     Create
                 </Button>

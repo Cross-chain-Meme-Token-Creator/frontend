@@ -79,7 +79,7 @@ export const initialState: RootState = {
     selectedChainName: SupportedChainName.Sui,
     selectedSigner: {},
     network: "Testnet",
-    searchValue: "",
+    searchValue: ""
 }
 
 export const reducer = (

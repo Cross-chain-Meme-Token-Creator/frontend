@@ -21,10 +21,15 @@ export interface BridgedChainInfo {
 
 export interface TokenState {
     tokenInfo?: TokenInfo
-    isLoading: boolean
+    loadings: {
+        isLoading: boolean
+        isWrappedTokensFetchLoading: boolean
+    }
     tokenAddress?: string
     bridgedChainInfos: Array<BridgedChainInfo>
-    refreshBalancesKey?: string
+    keys: {
+        refreshWrappedTokensKey?: string
+    }
 }
 
 export interface SetTokenAddressAction {
@@ -39,6 +44,10 @@ export interface SetTokenInfoAction {
 
 export interface SetIsLoadingAction {
     type: "SET_IS_LOADING"
+    payload: boolean
+}
+export interface SetIsWrappedTokensFetchLoadingAction {
+    type: "SET_IS_WRAPPED_TOKENS_FETCH_LOADING"
     payload: boolean
 }
 
@@ -60,23 +69,27 @@ export interface UpdateBalanceAction {
     }
 }
 
-export interface SetRefreshBalancesKeyAction {
-    type: "SET_REFRESH_BALANCES_KEY"
+export interface SetRefreshWrappedTokensKeyAction {
+    type: "SET_REFRESH_WRAPPED_TOKENS_KEY_ACTION"
 }
-
 
 export type TokenAction =
     | SetTokenAddressAction
     | SetTokenInfoAction
-    | SetIsLoadingAction
+    | SetIsWrappedTokensFetchLoadingAction
     | SetBridgedChainInfosAction
     | AddBridgedChainInfoAction
     | UpdateBalanceAction
-    | SetRefreshBalancesKeyAction
+    | SetRefreshWrappedTokensKeyAction
+    | SetIsLoadingAction
 
 export const initialState: TokenState = {
-    isLoading: false,
+    loadings: {
+        isLoading: false,
+        isWrappedTokensFetchLoading: false,
+    },
     bridgedChainInfos: [],
+    keys: {}
 }
 
 export const reducer = (
@@ -94,10 +107,13 @@ export const reducer = (
             ...state,
             tokenInfo: action.payload,
         }
-    case "SET_IS_LOADING":
+    case "SET_IS_WRAPPED_TOKENS_FETCH_LOADING":
         return {
             ...state,
-            isLoading: action.payload,
+            loadings: {
+                ...state.loadings,
+                isWrappedTokensFetchLoading: action.payload
+            }
         }
     case "SET_BRIDGED_CHAIN_INFOS": {
         const bridgedChainInfos = action.payload.map(
@@ -136,10 +152,21 @@ export const reducer = (
         }
     }
 
-    case "SET_REFRESH_BALANCES_KEY":
+    case "SET_REFRESH_WRAPPED_TOKENS_KEY_ACTION":
         return {
             ...state,
-            refreshBalancesKey: uuidv4(),
+            keys: {
+                ...state.keys,
+                refreshWrappedTokensKey: uuidv4()
+            }
+        }
+    case "SET_IS_LOADING":
+        return {
+            ...state,
+            loadings: {
+                ...state.loadings,
+                isLoading: action.payload
+            }
         }
 
     default:

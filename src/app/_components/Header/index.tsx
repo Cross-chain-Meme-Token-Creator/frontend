@@ -32,6 +32,7 @@ export const Header = () => {
                                 payload: chainName,
                             })
                         }
+                        selectedChainName={selectedChainName}
                     />
                 </NavbarItem>
                 <NavbarItem>

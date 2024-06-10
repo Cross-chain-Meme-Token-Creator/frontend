@@ -1,15 +1,18 @@
 "use client"
-import React, { useEffect, useRef } from "react"
+import React, { useEffect } from "react"
 import { Select, SelectItem, Image } from "@nextui-org/react"
 import { SupportedChainName, supportedChains } from "@services"
 
 interface ChainSelectProps {
     firstAsDefault?: boolean
     className?: string
-    chainName: SupportedChainName,
+    chainName: SupportedChainName
     setChainName: (chainName: SupportedChainName) => void
     label?: string
     excludes?: Array<SupportedChainName>
+    //cannot use both excludes and includes
+    includes?: Array<SupportedChainName>
+    selectedChainName: SupportedChainName
 }
 
 export const ChainSelect = (props: ChainSelectProps) => {
@@ -20,37 +23,39 @@ export const ChainSelect = (props: ChainSelectProps) => {
         className,
         label,
         excludes,
+        includes,
+        selectedChainName
     } = props
 
-    const hasMounted = useRef(false)
-    
-    const _chainName =
-        firstAsDefault && !hasMounted.current
-            ? Object.entries(supportedChains)
-                .filter(
-                    ([supportedChainName]) =>
-                        !excludes?.includes(
-                              supportedChainName as SupportedChainName
-                        )
-                )
-                .at(0)?.[0] as SupportedChainName
-            : chainName
+    const remainingSupportedChainNames =
+        includes ??
+        (Object.entries(supportedChains)
+            .filter(
+                ([supportedChainName]) =>
+                    !excludes?.includes(
+                        supportedChainName as SupportedChainName
+                    )
+            )
+            ?.map(([key]) => key) as Array<SupportedChainName>)
 
+    
+   
     useEffect(() => {
-        hasMounted.current = true
-    }, [])
+        if (!firstAsDefault) return
+        const _chainName = remainingSupportedChainNames.at(0) as SupportedChainName
+        setChainName(_chainName)
+    }, [selectedChainName])
 
     return (
         <Select
             className={className}
-            selectedKeys={[_chainName]}
+            selectedKeys={[chainName]}
             showScrollIndicators
             startContent={
                 <Image
                     alt="chain-logo"
-                    removeWrapper
                     className="w-3.5 h-3.5"
-                    src={supportedChains[_chainName].imageUrl}
+                    src={supportedChains[chainName].imageUrl}
                 />
             }
             labelPlacement="outside"
@@ -66,24 +71,20 @@ export const ChainSelect = (props: ChainSelectProps) => {
             selectionMode="single"
             label={label ?? ""}
         >
-            {Object.entries(supportedChains)
-                .filter(([key]) => {
-                    return !excludes?.includes(key as SupportedChainName)
-                })
-                .map(([chainName, { imageUrl, name }]) => (
-                    <SelectItem
-                        startContent={
-                            <Image
-                                alt="chain-logo"
-                                className="w-3.5 h-3.5"
-                                src={imageUrl}
-                            />
-                        }
-                        key={chainName}
-                    >
-                        {name}
-                    </SelectItem>
-                ))}
+            {remainingSupportedChainNames.map((chainName) => (
+                <SelectItem
+                    startContent={
+                        <Image
+                            alt="chain-logo"
+                            className="w-3.5 h-3.5"
+                            src={supportedChains[chainName].imageUrl}
+                        />
+                    }
+                    key={chainName}
+                >
+                    {supportedChains[chainName].name}
+                </SelectItem>
+            ))}
         </Select>
     )
 }

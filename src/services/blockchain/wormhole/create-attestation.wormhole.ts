@@ -24,10 +24,7 @@ export const createAttestation = async <N extends Network, ChainName extends Cha
     const chain = wormhole.getChain(chainName)
 
     const nativeTokenAddress = toNative(chainName, tokenAddress)
-    console.log(nativeTokenAddress)
-
     const tokenBridge = await chain.getTokenBridge()
-    console.log(tokenBridge)
 
     const txGenerator = tokenBridge.createAttestation(nativeTokenAddress)
 

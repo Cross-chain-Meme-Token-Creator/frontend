@@ -38,7 +38,12 @@ export const EvmTab = () => {
         <div>
             <div className="gap-4 flex">
                 <div className="grid gap-1 place-items-center w-fit">
-                    <Card isPressable onPress={connectMetaMask}>
+                    <Card
+                        isPressable
+                        onPress={connectMetaMask}
+                        shadow="none"
+                        className="border border-divider"
+                    >
                         <CardBody className="p-4 items-center">
                             <Image
                                 radius="none"

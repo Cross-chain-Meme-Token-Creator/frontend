@@ -9,19 +9,30 @@ import {
 } from "@nextui-org/react"
 import { useRouter } from "next/navigation"
 import { SearchBar } from "./SearchBar"
+import { DarkModeSwitch } from "./DarkModeSwitch"
 
 export const Navbar = () => {
     const { push } = useRouter()
     return (
-        <NextUINavbar isBlurred={false} isBordered classNames={{
-            wrapper: "max-w-[1280px]"
-        }}>
+        <NextUINavbar
+            isBlurred={false}
+            isBordered
+            classNames={{
+                wrapper: "max-w-[1280px]",
+            }}
+        >
             <NavbarBrand>
-                <p className="font-bold text-inherit">Cross-chain Meme Creator</p>
+                <p className="font-bold text-inherit">
+                    Cross-chain Meme Creator
+                </p>
             </NavbarBrand>
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
                 <NavbarItem>
-                    <Link color="foreground" onPress={() => push("/create-token")} size="sm">
+                    <Link
+                        color="foreground"
+                        onPress={() => push("/create-token")}
+                        size="sm"
+                    >
                         Create Token
                     </Link>
                 </NavbarItem>
@@ -38,7 +49,10 @@ export const Navbar = () => {
             </NavbarContent>
             <NavbarContent justify="end">
                 <NavbarItem>
-                    <SearchBar/>
+                    <DarkModeSwitch />
+                </NavbarItem>
+                <NavbarItem>
+                    <SearchBar />
                 </NavbarItem>
             </NavbarContent>
         </NextUINavbar>
@@ -46,9 +60,9 @@ export const Navbar = () => {
 }
 
 export interface FoundTokenInfo {
-    decimals: number,
-    name: string,
-    description: string,
-    iconUrl: string,
-    symbol: string,
+    decimals: number
+    name: string
+    description: string
+    iconUrl: string
+    symbol: string
 }

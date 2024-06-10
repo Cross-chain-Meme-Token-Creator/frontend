@@ -45,7 +45,12 @@ export const AlgorandTab = () => {
         <div>
             <div className="gap-4 flex">
                 <div className="grid gap-1 place-items-center w-fit">
-                    <Card isPressable onPress={() => connectPera()}>
+                    <Card
+                        isPressable
+                        onPress={() => connectPera()}
+                        shadow="none"
+                        className="border border-divider"
+                    >
                         <CardBody className="p-4 items-center">
                             <Image
                                 radius="full"

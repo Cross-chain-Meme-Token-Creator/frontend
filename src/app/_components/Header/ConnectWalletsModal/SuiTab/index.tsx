@@ -1,4 +1,11 @@
-import { Spacer, Image, Link, Card, CardBody, CardFooter } from "@nextui-org/react"
+import {
+    Spacer,
+    Image,
+    Link,
+    Card,
+    CardBody,
+    CardFooter,
+} from "@nextui-org/react"
 import React from "react"
 import { truncateString } from "@common"
 import { useWallet } from "@suiet/wallet-kit"
@@ -18,6 +25,8 @@ export const SuiTab = () => {
                         <Card
                             isPressable
                             onPress={() => select(name)}
+                            shadow="none"
+                            className="border border-divider"
                         >
                             <CardBody className="p-4 items-center">
                                 <Image src={iconUrl} className="w-12 h-12" />
@@ -43,8 +52,7 @@ export const SuiTab = () => {
                                     ({ name: foundName }) => foundName === name
                                 )?.iconUrl
                             }
-                        >
-                        </Image>
+                        ></Image>
                         {name}
                     </div>
                     {truncateString(address)}

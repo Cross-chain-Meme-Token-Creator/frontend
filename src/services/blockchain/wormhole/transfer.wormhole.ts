@@ -1,39 +1,42 @@
 import {
     SignAndSendSigner,
-    serialize,
     toNative,
     toUniversal,
 } from "@wormhole-foundation/sdk-definitions"
 import { getWormhole } from "./base.wormhole"
-import { Chain } from "@wormhole-foundation/sdk-base"
+import { Chain, Network } from "@wormhole-foundation/sdk-base"
 import { signSendWait } from "@wormhole-foundation/sdk"
 
 export interface TransferParams<
+    N extends Network,
     SourceChainName extends Chain,
     TargetChainName extends Chain
 > {
+    network: N,
     transferAmount: bigint
     recipient: string
     tokenAddress: string
     sourceChainName: SourceChainName
     targetChainName: TargetChainName
-    signer: SignAndSendSigner<"Testnet", SourceChainName>
+    signer: SignAndSendSigner<N, SourceChainName>
 }
 
 export const transfer = async <
+    N extends Network,
     SourceChainName extends Chain,
     TargetChainName extends Chain
 >({
+    network,
     transferAmount,
     recipient,
     tokenAddress,
     sourceChainName,
     targetChainName,
     signer,
-}: TransferParams<SourceChainName, TargetChainName>) => {
-    const wormhole = await getWormhole()
+}: TransferParams<N, SourceChainName, TargetChainName>) => {
+    const wormhole = await getWormhole(network)
+    
     const sourceChain = wormhole.getChain(sourceChainName)
-
     const sourceTokenBridge = await sourceChain.getTokenBridge()
 
     const txGenerator = sourceTokenBridge.transfer(
@@ -60,5 +63,5 @@ export const transfer = async <
 
     if (!vaa) return null
 
-    return Buffer.from(serialize(vaa)).toString("base64")
+    return vaa
 }

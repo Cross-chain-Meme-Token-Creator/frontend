@@ -9,7 +9,8 @@ import { toUniversal } from "@wormhole-foundation/sdk-definitions"
 export const useBridgedTokenInfos = () => {
     const { reducer } = useContext(TokenContext)!
     const [state, dispatch] = reducer
-    const { tokenAddress } = state
+    const { tokenAddress, keys } = state
+    const { refreshWrappedTokensKey } = keys
 
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
@@ -20,6 +21,10 @@ export const useBridgedTokenInfos = () => {
 
         const handleEffect = async () => {
             if (!tokenAddress) return
+            dispatch({
+                type: "SET_IS_WRAPPED_TOKENS_FETCH_LOADING",
+                payload: true
+            })
             const _bridgedChainInfos = await getBridgedChainInfos({
                 network,
                 mainChainName: selectedChainName,
@@ -39,7 +44,11 @@ export const useBridgedTokenInfos = () => {
                 type: "SET_BRIDGED_CHAIN_INFOS",
                 payload: bridgedChainInfos,
             })
+            dispatch({
+                type: "SET_IS_WRAPPED_TOKENS_FETCH_LOADING",
+                payload: false
+            })
         }
         handleEffect()
-    }, [tokenAddress])
+    }, [tokenAddress, refreshWrappedTokensKey])
 }

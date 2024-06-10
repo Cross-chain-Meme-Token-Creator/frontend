@@ -1,6 +1,6 @@
 import { useContext } from "react"
 import { NotificationModalContext } from "./NotificationModalProvider"
-import {
+import React, {
     Button,
     Modal,
     ModalBody,
@@ -13,20 +13,22 @@ export * from "./NotificationModalProvider"
 export * from "./useNotificationModalReducer"
 
 export const NotificationModal = () => {
-    const { reducer, discloresures  } = useContext(NotificationModalContext)!
-    const [ state ] = reducer
+    const { reducer, discloresures } = useContext(NotificationModalContext)!
+    const [state] = reducer
     const { innerHtml, title, size } = state
     const { baseDiscloresure } = discloresures
     const { onClose, isOpen } = baseDiscloresure!
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size={size}>
+        <Modal isDismissable={false} isOpen={isOpen} onClose={onClose} size={size}>
             <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">
-                    {title}
-                </ModalHeader>
-                <ModalBody>{innerHtml}</ModalBody>
-                <ModalFooter>
+                {title ? (
+                    <ModalHeader className="p-4 pb-0 text-base font-bold">
+                        {title}
+                    </ModalHeader>
+                ) : null}
+                <ModalBody className="p-4">{innerHtml}</ModalBody>
+                <ModalFooter className="p-4 pt-0">
                     <Button color="danger" variant="light" onPress={onClose}>
                         Close
                     </Button>

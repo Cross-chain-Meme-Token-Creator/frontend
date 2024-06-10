@@ -1,5 +1,5 @@
 export * from "./create-attestation.wormhole"
-export * from "./create-wrapped.wormhole"
+export * from "./create-wrapped-token.wormhole"
 export * from "./signers"
 export * from "./transfer.wormhole"
 export * from "./constants.wormhole"

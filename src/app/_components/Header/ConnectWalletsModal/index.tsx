@@ -53,10 +53,10 @@ export const ConnectWalletsModal = () => {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">
+                            <ModalHeader className="text-base font-bold p-4 pb-0">
                                 Connect Wallets
                             </ModalHeader>
-                            <ModalBody>
+                            <ModalBody className="p-4">
                                 <Tabs
                                     variant="underlined"
                                     classNames={{
@@ -73,7 +73,7 @@ export const ConnectWalletsModal = () => {
                                     ))}
                                 </Tabs>
                             </ModalBody>
-                            <ModalFooter>
+                            <ModalFooter className="p-4 pt-0">
                                 <Button
                                     color="danger"
                                     variant="light"
