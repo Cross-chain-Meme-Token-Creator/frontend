@@ -1,5 +1,5 @@
 import { getWormhole } from "./base.wormhole"
-import { SignAndSendSigner, VAA } from "@wormhole-foundation/sdk-definitions"
+import { SignAndSendSigner, UniversalOrNative, VAA } from "@wormhole-foundation/sdk-definitions"
 import { Chain, Network, signSendWait } from "@wormhole-foundation/sdk"
 
 export interface CreateWrappedParams<
@@ -9,7 +9,8 @@ export interface CreateWrappedParams<
     network: N
     targetChainName: ChainName
     vaa: VAA<"TokenBridge:AttestMeta">
-    signer: SignAndSendSigner<N, ChainName>
+    signer: SignAndSendSigner<N, ChainName>,
+    payer?: UniversalOrNative<ChainName>
 }
 
 export const createWrappedToken = async <
@@ -20,13 +21,14 @@ export const createWrappedToken = async <
     targetChainName,
     vaa,
     signer,
+    payer
 }: CreateWrappedParams<N, ChainName>) => {
 
     const wormhole = await getWormhole(network)
     const targetChain = wormhole.getChain(targetChainName)
 
     const targetTokenBridge = await targetChain.getTokenBridge()
-    const txGenerator = targetTokenBridge.submitAttestation(vaa)
+    const txGenerator = targetTokenBridge.submitAttestation(vaa, payer)
 
     const transactionIds = await signSendWait(targetChain, txGenerator, signer)
 

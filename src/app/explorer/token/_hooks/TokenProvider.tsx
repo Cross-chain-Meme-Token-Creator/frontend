@@ -16,6 +16,7 @@ import { useSearchParams } from "next/navigation"
 import { useBridgedTokenInfos } from "./useBridgedTokenInfos"
 import { useSuiToken } from "./useSuiToken"
 import { SupportedChainName } from "@services"
+import { useAlgorandToken } from "./useAlgorandToken"
 
 export interface TokenContextValue {
     reducer: [TokenState, React.Dispatch<TokenAction>]
@@ -29,7 +30,9 @@ export interface TokenContextValue {
 export const TokenContext = createContext<TokenContextValue | null>(null)
 
 const WrappedTokenProvider = ({ children }: { children: ReactNode }) => {
+    
     useSuiToken()
+    useAlgorandToken()
     useBridgedTokenInfos()
 
     return <>{children}</>

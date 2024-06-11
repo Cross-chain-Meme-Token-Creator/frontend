@@ -8,6 +8,7 @@ import { SuietWallet, WalletProvider } from "@suiet/wallet-kit"
 import { Header, Navbar } from "./_components"
 import { MetaMaskProvider } from "@metamask/sdk-react-ui"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
+import { GoogleAnalytics } from "@next/third-parties/google"
 
 import {
     AlgorandSignerProvider,
@@ -42,6 +43,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                                                 }}
                                             >
                                                 <NotificationModalProvider>
+                                                    <GoogleAnalytics gaId="G-XYZ" />
                                                     <NotificationModal />
                                                     <Header />
                                                     <Navbar />

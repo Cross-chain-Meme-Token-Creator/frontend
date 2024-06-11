@@ -11,3 +11,4 @@ export const getAlgodClient = (network: SupportedNetwork = "Testnet") => {
     const algodServerUrl = network == "Testnet" ? TESTNET_ALGOD_SERVER_URL : MAINNET_ALGOD_SERVER_URL
     return new algosdk.Algodv2("", algodServerUrl)
 } 
+

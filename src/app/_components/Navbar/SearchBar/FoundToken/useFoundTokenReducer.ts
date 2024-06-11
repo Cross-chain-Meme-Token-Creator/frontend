@@ -3,8 +3,8 @@ import { useReducer } from "react"
 export interface TokenInfo {
     decimals: number
     name: string
-    description: string
-    iconUrl: string
+    description?: string
+    iconUrl?: string
     symbol: string
 }
 

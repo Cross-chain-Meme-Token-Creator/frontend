@@ -82,6 +82,7 @@ const WrappedCreateTokenForm = () => {
                             "image/jpeg": [".jpeg", ".png"],
                         }}
                         onDrop={async (acceptedFiles: Array<File>) => {
+                            console.log("Called")
                             const file = acceptedFiles.at(0)
                             if (!file) return
                             console.log(file)

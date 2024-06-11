@@ -39,7 +39,7 @@ const initialValues: FormikValue = {
     description: "",
     decimals: 8,
     iconUrl: "",
-    totalSupply: 10,
+    totalSupply: 10_000_000_000,
 }
 
 export const CreateTokenFormContext =

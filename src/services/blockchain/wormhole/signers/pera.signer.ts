@@ -62,13 +62,14 @@ implements SignAndSendSigner<N, C>
                 [
                     {
                         txn: tx,
-                        signers: [this.address()],
+                        //signers: [this.address()],
                     },
                 ],
             ])
             const { txId } = await this._algodClient
                 .sendRawTransaction(signedTxns)
                 .do()
+
             await waitForConfirmation(this._algodClient, txId, 3)
 
             txids.push(txId)
