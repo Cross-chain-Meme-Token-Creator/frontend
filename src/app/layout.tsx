@@ -15,6 +15,7 @@ import {
     EvmSignerProvider,
     RootProvider,
 } from "./_hooks"
+
 import { NotificationModal, NotificationModalProvider } from "./_components"
 
 const font = Open_Sans({ subsets: ["latin"] })

@@ -37,8 +37,6 @@ export const ChainSelect = (props: ChainSelectProps) => {
                     )
             )
             ?.map(([key]) => key) as Array<SupportedChainName>)
-
-    
    
     useEffect(() => {
         if (!firstAsDefault) return
@@ -54,6 +52,7 @@ export const ChainSelect = (props: ChainSelectProps) => {
             startContent={
                 <Image
                     alt="chain-logo"
+                    removeWrapper
                     className="w-3.5 h-3.5"
                     src={supportedChains[chainName].imageUrl}
                 />

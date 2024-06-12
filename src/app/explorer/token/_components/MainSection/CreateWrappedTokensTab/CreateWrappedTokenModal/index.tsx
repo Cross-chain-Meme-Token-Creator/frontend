@@ -14,9 +14,9 @@ import {
     CreateWrappedTokenModalProvider,
 } from "./CreateWrappedTokenModalProvider"
 import React, { useContext } from "react"
-import { ChainSelect, UploadQR } from "@shared"
 import { RootContext } from "../../../../../../_hooks"
 import { TokenContext } from "../../../../_hooks"
+import { ChainSelect, UploadQR } from "../../../../../../_shared-components"
 
 const WrappedCreateWrappedTokenModal = () => {
     const { formik } = useContext(CreateWrappedTokenModalContext)!

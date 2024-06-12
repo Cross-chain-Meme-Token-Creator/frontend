@@ -6,12 +6,12 @@ import { computeRaw, getInnerType } from "@common"
 import { TokenContext } from "../../../../_hooks"
 import { NotificationModalContext } from "../../../../../../_components"
 import { RootContext, useGenericSigner } from "../../../../../../_hooks"
-import { VAA } from "@wormhole-foundation/sdk-definitions"
-import { PassphraseAndQRCodeContent } from "@shared"
+import { VAA, toNative } from "@wormhole-foundation/sdk-definitions"
+import { PassphraseAndQRCodeContent } from "../../../../../../_shared-components"
 
 interface FormikValue {
     targetChainName: SupportedChainName
-    recipient: string
+    recipientAddress: string
     transferAmount: number
 }
 
@@ -21,7 +21,7 @@ interface TransferCardContextValue {
 
 const initialValues: FormikValue = {
     targetChainName: SupportedChainName.Celo,
-    recipient: "",
+    recipientAddress: "",
     transferAmount: 0,
 }
 
@@ -45,11 +45,7 @@ const renderBody = (formik: FormikProps<FormikValue>, chidren: ReactNode) => {
     )
 }
 
-export const TransferCardProvider = ({
-    children,
-}: {
-    children: ReactNode
-}) => {
+export const TransferCardProvider = ({ children }: { children: ReactNode }) => {
     const { reducer } = useContext(TokenContext)!
     const [state] = reducer
     const { tokenInfo, tokenAddress } = state
@@ -69,27 +65,28 @@ export const TransferCardProvider = ({
             initialValues={initialValues}
             onSubmit={async ({
                 targetChainName,
-                recipient,
+                recipientAddress,
                 transferAmount,
             }) => {
-                if (!tokenType || !decimals) return
-
                 let vaa: VAA<"TokenBridge:Transfer"> | null
-
                 const signer = getGenericSigner(selectedChainName)
 
                 switch (selectedChainName) {
                 case SupportedChainName.Sui: {
+                    if (!tokenType || !decimals) return
                     vaa = await transfer({
                         network,
                         transferAmount: computeRaw(
                             transferAmount,
                             decimals
                         ),
-                        recipient,
+                        recipientAddress,
                         sourceChainName: selectedChainName as Chain,
                         targetChainName: targetChainName as Chain,
-                        tokenAddress: getInnerType(tokenType) ?? "",
+                        tokenAddress: toNative(
+                            selectedChainName,
+                            getInnerType(tokenType) ?? ""
+                        ),
                         signer,
                     })
                     break
@@ -102,10 +99,13 @@ export const TransferCardProvider = ({
                             transferAmount,
                             decimals
                         ),
-                        recipient,
+                        recipientAddress,
                         sourceChainName: selectedChainName as Chain,
                         targetChainName: targetChainName as Chain,
-                        tokenAddress: tokenAddress,
+                        tokenAddress: toNative(
+                            selectedChainName,
+                            tokenAddress
+                        ),
                         signer,
                     })
                     break

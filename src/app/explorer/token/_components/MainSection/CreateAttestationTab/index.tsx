@@ -10,8 +10,8 @@ import { TokenContext } from "../../../_hooks"
 import { SupportedChainName, createAttestation } from "@services"
 import { getInnerType } from "@common"
 import { NotificationModalContext } from "../../../../../_components"
-import { PassphraseAndQRCodeContent } from "@shared"
-import { VAA, toNative } from "@wormhole-foundation/sdk-definitions"
+import { VAA } from "@wormhole-foundation/sdk-definitions"
+import { PassphraseAndQRCodeContent } from "../../../../../_shared-components"
 
 export const CreateAttestationTab = () => {
     const { reducer } = useContext(TokenContext)!
@@ -42,8 +42,6 @@ export const CreateAttestationTab = () => {
                 />
             ),
         })
-
-    console.log(address)
 
     return (
         <div>
@@ -79,15 +77,12 @@ export const CreateAttestationTab = () => {
                                 if (!tokenAddress) return
                                     
                                 if (!address) return
+ 
                                 const vaa = await createAttestation({
                                     network,
                                     chainName: selectedChainName,
                                     tokenAddress,
-                                    signer: chainSigner,
-                                    payer: toNative(
-                                        selectedChainName,
-                                        chainSigner.address()
-                                    ),
+                                    signer: chainSigner
                                 })
 
                                 if (!vaa) return

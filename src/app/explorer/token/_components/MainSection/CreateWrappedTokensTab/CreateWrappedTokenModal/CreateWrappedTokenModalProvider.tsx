@@ -15,7 +15,7 @@ import {
     useCreateWrappedTokenModalReducer,
 } from "./useCreateWrappedTokenModalReducer"
 import * as Yup from "yup"
-import { deserialize, toNative } from "@wormhole-foundation/sdk-definitions"
+import { deserialize } from "@wormhole-foundation/sdk-definitions"
 import { NotificationModalContext } from "../../../../../../_components"
 import { Link } from "@nextui-org/react"
 import { truncateString } from "@common"
@@ -102,8 +102,7 @@ export const CreateWrappedTokenModalProvider = ({
                         network,
                         targetChainName,
                         vaa,
-                        signer,
-                        payer: toNative(targetChainName, signer.address())
+                        signer
                     })
 
                     openModal({

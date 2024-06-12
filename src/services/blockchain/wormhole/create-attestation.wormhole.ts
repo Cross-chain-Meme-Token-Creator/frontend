@@ -3,7 +3,6 @@ import {
     Chain,
     Network,
     SignAndSendSigner,
-    UniversalOrNative,
     signSendWait,
     toNative,
 } from "@wormhole-foundation/sdk"
@@ -13,7 +12,6 @@ export interface CreateAttestationParams<N extends Network, ChainName extends Ch
     chainName: ChainName
     tokenAddress: string
     signer: SignAndSendSigner<N, ChainName>
-    payer?: UniversalOrNative<ChainName>
 }
 
 export const createAttestation = async <N extends Network, ChainName extends Chain>({
@@ -21,19 +19,19 @@ export const createAttestation = async <N extends Network, ChainName extends Cha
     chainName,
     tokenAddress,
     signer,
-    payer
 }: CreateAttestationParams<N, ChainName>) => {
     const wormhole = await getWormhole(network)
     const chain = wormhole.getChain(chainName)
 
     const nativeTokenAddress = toNative(chainName, tokenAddress)
     const tokenBridge = await chain.getTokenBridge()
-
-    const txGenerator = tokenBridge.createAttestation(nativeTokenAddress, payer)
-
-    const transactionIds = await signSendWait(chain, txGenerator, signer)
+   
+    const txGenerator = tokenBridge.createAttestation(nativeTokenAddress, toNative(chainName, signer.address()))
     
+    const transactionIds = await signSendWait(chain, txGenerator, signer)
+
     const { txid } = transactionIds.at(0)!
+    
     const [ wormholeMessage ] = await chain.parseTransaction(txid)
 
     const vaa = await wormhole.getVaa(

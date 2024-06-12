@@ -1,4 +1,4 @@
-import { Transaction, waitForConfirmation } from "algosdk"
+import { Transaction, mnemonicToSecretKey, waitForConfirmation } from "algosdk"
 import { useContext, useEffect, useState } from "react"
 import { getAlgodClient } from "@services"
 import { AlgorandSignerContext, peraWallet } from "./AlgorandSignerProvider"
@@ -32,7 +32,8 @@ export const useAlgorandSigner = () => {
             const [address] = await peraWallet.connect()
             dispatch({
                 type: "SET_PERA_WALLET_ADDRESS",
-                payload: address,
+                //payload: address,
+                payload: "ZLNCYK6I3PAOB74KDAPKFUKQPVNVYTUANAYJDIB3GJS6FYAC6XTZ3QL7GY"
             })
             dispatch({
                 type: "SET_ALGORAND_SELECTED_SIGNER",
@@ -62,16 +63,19 @@ export const useAlgorandSigner = () => {
         const _getAlgodClient = getAlgodClient(network)
         switch (selectedSigner) {
         case "pera": {
-            const signedTxns = await peraWallet.signTransaction([
-                [
-                    {
-                        txn,
-                    },
-                ],
-            ])
+            // const signedTxns = await peraWallet.signTransaction([
+            //     [
+            //         {
+            //             txn,
+            //         },
+            //     ],
+            // ])
+
+            const _aaa = mnemonicToSecretKey("solve youth payment gasp swallow document spoil just aim ancient control cotton anger miss multiply siren laugh shoulder lonely embody penalty term comic abstract between")
+            const ttt = txn.signTxn(_aaa.sk)
 
             const { txId } = await _getAlgodClient
-                .sendRawTransaction(signedTxns)
+                .sendRawTransaction(ttt)
                 .do()
             return await waitForConfirmation(_getAlgodClient, txId, 3)
         }

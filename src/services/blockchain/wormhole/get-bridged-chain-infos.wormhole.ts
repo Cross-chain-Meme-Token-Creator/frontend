@@ -1,25 +1,33 @@
 import { Chain, Network } from "@wormhole-foundation/sdk-base"
 import { getWormhole } from "./base.wormhole"
 import {
-
     NativeAddress,
-    TokenAddress,
-    toNative
+    UniversalAddress,
+    toNative,
+    toUniversal,
 } from "@wormhole-foundation/sdk-definitions"
 import { supportedChains } from "./constants.wormhole"
+import { AlgorandAddress } from "@wormhole-foundation/sdk-algorand"
+import { SuiAddress } from "@wormhole-foundation/sdk-sui"
 
 export interface BridgedChainInfo<ChainName extends Chain = Chain> {
     chainName: ChainName
     nativeWrappedAddress: NativeAddress<ChainName>
 }
 
-export interface GetBridgeChainsParams<N extends Network, ChainName extends Chain> {
-    network: N,
+export interface GetBridgeChainsParams<
+    N extends Network,
+    ChainName extends Chain
+> {
+    network: N
     mainChainName: ChainName
-    tokenAddress: TokenAddress<ChainName>
+    tokenAddress: string
 }
 
-export const getBridgedChainInfos = async <N extends Network, ChainName extends Chain>({
+export const getBridgedChainInfos = async <
+    N extends Network,
+    ChainName extends Chain
+>({
     network,
     mainChainName,
     tokenAddress,
@@ -31,7 +39,24 @@ export const getBridgedChainInfos = async <N extends Network, ChainName extends 
         Object.keys(supportedChains) as Array<Chain>
     ).filter((chain) => chain !== mainChainName)
 
-    console.log(allSupportedChainNamesExceptMainChain)
+    let universalAddress: UniversalAddress
+    switch (mainChainName) {
+    case "Algorand": {
+        universalAddress = new AlgorandAddress(
+            tokenAddress
+        ).toUniversalAddress()
+        break
+    }
+    case "Sui": {
+        universalAddress = new SuiAddress(tokenAddress).toUniversalAddress()
+        break
+    }
+    default: {
+        universalAddress = toUniversal(mainChainName, tokenAddress)
+        break
+    }
+    }
+
     const promises: Array<Promise<void>> = []
     for (const chainName of allSupportedChainNamesExceptMainChain) {
         promises.push(
@@ -39,14 +64,12 @@ export const getBridgedChainInfos = async <N extends Network, ChainName extends 
                 try {
                     const chain = wormhole.getChain(chainName)
                     const tokenBridge = await chain.getTokenBridge()
-                    console.log(tokenBridge)
 
                     const { address: nativeWrappedAddress } =
                         await tokenBridge.getWrappedAsset({
                             chain: mainChainName,
-                            address: tokenAddress,
+                            address: universalAddress,
                         })
-                    console.log(nativeWrappedAddress)
 
                     const bridgedChain: BridgedChainInfo<typeof chainName> = {
                         chainName,

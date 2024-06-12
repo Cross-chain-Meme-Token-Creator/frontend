@@ -9,7 +9,7 @@ import {
 } from "@nextui-org/react"
 import React, { useContext } from "react"
 import { RedeemCardContext, RedeemCardProvider } from "./RedeemCardProvider"
-import { ChainSelect, UploadQR } from "@shared"
+import { ChainSelect, UploadQR } from "../../../../../../_shared-components"
 import { RootContext } from "../../../../../../_hooks"
 
 const WrappedRedeemCard = () => {

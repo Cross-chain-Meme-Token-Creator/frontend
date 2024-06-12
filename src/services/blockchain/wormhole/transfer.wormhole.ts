@@ -1,7 +1,7 @@
 import {
     SignAndSendSigner,
+    TokenAddress,
     toNative,
-    toUniversal,
 } from "@wormhole-foundation/sdk-definitions"
 import { getWormhole } from "./base.wormhole"
 import { Chain, Network } from "@wormhole-foundation/sdk-base"
@@ -12,10 +12,10 @@ export interface TransferParams<
     SourceChainName extends Chain,
     TargetChainName extends Chain
 > {
-    network: N,
+    network: N
     transferAmount: bigint
-    recipient: string
-    tokenAddress: string
+    recipientAddress: string
+    tokenAddress: TokenAddress<SourceChainName>
     sourceChainName: SourceChainName
     targetChainName: TargetChainName
     signer: SignAndSendSigner<N, SourceChainName>
@@ -28,24 +28,24 @@ export const transfer = async <
 >({
     network,
     transferAmount,
-    recipient,
+    recipientAddress,
     tokenAddress,
     sourceChainName,
     targetChainName,
     signer,
 }: TransferParams<N, SourceChainName, TargetChainName>) => {
     const wormhole = await getWormhole(network)
-    
+
     const sourceChain = wormhole.getChain(sourceChainName)
     const sourceTokenBridge = await sourceChain.getTokenBridge()
 
     const txGenerator = sourceTokenBridge.transfer(
-        toUniversal(sourceChainName, signer.address()),
+        toNative(sourceChainName, signer.address()),
         {
             chain: targetChainName,
-            address: toUniversal(targetChainName, recipient),
+            address: toNative(targetChainName, recipientAddress),
         },
-        toNative(sourceChainName, tokenAddress),
+        tokenAddress,
         transferAmount
     )
 

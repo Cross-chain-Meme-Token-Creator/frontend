@@ -5,7 +5,7 @@ import {
 import { RootContext } from "../../../_hooks"
 import { useContext, useEffect } from "react"
 import { TokenContext } from "./TokenProvider"
-import { toUniversal } from "@wormhole-foundation/sdk-definitions"
+
 export const useBridgedTokenInfos = () => {
     const { reducer } = useContext(TokenContext)!
     const [state, dispatch] = reducer
@@ -23,12 +23,13 @@ export const useBridgedTokenInfos = () => {
             if (!tokenAddress) return
             dispatch({
                 type: "SET_IS_WRAPPED_TOKENS_FETCH_LOADING",
-                payload: true
+                payload: true,
             })
+
             const _bridgedChainInfos = await getBridgedChainInfos({
                 network,
                 mainChainName: selectedChainName,
-                tokenAddress: toUniversal(selectedChainName, tokenAddress),
+                tokenAddress,
             })
 
             const bridgedChainInfos = _bridgedChainInfos.map(
@@ -38,15 +39,13 @@ export const useBridgedTokenInfos = () => {
                 })
             )
 
-            console.log(bridgedChainInfos)
-
             dispatch({
                 type: "SET_BRIDGED_CHAIN_INFOS",
                 payload: bridgedChainInfos,
             })
             dispatch({
                 type: "SET_IS_WRAPPED_TOKENS_FETCH_LOADING",
-                payload: false
+                payload: false,
             })
         }
         handleEffect()

@@ -11,9 +11,10 @@ import {
     TransferCardContext,
     TransferCardProvider,
 } from "./TransferCardProvider"
-import { ChainSelect } from "@shared"
+
 import { TokenContext } from "../../../../_hooks"
 import { RootContext } from "../../../../../../_hooks"
+import { ChainSelect } from "../../../../../../_shared-components"
 
 const WrappedTransferCard = () => {
     const { formik } = useContext(TransferCardContext)!
@@ -39,14 +40,14 @@ const WrappedTransferCard = () => {
 
                 <div className="gap-4 grid">
                     <Input
-                        id="recipient"
+                        id="recipientAddress"
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
-                        value={formik.values.recipient}
+                        value={formik.values.recipientAddress}
                         isRequired
                         placeholder="0xcoffee"
                         labelPlacement="outside"
-                        label="Recipient"
+                        label="Recipient Address"
                     />
                     <Input
                         id="transferAmount"
