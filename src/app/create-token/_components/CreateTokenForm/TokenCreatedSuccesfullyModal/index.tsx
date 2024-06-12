@@ -20,16 +20,19 @@ import { useSearchParams } from "next/navigation"
 import { useRouter } from "next/navigation"
 
 export const TokenCreatedSuccesfullyModal = () => {
-    const { discloresures, formik, reducer } = useContext(CreateTokenFormContext)!
+    const { discloresures, formik, reducer } = useContext(
+        CreateTokenFormContext
+    )!
     const { tokenCreatedSuccesfullyModalDiscloresure } = discloresures
-    const { onOpenChange, onClose, isOpen } = tokenCreatedSuccesfullyModalDiscloresure
+    const { onOpenChange, onClose, isOpen } =
+        tokenCreatedSuccesfullyModalDiscloresure
 
-    const [state, ] = reducer
-    const { tempTokenInfo } = state 
+    const [state] = reducer
+    const { tempTokenInfo } = state
     const { tokenAddress } = { ...tempTokenInfo }
 
-    const { reducer : rootReducer } = useContext(RootContext)!
-    const [ rootState ] = rootReducer
+    const { reducer: rootReducer } = useContext(RootContext)!
+    const [rootState] = rootReducer
     const { selectedChainName } = rootState
 
     const router = useRouter()
@@ -48,6 +51,8 @@ export const TokenCreatedSuccesfullyModal = () => {
                             <Avatar
                                 className="w-12 h-12"
                                 src={formik.values.iconUrl}
+                                showFallback
+                                name={formik.values.symbol}
                             />
                             <Spacer y={2} />
                             <div>{formik.values.name}</div>
@@ -103,17 +108,23 @@ export const TokenCreatedSuccesfullyModal = () => {
                     </div>
                 </ModalBody>
                 <ModalFooter className="p-4 pt-0">
-                    <Button color="primary" fullWidth onPress={() => {
-                        if (!tokenAddress) return
-                        const _searchParams = new URLSearchParams(searchParams)
-                        _searchParams.set("chainName", selectedChainName)
-                        _searchParams.set("tokenAddress", tokenAddress)
-                      
-                        const url = `/explorer/token?${_searchParams.toString()}`
-                        router.push(url)
+                    <Button
+                        color="primary"
+                        fullWidth
+                        onPress={() => {
+                            if (!tokenAddress) return
+                            const _searchParams = new URLSearchParams(
+                                searchParams
+                            )
+                            _searchParams.set("chainName", selectedChainName)
+                            _searchParams.set("tokenAddress", tokenAddress)
 
-                        onClose()
-                    }}>
+                            const url = `/explorer/token?${_searchParams.toString()}`
+                            router.push(url)
+
+                            onClose()
+                        }}
+                    >
                         View in explorer
                     </Button>
                 </ModalFooter>

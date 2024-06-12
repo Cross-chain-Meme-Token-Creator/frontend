@@ -44,7 +44,12 @@ export const InfoTab = () => {
         <div>
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Avatar className="w-20 h-20" src={iconUrl} />
+                    <Avatar
+                        showFallback
+                        name={symbol}
+                        className="w-20 h-20"
+                        src={iconUrl}
+                    />
                     <Spacer y={4} />
                     <div>
                         <div className="font-semibold text-4xl"> {symbol} </div>
@@ -71,7 +76,6 @@ export const InfoTab = () => {
                                 className="font-semibold"
                                 as="button"
                             >
-                                
                                 {tokenAddress}
                             </Link>
                         </CardBody>
