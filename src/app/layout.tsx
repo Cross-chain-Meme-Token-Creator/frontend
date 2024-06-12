@@ -3,7 +3,7 @@
 import { Open_Sans } from "next/font/google"
 import "./globals.css"
 import React, { Suspense } from "react"
-import { NextUIProvider } from "@nextui-org/react"
+import { NextUIProvider, Spinner } from "@nextui-org/react"
 import { SuietWallet, WalletProvider } from "@suiet/wallet-kit"
 import { Header, Navbar } from "./_components"
 import { MetaMaskProvider } from "@metamask/sdk-react-ui"
@@ -24,7 +24,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
         <html lang="en" className={font.className}>
             <body>
-                <Suspense>
+                <Suspense fallback={<Spinner/>}>
                     <RootProvider>
                         <NextUIProvider>
                             <NextThemesProvider

@@ -11,7 +11,7 @@ import { VAA, serialize } from "@wormhole-foundation/sdk-definitions"
 import React, { useEffect, useRef } from "react"
 import { truncateString } from "@common"
 import { ArrowDownTrayIcon, ShareIcon } from "@heroicons/react/24/outline"
-import QRCodeStyling from "qr-code-styling-2"
+import type QRCodeStyling from "qr-code-styling-2"
 
 interface PassphraseAndQRCodeContentProps {
     vaa: VAA
@@ -19,27 +19,6 @@ interface PassphraseAndQRCodeContentProps {
     qrNote?: string
     className?: string
 }
-
-const qrCode = new QRCodeStyling({
-    width: 250,
-    height: 250,
-    image: "https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/316301705_114932571436049_549628509009748365_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHaIKEt134Xa2ZjdJrvilRUrDdtxUGd03esN23FQZ3Td7fMEvFORvSbm5TKvy8qC_fb1km34ZjkOpjj4ioMFklQ&_nc_ohc=qiWierkmR7oQ7kNvgGihk8a&_nc_ht=scontent.fsgn5-12.fna&oh=00_AYBIZHJ0uKl1kS4713vfJDw_jUXqxedh6vM0PDWWNS4jHA&oe=666DF2CA",
-    dotsOptions: {
-        color: "#000",
-        type: "rounded",
-    },
-    cornersSquareOptions: {
-        color: "#006fee",
-        type: "extra-rounded"
-    },
-    cornersDotOptions: {
-        type: "dot"
-    },
-    imageOptions: {
-        crossOrigin: "anonymous",
-        margin: 5,
-    },
-})
 
 export const PassphraseAndQRCodeContent = ({
     vaa,
@@ -50,15 +29,38 @@ export const PassphraseAndQRCodeContent = ({
     const serializedVaa = Buffer.from(serialize(vaa)).toString("base64")
 
     const ref = useRef<HTMLDivElement | null>(null)
+    const qrCodeRef = useRef<QRCodeStyling | null>(null)
 
     useEffect(() => {
-        qrCode.append(ref.current ?? undefined)
-    }, [])
-
-    useEffect(() => {
-        qrCode.update({
-            data: serializedVaa,
-        })
+        const handleEffect = async () => {
+            const { default: QRCodeStyling } = await import("qr-code-styling-2")
+            const qrCode = new QRCodeStyling({
+                width: 250,
+                height: 250,
+                image: "https://scontent.fsgn5-12.fna.fbcdn.net/v/t39.30808-6/316301705_114932571436049_549628509009748365_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeHaIKEt134Xa2ZjdJrvilRUrDdtxUGd03esN23FQZ3Td7fMEvFORvSbm5TKvy8qC_fb1km34ZjkOpjj4ioMFklQ&_nc_ohc=qiWierkmR7oQ7kNvgGihk8a&_nc_ht=scontent.fsgn5-12.fna&oh=00_AYBIZHJ0uKl1kS4713vfJDw_jUXqxedh6vM0PDWWNS4jHA&oe=666DF2CA",
+                dotsOptions: {
+                    color: "#000",
+                    type: "rounded",
+                },
+                cornersSquareOptions: {
+                    color: "#006fee",
+                    type: "extra-rounded",
+                },
+                cornersDotOptions: {
+                    type: "dot",
+                },
+                imageOptions: {
+                    crossOrigin: "anonymous",
+                    margin: 5,
+                },
+            })
+            qrCode.append(ref.current ?? undefined)
+            qrCode.update({
+                data: serializedVaa,
+            })
+            qrCodeRef.current = qrCode
+        }
+        handleEffect()
     }, [])
 
     return (
@@ -83,7 +85,6 @@ export const PassphraseAndQRCodeContent = ({
                         <div ref={ref} />
                     </CardBody>
                 </Card>
-              
 
                 <Spacer y={4} />
                 <div className="flex gap-4">
@@ -91,7 +92,7 @@ export const PassphraseAndQRCodeContent = ({
                         color="primary"
                         variant="light"
                         isIconOnly
-                        onPress={() => qrCode.download()}
+                        onPress={() => qrCodeRef.current?.download()}
                     >
                         <ArrowDownTrayIcon className="w-5 h-5" />
                     </Button>
