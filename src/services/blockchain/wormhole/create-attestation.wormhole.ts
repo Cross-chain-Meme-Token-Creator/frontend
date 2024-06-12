@@ -30,7 +30,7 @@ export const createAttestation = async <N extends Network, ChainName extends Cha
     
     const transactionIds = await signSendWait(chain, txGenerator, signer)
 
-    const { txid } = transactionIds.at(0)!
+    const { txid } = transactionIds.at(-1)!
     
     const [ wormholeMessage ] = await chain.parseTransaction(txid)
 

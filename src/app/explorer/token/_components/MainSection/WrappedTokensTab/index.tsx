@@ -4,7 +4,7 @@ import { WrappedTokensTable } from "./WrappedTokensTable"
 import { Spacer } from "@nextui-org/react"
 import { CreateWrappedTokenModal } from "./CreateWrappedTokenModal"
 
-export const CreateWrappedTokensTab = () => {
+export const WrappedTokensTab = () => {
     return (
         <div>
             <WrappedTokensTable/>

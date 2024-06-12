@@ -35,7 +35,7 @@ export const Header = () => {
                         setChainName={(chainName) => {
                             const params = new URLSearchParams(searchParams)
                             
-                            params.set("chainName", selectedChainName)
+                            params.set("chainName", chainName)
                             router.push(`${pathname}?${params.toString()}`, {
                                 scroll: false,
                             })

@@ -2,7 +2,7 @@
 import { Tabs, Tab } from "@nextui-org/react"
 import React from "react"
 import { InfoTab } from "./InfoTab"
-import { CreateWrappedTokensTab } from "./CreateWrappedTokensTab"
+import { WrappedTokensTab } from "./WrappedTokensTab"
 import { CreateAttestationTab } from "./CreateAttestationTab"
 import { TransferTab } from "./TransferTab"
 import { RedeemTab } from "./RedeemTab"
@@ -21,9 +21,9 @@ export const MainSection = () => {
             component: <CreateAttestationTab />,
         },
         {
-            key: "createWrappedTokenTokensTab",
-            title: "Create Wrapped Tokens",
-            component: <CreateWrappedTokensTab />,
+            key: "wrappedTokenTokens",
+            title: "Wrapped Tokens",
+            component: <WrappedTokensTab />,
         },
         { key: "transfer", title: "Transfer", component: <TransferTab /> },
         { key: "redeem", title: "Redeem", component: <RedeemTab /> },

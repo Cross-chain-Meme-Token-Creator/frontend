@@ -51,7 +51,7 @@ export const transfer = async <
 
     const transactionIds = await signSendWait(sourceChain, txGenerator, signer)
 
-    const { txid } = transactionIds.at(0)!
+    const { txid } = transactionIds.at(-1)!
 
     const [wormholeMessage] = await sourceChain.parseTransaction(txid)
 

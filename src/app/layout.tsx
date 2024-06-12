@@ -24,7 +24,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
         <html lang="en" className={font.className}>
             <body>
-                <Suspense fallback={<Spinner/>}>
+                <Suspense
+                    fallback={
+                        <div className="w-screen h-screen grid place-items-center">
+                            <Spinner />
+                        </div>
+                    }
+                >
                     <RootProvider>
                         <NextUIProvider>
                             <NextThemesProvider
