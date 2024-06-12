@@ -9,15 +9,15 @@ import {
     AlgorandUnsignedTransaction,
 } from "@wormhole-foundation/sdk-algorand"
 import { SignAndSendSigner } from "@wormhole-foundation/sdk-definitions"
-import algosdk, {
+import {
     Algodv2,
     Transaction,
     assignGroupID,
-    mnemonicToSecretKey,
     waitForConfirmation,
 } from "algosdk"
 import { getAlgodClient } from "../../algorand"
 import { SignerTransaction } from "@perawallet/connect/dist/util/model/peraWalletModels"
+import { WithIdx, pushPositionedElementsToArray } from "@common"
 
 export class PeraWalletSigner<N extends Network, C extends AlgorandChains>
 implements SignAndSendSigner<N, C>
@@ -70,9 +70,8 @@ implements SignAndSendSigner<N, C>
         }) as Array<AlgorandUnsignedTransaction<N, C>>
 
         const unsignedTxns: Array<SignerTransaction> = []
-        const signedTxns: Array<Uint8Array> = []
 
-        const { sk } = mnemonicToSecretKey("judge corn snack deposit visa kidney unfair tenant cause car lobster destroy gorilla license coil viable humor use head vessel salon grape fiber about random")
+        const signedTxnWithIdxs: Array<WithIdx<Uint8Array>> = []
 
         for (let i = 0; i < groupedUnsignedTxns.length; i++) {
             const unsignedTxn = groupedUnsignedTxns.at(i)!
@@ -88,27 +87,26 @@ implements SignAndSendSigner<N, C>
 
             if (signer) {
                 const signedTxn = await signer.signTxn(tx)
-                signedTxns.push(signedTxn)
-            } else {
-                signedTxns.push(tx.signTxn(sk))
+                signedTxnWithIdxs.push({
+                    idx: i,
+                    data: signedTxn,
+                })
             }
-            // unsignedTxns.push({
-            //     txn: tx,
-            //     signers: [signer?.address ?? this.address()],
-            // })
+
+            unsignedTxns.push({
+                txn: tx,
+                signers: signer ? [signer.address] : [],
+            })
         }
 
-        // const signedTxnsToSend = await this._peraWallet.signTransaction([
-        //     unsignedTxns,
-        // ])
-        // for (const { idx, signedData } of signedTxns) {
-        //     signedTxnsToSend[idx] = signedData
-        // }
-        // console.log(signedTxns)
-
+        const signedTxns = await this._peraWallet.signTransaction([
+            unsignedTxns,
+        ])
 
         const { txId } = await this._algodClient
-            .sendRawTransaction(signedTxns)
+            .sendRawTransaction(
+                pushPositionedElementsToArray(signedTxnWithIdxs, signedTxns)
+            )
             .do()
 
         await waitForConfirmation(this._algodClient, txId, 15)
