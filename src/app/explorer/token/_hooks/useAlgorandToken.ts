@@ -25,12 +25,14 @@ export const useAlgorandToken = () => {
             type: "SET_IS_LOADING",
             payload: true,
         })
-
+        console.log(tokenAddress, selectedChainName)
         const handleEffect = async () => {
             try {
                 const asset = (await algodClient
                     .getAssetByID(Number.parseInt(tokenAddress))
                     .do()) as AlgorandAsset
+                console.log(asset)
+
                 const { params } = asset
                 const {
                     decimals,
@@ -48,9 +50,17 @@ export const useAlgorandToken = () => {
                         symbol,
                     },
                 })
+                tokenDispatch({
+                    type: "SET_IS_NOT_FOUND",
+                    payload: false
+                })
             } catch (ex) {
                 tokenDispatch({
                     type: "SET_TOKEN_INFO",
+                })
+                tokenDispatch({
+                    type: "SET_IS_NOT_FOUND",
+                    payload: true
                 })
             } finally {
                 tokenDispatch({
@@ -66,5 +76,5 @@ export const useAlgorandToken = () => {
         )
 
         return () => clearTimeout(delayedFunction)
-    }, [tokenAddress])
+    }, [tokenAddress, selectedChainName])
 }

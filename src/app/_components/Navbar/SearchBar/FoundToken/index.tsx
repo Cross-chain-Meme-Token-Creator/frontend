@@ -6,6 +6,7 @@ import { useFoundSuiToken } from "./useFoundSuiToken"
 import { useFoundAlgorandToken } from "./useFoundAlgorandToken"
 import { useRouter } from "next/navigation"
 import { RootContext } from "../../../../_hooks"
+import { SearchBarContext } from "../SearchBarProvider"
 
 const WrappedFoundToken = () => {
     const { reducer } = useContext(FoundTokenContext)!
@@ -15,6 +16,10 @@ const WrappedFoundToken = () => {
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
     const { searchValue, selectedChainName } = rootState
+
+    const { discloresures } = useContext(SearchBarContext)!
+    const { originDiscloresure } = discloresures
+    const { onClose } = originDiscloresure
 
     useFoundSuiToken()
     useFoundAlgorandToken()
@@ -43,6 +48,7 @@ const WrappedFoundToken = () => {
                         router.push(
                             `/explorer/token?${urlSearchParams.toString()}`
                         )
+                        onClose()
                     }}
                     shadow="none"
                 >

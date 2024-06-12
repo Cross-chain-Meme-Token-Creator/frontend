@@ -8,3 +8,8 @@ export interface AlgorandAsset {
         url: string
     }
 }
+
+export type AlgorandCreateAssetResponse = {
+    "asset-index": number,
+    "confirmed-round": number
+}

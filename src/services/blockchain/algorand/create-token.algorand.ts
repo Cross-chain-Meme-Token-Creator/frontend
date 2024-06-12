@@ -5,7 +5,7 @@ import {
     makeAssetCreateTxnWithSuggestedParamsFromObject,
 } from "algosdk"
 
-export type CreateAlgorandTokenParams = {
+export type GetMakeAlgorandAssetTransactionParams = {
     fromAddress: string
     decimals: number
     name: string
@@ -22,7 +22,7 @@ export const getMakeAlgorandAssetTransaction = async (
         symbol,
         totalSupply,
         iconUrl,
-    }: CreateAlgorandTokenParams,
+    }: GetMakeAlgorandAssetTransactionParams,
     network: SupportedNetwork = "Testnet"
 ): Promise<Transaction> => {
     const suggestedParams = await getAlgodClient(network)

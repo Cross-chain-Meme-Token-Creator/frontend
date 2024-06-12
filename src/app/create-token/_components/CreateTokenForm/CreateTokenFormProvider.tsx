@@ -1,20 +1,30 @@
 import { Form, Formik, FormikProps } from "formik"
-import React, { ReactNode, createContext, useContext, useMemo } from "react"
+import React, {
+    Dispatch,
+    ReactNode,
+    createContext,
+    useContext,
+    useMemo,
+} from "react"
 import {
+    AlgorandCreateAssetResponse,
     SupportedChainName,
     baseAxios,
     getCreateSuiTokenTransactionBlock,
     getMakeAlgorandAssetTransaction,
 } from "@services"
 import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
-import { Link, Spacer } from "@nextui-org/react"
-import { NotificationModalContext } from "../../../_components"
-import { useRouter } from "next/navigation"
+import { useDisclosure } from "@nextui-org/react"
 import useSwr, { SWRResponse } from "swr"
 import * as Yup from "yup"
-import { computeNumberMultipeBigInt, computePow } from "@common"
+import { DisclosureType, computeNumberMultipeBigInt, computePow } from "@common"
 import { RootContext, useAlgorandSigner } from "../../../_hooks"
 import { useWallet } from "@suiet/wallet-kit"
+import {
+    CreateTokenFormState,
+    SetCreateTokenFormAddressAction,
+    useCreateTokenFormReducer,
+} from "./useCreateTokenFormReducer"
 
 interface FormikValue {
     symbol: string
@@ -31,6 +41,10 @@ interface CreateTokenFormContextValue {
         iconUrlSwr: SWRResponse
     }
     formik: FormikProps<FormikValue>
+    discloresures: {
+        tokenCreatedSuccesfullyModalDiscloresure: DisclosureType
+    }
+    reducer: [CreateTokenFormState, Dispatch<SetCreateTokenFormAddressAction>]
 }
 
 const initialValues: FormikValue = {
@@ -45,7 +59,19 @@ const initialValues: FormikValue = {
 export const CreateTokenFormContext =
     createContext<CreateTokenFormContextValue | null>(null)
 
-const renderBody = (formik: FormikProps<FormikValue>, chidren: ReactNode) => {
+const renderBody = (
+    formik: FormikProps<FormikValue>,
+    chidren: ReactNode,
+    others: {
+        tokenCreatedSuccesfullyModalDiscloresure: DisclosureType
+        reducer: [
+            CreateTokenFormState,
+            Dispatch<SetCreateTokenFormAddressAction>
+        ]
+    }
+) => {
+    const { tokenCreatedSuccesfullyModalDiscloresure, reducer } = others
+
     const iconUrlSwr = useSwr(
         "ICON_URL",
         async () => {
@@ -70,8 +96,12 @@ const renderBody = (formik: FormikProps<FormikValue>, chidren: ReactNode) => {
             swrs: {
                 iconUrlSwr,
             },
+            discloresures: {
+                tokenCreatedSuccesfullyModalDiscloresure,
+            },
+            reducer,
         }),
-        [formik, iconUrlSwr]
+        [formik, iconUrlSwr, reducer, tokenCreatedSuccesfullyModalDiscloresure]
     )
 
     return (
@@ -92,20 +122,23 @@ export const CreateTokenFormProvider = ({
         address: suiAddress,
         select,
         signAndExecuteTransactionBlock,
-    } = useWallet()
-    const { functions } = useContext(NotificationModalContext)!
-    const { openModal, closeModal } = functions
-    const router = useRouter()
+    } = useWallet()!
 
-    const { reducer } = useContext(RootContext)!
-    const [state] = reducer
-    const { selectedChainName } = state
+    const tokenCreatedSuccesfullyModalDiscloresure = useDisclosure()
+    const { onOpen } = tokenCreatedSuccesfullyModalDiscloresure
+
+    const { reducer: rootReducer } = useContext(RootContext)!
+    const [rootState] = rootReducer
+    const { selectedChainName } = rootState
 
     const {
         address: algorandAddress,
         signAndSend,
-        connectPera
+        connectPera,
     } = useAlgorandSigner()
+
+    const reducer = useCreateTokenFormReducer()
+    const [, dispatch] = reducer
 
     return (
         <Formik
@@ -124,10 +157,7 @@ export const CreateTokenFormProvider = ({
                 iconUrl,
                 totalSupply,
             }) => {
-                let contractAddress: string
-
                 switch (selectedChainName) {
-
                 case SupportedChainName.Sui: {
                     if (!suiAddress) {
                         await select("Suiet")
@@ -162,7 +192,13 @@ export const CreateTokenFormProvider = ({
                     if (!metadataObject) return
 
                     const { objectId } = metadataObject
-                    contractAddress = objectId
+
+                    dispatch({
+                        type: "SET_TEMP_TOKEN_INFO",
+                        payload: {
+                            tokenAddress: objectId,
+                        },
+                    })
                     break
                 }
                 case SupportedChainName.Algorand: {
@@ -170,7 +206,7 @@ export const CreateTokenFormProvider = ({
                         connectPera()
                         return
                     }
-                    
+
                     const txn = await getMakeAlgorandAssetTransaction({
                         fromAddress: algorandAddress,
                         decimals,
@@ -182,45 +218,29 @@ export const CreateTokenFormProvider = ({
                             computePow(decimals)
                         ),
                     })
-                    const res = await signAndSend(txn)
-                    console.log(res)
-                    contractAddress = ""
+                    const response = (await signAndSend(txn)) as
+                            | AlgorandCreateAssetResponse
+                            | undefined
+                    if (!response) return
+                    dispatch({
+                        type: "SET_TEMP_TOKEN_INFO",
+                        payload: {
+                            tokenAddress:
+                                    response["asset-index"].toString(),
+                        },
+                    })
                     break
                 }
                 }
-
-                const innerHtml = (
-                    <div>
-                        <div className="text-sm">
-                            {`Congratulations! You have created token ${symbol} successfully. ${totalSupply} ${symbol} have been sent to you.`}
-                        </div>
-                        <Spacer y={2} />
-                        <div className="flex gap-1 items-center text-sm">
-                            <div>{`To transfer ${symbol}, please go to `}</div>
-
-                            <Link
-                                as="button"
-                                onPress={() => {
-                                    router.push(
-                                        `/explorer/sui/${contractAddress}`
-                                    )
-                                    closeModal()
-                                }}
-                                isExternal
-                            >
-                                explorer page
-                            </Link>
-                        </div>
-                    </div>
-                )
-
-                openModal({
-                    innerHtml,
-                    title: "Create Token Successfully",
-                })
+                onOpen()
             }}
         >
-            {(formik) => renderBody(formik, children)}
+            {(formik) =>
+                renderBody(formik, children, {
+                    tokenCreatedSuccesfullyModalDiscloresure,
+                    reducer,
+                })
+            }
         </Formik>
     )
 }

@@ -29,7 +29,8 @@ export interface TokenState {
     bridgedChainInfos: Array<BridgedChainInfo>
     keys: {
         refreshWrappedTokensKey?: string
-    }
+    },
+    isNotFound: boolean
 }
 
 export interface SetTokenAddressAction {
@@ -72,6 +73,10 @@ export interface UpdateBalanceAction {
 export interface SetRefreshWrappedTokensKeyAction {
     type: "SET_REFRESH_WRAPPED_TOKENS_KEY_ACTION"
 }
+export interface SetIsNotFoundAction {
+    type: "SET_IS_NOT_FOUND"
+    payload: boolean
+}
 
 export type TokenAction =
     | SetTokenAddressAction
@@ -82,14 +87,16 @@ export type TokenAction =
     | UpdateBalanceAction
     | SetRefreshWrappedTokensKeyAction
     | SetIsLoadingAction
+    | SetIsNotFoundAction
 
 export const initialState: TokenState = {
     loadings: {
-        isLoading: false,
+        isLoading: true,
         isWrappedTokensFetchLoading: false,
     },
     bridgedChainInfos: [],
-    keys: {}
+    keys: {},
+    isNotFound: false
 }
 
 export const reducer = (
@@ -168,7 +175,11 @@ export const reducer = (
                 isLoading: action.payload
             }
         }
-
+    case "SET_IS_NOT_FOUND": 
+        return {
+            ...state,
+            isNotFound: action.payload
+        }
     default:
         return state
     }

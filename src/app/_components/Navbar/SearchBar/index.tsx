@@ -8,17 +8,20 @@ import {
     ModalContent,
     ModalFooter,
     ModalHeader,
-    useDisclosure,
 } from "@nextui-org/react"
 import React, { useContext } from "react"
 import { FoundToken } from "./FoundToken"
 import { RootContext } from "../../../_hooks"
+import { SearchBarContext, SearchBarProvider } from "./SearchBarProvider"
 
-export const SearchBar = () => {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure()
+const WrappedSearchBar = () => {
     const { reducer } = useContext(RootContext)!
     const [state, dispatch] = reducer
     const { searchValue } = state
+
+    const { discloresures } = useContext(SearchBarContext)!
+    const { originDiscloresure } = discloresures
+    const { onOpenChange, onOpen, isOpen } = originDiscloresure
 
     return (
         <>
@@ -29,7 +32,12 @@ export const SearchBar = () => {
             >
                 Search anything
             </Button>
-            <Modal size="4xl" hideCloseButton isOpen={isOpen} onOpenChange={onOpenChange}>
+            <Modal
+                size="4xl"
+                hideCloseButton
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -62,5 +70,13 @@ export const SearchBar = () => {
                 </ModalContent>
             </Modal>
         </>
+    )
+}
+
+export const SearchBar = () => {
+    return (
+        <SearchBarProvider>
+            <WrappedSearchBar />
+        </SearchBarProvider>
     )
 }

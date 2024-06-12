@@ -29,6 +29,7 @@ export const Navbar = () => {
             <NavbarContent className="hidden sm:flex gap-4" justify="center">
                 <NavbarItem>
                     <Link
+                        as="button"
                         color="foreground"
                         onPress={() => push("/create-token")}
                         size="sm"
@@ -37,12 +38,12 @@ export const Navbar = () => {
                     </Link>
                 </NavbarItem>
                 <NavbarItem isActive>
-                    <Link href="#" aria-current="page" size="sm">
+                    <Link as="button" href="#" aria-current="page" size="sm">
                         Explorer
                     </Link>
                 </NavbarItem>
                 <NavbarItem>
-                    <Link color="foreground" href="#" size="sm">
+                    <Link as="button" color="foreground" href="#" size="sm">
                         More
                     </Link>
                 </NavbarItem>

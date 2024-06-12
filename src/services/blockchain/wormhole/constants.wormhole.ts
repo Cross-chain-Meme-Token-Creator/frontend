@@ -50,6 +50,14 @@ export interface SupportedChainInfo {
     platform: SupportedPlatform
 }
 
+export const chainNameToTokenIdName: Record<SupportedChainName, string> = {
+    [SupportedChainName.Sui]: "Object ID",
+    [SupportedChainName.Algorand]: "Asset Id",
+    [SupportedChainName.Solana]: "Contract Address",
+    [SupportedChainName.Bsc]: "Contract Address",
+    [SupportedChainName.Celo]: "Contract Address",
+}
+
 export const supportedChains: Record<SupportedChainName, SupportedChainInfo> = {
     [SupportedChainName.Sui]: {
         name: "Sui",

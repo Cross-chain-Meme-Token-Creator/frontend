@@ -3,9 +3,9 @@
 import { Open_Sans } from "next/font/google"
 import "./globals.css"
 import React, { Suspense } from "react"
-import { NextUIProvider, Spinner } from "@nextui-org/react"
+import { NextUIProvider } from "@nextui-org/react"
 import { SuietWallet, WalletProvider } from "@suiet/wallet-kit"
-import { Header, Navbar } from "./_components"
+import { Header, Navbar, SuspenseScreen } from "./_components"
 import { MetaMaskProvider } from "@metamask/sdk-react-ui"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 import { GoogleAnalytics } from "@next/third-parties/google"
@@ -23,16 +23,10 @@ const font = Open_Sans({ subsets: ["latin"] })
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (
         <html lang="en" className={font.className}>
-            <body>
-                <Suspense
-                    fallback={
-                        <div className="w-screen h-screen grid place-items-center">
-                            <Spinner />
-                        </div>
-                    }
-                >
+            <body className="min-h-screen grid">
+                <Suspense fallback={<SuspenseScreen />}>
                     <RootProvider>
-                        <NextUIProvider>
+                        <NextUIProvider className="h-full">
                             <NextThemesProvider
                                 attribute="class"
                                 defaultTheme="light"

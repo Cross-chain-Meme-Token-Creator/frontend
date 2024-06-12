@@ -64,9 +64,17 @@ export const useSuiToken = () => {
                         tokenType
                     },
                 })
+                tokenDispatch({
+                    type: "SET_IS_NOT_FOUND",
+                    payload: false
+                })
             } catch (ex) {
                 tokenDispatch({
                     type: "SET_TOKEN_INFO",
+                })
+                tokenDispatch({
+                    type: "SET_IS_NOT_FOUND",
+                    payload: true
                 })
             } finally {
                 tokenDispatch({
@@ -76,5 +84,5 @@ export const useSuiToken = () => {
             }
         }
         handleEffect()
-    }, [tokenAddress])
+    }, [tokenAddress, selectedChainName])
 }
