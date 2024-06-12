@@ -9,10 +9,11 @@ import {
     AlgorandUnsignedTransaction,
 } from "@wormhole-foundation/sdk-algorand"
 import { SignAndSendSigner } from "@wormhole-foundation/sdk-definitions"
-import {
+import algosdk, {
     Algodv2,
     Transaction,
     assignGroupID,
+    mnemonicToSecretKey,
     waitForConfirmation,
 } from "algosdk"
 import { getAlgodClient } from "../../algorand"
@@ -52,7 +53,9 @@ implements SignAndSendSigner<N, C>
         return this._address
     }
 
-    async signAndSend(txns: Array<UnsignedTransaction>): Promise<Array<SignedTx>> {
+    async signAndSend(
+        txns: Array<UnsignedTransaction>
+    ): Promise<Array<SignedTx>> {
         const txids: Array<SignedTx> = []
 
         const ungrouped = txns.map((txn) => {
@@ -67,10 +70,15 @@ implements SignAndSendSigner<N, C>
         }) as Array<AlgorandUnsignedTransaction<N, C>>
 
         const unsignedTxns: Array<SignerTransaction> = []
+        const signedTxns: Array<Uint8Array> = []
 
-        for (const unsignedTxn of groupedUnsignedTxns) {
+        const { sk } = mnemonicToSecretKey("judge corn snack deposit visa kidney unfair tenant cause car lobster destroy gorilla license coil viable humor use head vessel salon grape fiber about random")
+
+        for (let i = 0; i < groupedUnsignedTxns.length; i++) {
+            const unsignedTxn = groupedUnsignedTxns.at(i)!
+
             const { description, transaction: tsp } = unsignedTxn
-            const { tx } = tsp
+            const { tx, signer } = tsp
             const txId = tx.txID()
             txids.push(txId)
 
@@ -78,14 +86,30 @@ implements SignAndSendSigner<N, C>
                 console.log(`Signing ${description} for ${this.address()}`)
             }
 
-            unsignedTxns.push({
-                txn: tx,
-                signers: [this.address()]
-            })
+            if (signer) {
+                const signedTxn = await signer.signTxn(tx)
+                signedTxns.push(signedTxn)
+            } else {
+                signedTxns.push(tx.signTxn(sk))
+            }
+            // unsignedTxns.push({
+            //     txn: tx,
+            //     signers: [signer?.address ?? this.address()],
+            // })
         }
 
-        const signedTxns = await this._peraWallet.signTransaction([unsignedTxns])
-        const { txId } = await this._algodClient.sendRawTransaction(signedTxns).do()
+        // const signedTxnsToSend = await this._peraWallet.signTransaction([
+        //     unsignedTxns,
+        // ])
+        // for (const { idx, signedData } of signedTxns) {
+        //     signedTxnsToSend[idx] = signedData
+        // }
+        // console.log(signedTxns)
+
+
+        const { txId } = await this._algodClient
+            .sendRawTransaction(signedTxns)
+            .do()
 
         await waitForConfirmation(this._algodClient, txId, 15)
 
