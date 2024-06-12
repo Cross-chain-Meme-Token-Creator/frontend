@@ -25,8 +25,8 @@ implements SignAndSendSigner<N, C> {
         return this._metamaskWallet.account ?? ""
     }
 
-    async signAndSend(txns: UnsignedTransaction[]): Promise<TxHash[]> {
-        const txids: TxHash[] = []
+    async signAndSend(txns: Array<UnsignedTransaction>): Promise<Array<TxHash>> {
+        const txids: Array<TxHash> = []
         for (const tx of txns) {
             const { description, transaction } = tx as EvmUnsignedTransaction<
                 N,

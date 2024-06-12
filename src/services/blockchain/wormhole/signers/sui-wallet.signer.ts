@@ -19,7 +19,7 @@ export class SuiWalletSigner<N extends Network, C extends SuiChains> implements 
         return this._suiWallet.address ?? ""
     }
 
-    async signAndSend(txns: UnsignedTransaction[]): Promise<TxHash[]> {
+    async signAndSend(txns: Array<UnsignedTransaction>): Promise<Array<TxHash>> {
         const txids: TxHash[] = []
         for (const tx of txns) {
             const { description, transaction } = tx as SuiUnsignedTransaction<N, C>

@@ -52,7 +52,7 @@ implements SignAndSendSigner<N, C>
         return this._address
     }
 
-    async signAndSend(txns: UnsignedTransaction[]): Promise<SignedTx[]> {
+    async signAndSend(txns: Array<UnsignedTransaction>): Promise<Array<SignedTx>> {
         const txids: Array<SignedTx> = []
 
         const ungrouped = txns.map((txn) => {
