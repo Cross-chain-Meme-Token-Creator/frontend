@@ -8,8 +8,8 @@ export const pushPositionedElementsToArray = <T>(
 ): Array<T> => {
     const newArray = [...array]
 
-    for (const positionedElement of positionedElements) {
-        newArray.splice(positionedElement.idx, 0, positionedElement.data)
+    for (const { idx, data } of positionedElements) {
+        newArray.splice(idx, 0, data)
     }
 
     return newArray
