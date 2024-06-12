@@ -33,7 +33,6 @@ export const useAlgorandSigner = () => {
             dispatch({
                 type: "SET_PERA_WALLET_ADDRESS",
                 payload: address,
-                //payload: "ZLNCYK6I3PAOB74KDAPKFUKQPVNVYTUANAYJDIB3GJS6FYAC6XTZ3QL7GY"
             })
             dispatch({
                 type: "SET_ALGORAND_SELECTED_SIGNER",
@@ -66,13 +65,10 @@ export const useAlgorandSigner = () => {
             const signedTxns = await peraWallet.signTransaction([
                 [
                     {
-                        txn
+                        txn,
                     },
                 ],
             ])
-
-            // const _aaa = mnemonicToSecretKey("solve youth payment gasp swallow document spoil just aim ancient control cotton anger miss multiply siren laugh shoulder lonely embody penalty term comic abstract between")
-            // const ttt = txn.signTxn(_aaa.sk)
 
             const { txId } = await _getAlgodClient
                 .sendRawTransaction(signedTxns)

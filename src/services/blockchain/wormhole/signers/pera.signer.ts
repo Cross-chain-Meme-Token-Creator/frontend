@@ -49,7 +49,6 @@ implements SignAndSendSigner<N, C>
     }
 
     address(): string {
-        //return "ZLNCYK6I3PAOB74KDAPKFUKQPVNVYTUANAYJDIB3GJS6FYAC6XTZ3QL7GY"
         return this._address
     }
 
@@ -70,14 +69,13 @@ implements SignAndSendSigner<N, C>
         const unsignedTxns: Array<SignerTransaction> = []
 
         for (const unsignedTxn of groupedUnsignedTxns) {
-            const { transaction: tsp } = unsignedTxn
+            const { description, transaction: tsp } = unsignedTxn
             const { tx } = tsp
             const txId = tx.txID()
             txids.push(txId)
 
             if (this._debug) {
-                console.log(tx._getDictForDisplay())
-                console.log(txId)
+                console.log(`Signing ${description} for ${this.address()}`)
             }
 
             unsignedTxns.push({
