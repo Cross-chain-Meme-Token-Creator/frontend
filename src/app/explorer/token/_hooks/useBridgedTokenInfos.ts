@@ -1,6 +1,6 @@
 import {
     getBridgedChainInfos,
-    tryMapChainNameToSupportedChainName,
+    mapChainNameToSupportedChainName,
 } from "@services"
 import { RootContext } from "../../../_hooks"
 import { useContext, useEffect } from "react"
@@ -34,7 +34,7 @@ export const useBridgedTokenInfos = () => {
 
             const bridgedChainInfos = _bridgedChainInfos.map(
                 ({ nativeWrappedAddress, chainName }) => ({
-                    chainName: tryMapChainNameToSupportedChainName(chainName),
+                    chainName: mapChainNameToSupportedChainName(chainName),
                     wrappedAddress: nativeWrappedAddress.address as string,
                 })
             )

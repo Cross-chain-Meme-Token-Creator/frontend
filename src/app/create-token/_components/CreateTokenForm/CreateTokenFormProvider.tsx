@@ -25,7 +25,11 @@ import {
     SetCreateTokenFormAddressAction,
     useCreateTokenFormReducer,
 } from "./useCreateTokenFormReducer"
-import { SigningTransactionModalContext } from "../../../_components"
+import {
+    SignTransactionModalContext,
+    TransactionToastContext,
+    WalletConnectionRequiredModalContext,
+} from "../../../_components"
 
 interface FormikValue {
     symbol: string
@@ -119,11 +123,7 @@ export const CreateTokenFormProvider = ({
 }: {
     children: ReactNode
 }) => {
-    const {
-        address: suiAddress,
-        select,
-        signAndExecuteTransactionBlock,
-    } = useWallet()!
+    const { address: suiAddress, signAndExecuteTransactionBlock } = useWallet()!
 
     const tokenCreatedSuccesfullyModalDiscloresure = useDisclosure()
     const { onOpen } = tokenCreatedSuccesfullyModalDiscloresure
@@ -132,17 +132,24 @@ export const CreateTokenFormProvider = ({
     const [rootState] = rootReducer
     const { selectedChainName } = rootState
 
-    const {
-        address: algorandAddress,
-        signAndSend,
-        connectPera,
-    } = useAlgorandSigner()
+    const { address: algorandAddress, signAndSend } = useAlgorandSigner()
 
     const reducer = useCreateTokenFormReducer()
     const [, dispatch] = reducer
 
-    const { functions } = useContext(SigningTransactionModalContext)!
+    const { functions } = useContext(SignTransactionModalContext)!
     const { openModal, closeModal } = functions
+
+    const { functions: walletConnectionRequiredModalFunctions } = useContext(
+        WalletConnectionRequiredModalContext
+    )!
+    const { openModal: openWalletConnectionRequiredModal } =
+        walletConnectionRequiredModalFunctions
+
+    const { functions: transactionToastFunctions } = useContext(
+        TransactionToastContext
+    )!
+    const { notify } = transactionToastFunctions
 
     return (
         <Formik
@@ -161,14 +168,14 @@ export const CreateTokenFormProvider = ({
                 iconUrl,
                 totalSupply,
             }) => {
-                try {
-                    switch (selectedChainName) {
-                    case SupportedChainName.Sui: {
-                        if (!suiAddress) {
-                            await select("Suiet")
-                            return
-                        }
-
+                switch (selectedChainName) {
+                case SupportedChainName.Sui: {
+                    if (!suiAddress) {
+                        openWalletConnectionRequiredModal()
+                        return
+                    }
+                    try {
+                        openModal()
                         const transactionBlock =
                                 await getCreateSuiTokenTransactionBlock({
                                     decimals,
@@ -181,7 +188,7 @@ export const CreateTokenFormProvider = ({
                                         computePow(decimals)
                                     ),
                                 })
-                        const { objectChanges } =
+                        const { objectChanges, digest } =
                                 await signAndExecuteTransactionBlock({
                                     transactionBlock,
                                     options: {
@@ -204,16 +211,24 @@ export const CreateTokenFormProvider = ({
                                 tokenAddress: objectId,
                             },
                         })
-                        break
+
+                        notify({
+                            chainName: selectedChainName,
+                            txHash: digest,
+                        })
+                        onOpen()
+                    } finally {
+                        closeModal()
                     }
-                    case SupportedChainName.Algorand: {
-                        if (!algorandAddress) {
-                            connectPera()
-                            return
-                        }
-
+                    break
+                }
+                case SupportedChainName.Algorand: {
+                    if (!algorandAddress) {
+                        openWalletConnectionRequiredModal()
+                        return
+                    }
+                    try {
                         openModal()
-
                         const txn = await getMakeAlgorandAssetTransaction({
                             fromAddress: algorandAddress,
                             decimals,
@@ -226,22 +241,28 @@ export const CreateTokenFormProvider = ({
                             ),
                         })
                         const response = (await signAndSend(txn)) as
-                                | AlgorandCreateAssetResponse
-                                | undefined
+                            | AlgorandCreateAssetResponse
+                            | undefined
                         if (!response) return
                         dispatch({
                             type: "SET_TEMP_TOKEN_INFO",
                             payload: {
                                 tokenAddress:
-                                        response["asset-index"].toString(),
+                                    response["asset-index"].toString(),
                             },
                         })
-                        break
+
+                    
+                        notify({
+                            chainName: selectedChainName,
+                            txHash: txn.txID(),
+                        })
+                        onOpen()
+                    } finally {
+                        closeModal()
                     }
-                    }
-                    onOpen()
-                } finally {
-                    closeModal()
+                    break
+                }
                 }
             }}
         >

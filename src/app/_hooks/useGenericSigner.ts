@@ -23,10 +23,8 @@ export const AllSignersContext = createContext<AllSignersContextValue | null>(
 
 export const useGenericSigner = () => {
     const suiWallet = useWallet()
-    const {
-        selectedSigner: algorandSelectedSigner,
-        address: algorandAddress,
-    } = useAlgorandSigner()
+    const { selectedSigner: algorandSelectedSigner, address: algorandAddress } =
+        useAlgorandSigner()
     const {
         selectedSigner: evmSelectedSigner,
         address: evmAddress,
@@ -74,14 +72,11 @@ export const useGenericSigner = () => {
         const evmSigner = getEvmSigner(chainName as EvmChains)
         const algorandSigner = getAlgorandSigner()
 
-        const chainToSigner: Record<
-            SupportedPlatform,
-            SignAndSendSigner<N, C>
-        > = {
-            Evm: evmSigner as unknown as SignAndSendSigner<N, C>,
-            Algorand: algorandSigner as unknown as SignAndSendSigner<N, C>,
-            Sui: getSuiSigner() as unknown as SignAndSendSigner<N, C>,
-            Solana: getSuiSigner() as unknown as SignAndSendSigner<N, C>,
+        const chainToSigner: Record<SupportedPlatform, GenericSigner<N, C>> = {
+            Evm: evmSigner as unknown as GenericSigner<N, C>,
+            Algorand: algorandSigner as unknown as GenericSigner<N, C>,
+            Sui: getSuiSigner() as unknown as GenericSigner<N, C>,
+            Solana: getSuiSigner() as unknown as GenericSigner<N, C>,
         }
         return chainToSigner[chainToPlatform(chainName) as SupportedPlatform]
     }
@@ -90,3 +85,7 @@ export const useGenericSigner = () => {
         getGenericSigner,
     }
 }
+
+type GenericSigner<N extends Network, C extends Chain> =
+    | SignAndSendSigner<N, C>
+    | undefined

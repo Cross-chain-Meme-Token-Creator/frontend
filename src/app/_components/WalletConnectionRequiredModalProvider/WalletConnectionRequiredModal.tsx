@@ -3,7 +3,6 @@ import { useContext } from "react"
 import { WalletConnectionRequiredModalContext } from "."
 import React, {
     Modal,
-    Image,
     ModalBody,
     ModalContent,
     ModalFooter,
@@ -12,13 +11,15 @@ import React, {
     Button,
 } from "@nextui-org/react"
 import { ConnectWalletContext, RootContext } from "../../_hooks"
-import {
-    ArrowRightIcon,
-    QuestionMarkCircleIcon,
-} from "@heroicons/react/24/outline"
-import { supportedChains } from "@services"
+import { mapPlatformToSupportedPlatform, supportedChains } from "@services"
+import { publicConfig } from "@config"
+import { chainToPlatform } from "@wormhole-foundation/sdk-base"
 
 export const WalletConnectionRequiredModal = () => {
+    const { reducer } = useContext(WalletConnectionRequiredModalContext)!
+    const [state] = reducer
+    const { chainName } = state
+
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
     const { selectedChainName } = rootState
@@ -40,28 +41,20 @@ export const WalletConnectionRequiredModal = () => {
                 <ModalHeader className="p-4 pb-0 text-base font-bold">
                     Wallet Connection Required
                 </ModalHeader>
-                <ModalBody className="p-4 min-h-[160px] place-content-center">
-                    <div className="flex items-center gap-4">
-                        <Image
-                            className="w-10 h-10"
-                            removeWrapper
+                <ModalBody className="p-4 min-h-[160px] grid place-items-center">
+                    <div className="relative">
+                        <Avatar
+                            isBordered
+                            classNames={{
+                                base: "ring-0",
+                            }}
+                            className="-bottom-2 -right-2 w-8 h-8 absolute z-20"
                             src={supportedChains[selectedChainName].imageUrl}
                         />
-                        <ArrowRightIcon className="w-5 h-5 text-foreground-500" />
                         <Avatar
-                            fallback={
-                                <QuestionMarkCircleIcon className="w-10 h-10" />
-                            }
-                            showFallback
-                        ></Avatar>
-                    </div>
-
-                    <div className="text-sm text-justify">
-                        To process the transaction(s) in{" "}
-                        <span className="font-bold text-primary">
-                            {supportedChains[selectedChainName].name}
-                        </span>
-                        , please connect wallet
+                            className="w-16 h-16 relative"
+                            src={publicConfig.images.web3Wallet}
+                        />
                     </div>
                 </ModalBody>
                 <ModalFooter className="p-4 pt-0">
@@ -69,7 +62,12 @@ export const WalletConnectionRequiredModal = () => {
                         color="primary"
                         fullWidth
                         onPress={() => {
-                            connectWallet()
+                            if (!chainName) return
+                            connectWallet({
+                                platform: mapPlatformToSupportedPlatform(
+                                    chainToPlatform(chainName)
+                                ),
+                            })
                             onClose()
                         }}
                     >

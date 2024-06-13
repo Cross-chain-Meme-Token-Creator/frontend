@@ -1,11 +1,12 @@
 export const truncateString = (
-    address?: string,
+    string?: string,
     start: number = 4,
     end: number = 2
 ): string => {
-    if (!address) return ""
-    const beginning = address.slice(0, start)
-    const ending = address.slice(-end)
+    if (!string) return ""
+    if (string.length <= start + end) return string
+    const beginning = string.slice(0, start)
+    const ending = string.slice(-end)
     return `${beginning}...${ending}`
 }
 

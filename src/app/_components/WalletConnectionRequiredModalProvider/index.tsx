@@ -3,13 +3,22 @@ import React, { ReactNode, createContext, useCallback, useMemo } from "react"
 import { useDisclosure } from "@nextui-org/react"
 import { DisclosureType } from "@common"
 import { WalletConnectionRequiredModal } from "./WalletConnectionRequiredModal"
+import {
+    WalletConnectionRequiredModalAction,
+    WalletConnectionRequiredModalState,
+    useWalletConnectionRequiredModalReducer,
+} from "./useWalletConnectionRequiredModalReducer"
 
 export interface WalletConnectionRequiredModalContextValue {
+    reducer: [
+        WalletConnectionRequiredModalState,
+        React.Dispatch<WalletConnectionRequiredModalAction>
+    ]
     discloresures: {
         baseDiscloresure: DisclosureType
     }
     functions: {
-        openModal: () => void
+        openModal: (params?: WalletConnectionRequiredModalState) => void
     }
 }
 
@@ -21,21 +30,34 @@ export const WalletConnectionRequiredModalProvider = ({
 }: {
     children: ReactNode
 }) => {
+    const reducer = useWalletConnectionRequiredModalReducer()
+    const [, dispatch] = reducer
+
     const baseDiscloresure = useDisclosure()
     const { onOpen } = baseDiscloresure
 
-    const openModal = useCallback(() => {
-        onOpen()
-    }, [baseDiscloresure])
-    
-    const WalletConnectionRequiredModalContextValue: WalletConnectionRequiredModalContextValue =
+    const openModal = useCallback(
+        (params?: WalletConnectionRequiredModalState) => {
+            if (params) {
+                dispatch({
+                    type: "OPEN",
+                    payload: params,
+                })
+            }
+            onOpen()
+        },
+        [reducer, baseDiscloresure]
+    )
+
+    const walletConnectionRequiredModalContextValue: WalletConnectionRequiredModalContextValue =
         useMemo(
             () => ({
+                reducer,
                 discloresures: {
                     baseDiscloresure,
                 },
                 functions: {
-                    openModal
+                    openModal,
                 },
             }),
             [baseDiscloresure]
@@ -43,7 +65,7 @@ export const WalletConnectionRequiredModalProvider = ({
 
     return (
         <WalletConnectionRequiredModalContext.Provider
-            value={WalletConnectionRequiredModalContextValue}
+            value={walletConnectionRequiredModalContextValue}
         >
             <WalletConnectionRequiredModal />
             {children}

@@ -4,10 +4,14 @@ import { SupportedChainName, transfer } from "@services"
 import { Chain } from "@wormhole-foundation/sdk-base"
 import { computeRaw, getInnerType } from "@common"
 import { TokenContext } from "../../../../_hooks"
-import { NotificationModalContext } from "../../../../../../_components"
+import {
+    PassphraseAndQRCodeModalContext,
+    SignTransactionModalContext,
+    TransactionToastContext,
+    WalletConnectionRequiredModalContext,
+} from "../../../../../../_components"
 import { RootContext, useGenericSigner } from "../../../../../../_hooks"
 import { VAA, toNative } from "@wormhole-foundation/sdk-definitions"
-import { PassphraseAndQRCodeContent } from "../../../../../../_shared-components"
 
 interface FormikValue {
     targetChainName: SupportedChainName
@@ -51,14 +55,42 @@ export const TransferCardProvider = ({ children }: { children: ReactNode }) => {
     const { tokenInfo, tokenAddress } = state
     const { tokenType, decimals } = { ...tokenInfo }
 
-    const { functions } = useContext(NotificationModalContext)!
-    const { openModal } = functions
-
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
     const { network, selectedChainName } = rootState
 
+    const { functions } = useContext(PassphraseAndQRCodeModalContext)!
+    const { openModal } = functions
+
     const { getGenericSigner } = useGenericSigner()
+
+    const { functions: signTransactionModalFunctions } = useContext(
+        SignTransactionModalContext
+    )!
+    const {
+        openModal: openSignTransactionModal,
+        closeModal: closeSignTransactionModal,
+    } = signTransactionModalFunctions
+
+    const { functions: walletConnectionRequiredModalFunctions } = useContext(
+        WalletConnectionRequiredModalContext
+    )!
+    const { openModal: openWalletConnectionRequiredModal } =
+        walletConnectionRequiredModalFunctions
+
+    const { functions: transactionToastFunctions } = useContext(
+        TransactionToastContext
+    )!
+    const { notify } = transactionToastFunctions
+
+    const openModalWithVaa = (vaa: VAA) =>
+        openModal({
+            title: "Transfer Successfully",
+            vaa,
+            passphraseNote:
+                "Send this passphrase to the recipient to allow them to redeem tokens",
+            qrNote: "Send the QR code to the recipient so they can scan it to redeem their tokens",
+        })
 
     return (
         <Formik
@@ -68,13 +100,16 @@ export const TransferCardProvider = ({ children }: { children: ReactNode }) => {
                 recipientAddress,
                 transferAmount,
             }) => {
-                let vaa: VAA<"TokenBridge:Transfer"> | null
                 const signer = getGenericSigner(selectedChainName)
+                if (!signer) {
+                    openWalletConnectionRequiredModal()
+                    return
+                }
 
                 switch (selectedChainName) {
                 case SupportedChainName.Sui: {
                     if (!tokenType || !decimals) return
-                    vaa = await transfer({
+                    const { vaa, txHash } = await transfer({
                         network,
                         transferAmount: computeRaw(
                             transferAmount,
@@ -93,38 +128,39 @@ export const TransferCardProvider = ({ children }: { children: ReactNode }) => {
                 }
                 default: {
                     if (!tokenAddress) return
-                    vaa = await transfer({
-                        network,
-                        transferAmount: computeRaw(
-                            transferAmount,
-                            decimals
-                        ),
-                        recipientAddress,
-                        sourceChainName: selectedChainName as Chain,
-                        targetChainName: targetChainName as Chain,
-                        tokenAddress: toNative(
-                            selectedChainName,
-                            tokenAddress
-                        ),
-                        signer,
-                    })
+
+                    try {
+                        openSignTransactionModal()
+                        
+                        const { vaa, txHash } = await transfer({
+                            network,
+                            transferAmount: computeRaw(
+                                transferAmount,
+                                decimals
+                            ),
+                            recipientAddress,
+                            sourceChainName: selectedChainName as Chain,
+                            targetChainName: targetChainName as Chain,
+                            tokenAddress: toNative(
+                                selectedChainName,
+                                tokenAddress
+                            ),
+                            signer,
+                        })
+
+                        if (!vaa) return
+                        openModalWithVaa(vaa)
+
+                        notify({ chainName: selectedChainName, txHash })
+                    } catch (ex) {
+                        console.log(ex)
+                    } finally {
+                        closeSignTransactionModal()
+                    }
+
                     break
                 }
                 }
-
-                if (!vaa) return
-
-                openModal({
-                    innerHtml: (
-                        <PassphraseAndQRCodeContent
-                            vaa={vaa}
-                            passphraseNote="Send this passphrase to the recipient to allow them to redeem tokens"
-                            qrNote="Send the QR code to the recipient so they can scan it to redeem their tokens"
-                        />
-                    ),
-                    title: "Transfer Tokens Successfully",
-                    size: "xl",
-                })
             }}
         >
             {(_props) => renderBody(_props, children)}

@@ -1,11 +1,14 @@
 import { Form, Formik, FormikProps } from "formik"
 import React, { ReactNode, createContext, useContext, useMemo } from "react"
-import { SupportedChainName, redeem } from "@services"
+import { SupportedChainName, redeem, supportedChains } from "@services"
 import { RootContext, useGenericSigner } from "../../../../../../_hooks"
 import { deserialize } from "@wormhole-foundation/sdk-definitions"
-import { NotificationModalContext } from "../../../../../../_components"
-import { truncateString } from "@common"
-import { Link } from "@nextui-org/react"
+import {
+    NotificationModalContext,
+    SignTransactionModalContext,
+    TransactionToastContext,
+    WalletConnectionRequiredModalContext,
+} from "../../../../../../_components"
 
 interface FormikValue {
     senderChainName: SupportedChainName
@@ -52,39 +55,70 @@ export const RedeemCardProvider = ({ children }: { children: ReactNode }) => {
     const { functions } = useContext(NotificationModalContext)!
     const { openModal } = functions
 
+    const { functions: signTransactionModalFunctions } = useContext(
+        SignTransactionModalContext
+    )!
+    const {
+        openModal: openSignTransactionModal,
+        closeModal: closeSignTransactionModal,
+    } = signTransactionModalFunctions
+
+    const { functions: walletConnectionRequiredModalFunctions } = useContext(
+        WalletConnectionRequiredModalContext
+    )!
+    const { openModal: openWalletConnectionRequiredModal } =
+        walletConnectionRequiredModalFunctions
+
+    const { functions: transactionToastFunctions } = useContext(
+        TransactionToastContext
+    )!
+    const { notify } = transactionToastFunctions
+
     return (
         <Formik
             initialValues={initialValues}
-            //validationSchema={}
             onSubmit={async ({ senderChainName, passphrase }) => {
                 const signer = getGenericSigner(selectedChainName)
-                if (!signer) return
+                if (!signer) {
+                    openWalletConnectionRequiredModal()
+                    return
+                }
 
-                const txId = await redeem({
-                    network,
-                    redeemChainName: selectedChainName,
-                    senderChainName: senderChainName,
-                    vaa: deserialize(
-                        "TokenBridge:Transfer",
-                        Uint8Array.from(Buffer.from(passphrase, "base64"))
-                    ),
-                    signer,
-                })
+                try {
+                    openSignTransactionModal()
+                    const txHash = await redeem({
+                        network,
+                        redeemChainName: selectedChainName,
+                        senderChainName: senderChainName,
+                        vaa: deserialize(
+                            "TokenBridge:Transfer",
+                            Uint8Array.from(Buffer.from(passphrase, "base64"))
+                        ),
+                        signer,
+                    })
 
-                openModal({
-                    title: "Redeem Tokens Successfully",
-                    innerHtml: (
-                        <div>
+                    openModal({
+                        title: "Redeem Tokens Successfully",
+                        innerHtml: (
                             <div className="text-sm">
-                                Redeem tokens successfully.
+                                You have successfully redeemed tokens sent from{" "}
+                                <span className="font-semibold">
+                                    {supportedChains[senderChainName].name}
+                                </span>{" "}
+                                blockchain. Double-check your balance to see the
+                                changes.
                             </div>
-                            <div className="flex gap-1">
-                                <div className="text-sm">Transaction hash:</div>
-                                <Link size="sm"> {truncateString(txId)}</Link>
-                            </div>
-                        </div>
-                    ),
-                })
+                        ),
+                    })
+                    notify({
+                        chainName: selectedChainName,
+                        txHash,
+                    })
+                } catch (ex) {
+                    console.log(ex)
+                } finally {
+                    closeSignTransactionModal()
+                }
             }}
         >
             {(_props) => renderBody(_props, children)}

@@ -1,15 +1,17 @@
 "use client"
-import { Avatar, Card, CardBody, Spacer, Link } from "@nextui-org/react"
+import { Avatar, Spacer, Link } from "@nextui-org/react"
 import React, { useContext } from "react"
 import { TokenContext } from "../../../_hooks"
 import { RootContext } from "../../../../../_hooks"
 import { SupportedChainName, chainNameToTokenIdName } from "@services"
 import { OptInButton } from "./OpInButton"
-import { formatNumber } from "@common"
+import { formatNumber, truncateString } from "@common"
+import { ArrowPathIcon } from "@heroicons/react/24/outline"
+import { BalanceInfo } from "./BalanceInfo"
 
 export const InfoTab = () => {
     const { reducer } = useContext(TokenContext)!
-    const [state] = reducer
+    const [state, dispatch ] = reducer
     const { tokenInfo, tokenAddress } = state
     const { iconUrl, name, symbol } = { ...tokenInfo }
 
@@ -20,23 +22,34 @@ export const InfoTab = () => {
     const items = [
         {
             key: 0,
-            name: "Name",
-            value: name,
+            name: chainNameToTokenIdName[selectedChainName],
+            value: (
+                <Link color="foreground" isExternal showAnchorIcon size="sm">
+                    {truncateString(tokenAddress)}
+                </Link>
+            ),
         },
         {
             key: 1,
-            name: "Symbol",
-            value: symbol,
+            name: "Name",
+            value: <div className="text-sm">{name}</div>,
         },
         {
             key: 2,
-            name: "Decimals",
-            value: 8,
+            name: "Symbol",
+            value: <div className="text-sm">{symbol}</div>,
         },
         {
             key: 3,
+            name: "Decimals",
+            value: <div className="text-sm">{8}</div>,
+        },
+        {
+            key: 4,
             name: "Total Supply",
-            value: formatNumber(10_000_000_000),
+            value: (
+                <div className="text-sm">{formatNumber(10_000_000_000)}</div>
+            ),
         },
     ]
 
@@ -52,42 +65,37 @@ export const InfoTab = () => {
                     />
                     <Spacer y={4} />
                     <div>
-                        <div className="font-semibold text-4xl"> {symbol} </div>
+                        <div className="font-semibold text-2xl"> {symbol} </div>
                         <div className="text-foreground-500 text-sm">
                             {name}
                         </div>
                     </div>
-                    {}
                     <Spacer y={4} />
+                    <div className="flex gap-2 items-center">
+                        <div className="text-sm font-semibold">Balance</div>
+                        <div className="flex gap-2 text-sm">
+                            <BalanceInfo/>
+                            <Link as="button" size="sm" onPress={() => dispatch({
+                                type: "SET_REFRESH_BALANCE_KEY"
+                            })}> <ArrowPathIcon className="w-3.5 h-3.5"/> </Link>
+                        </div>   
+                    </div>
                     {selectedChainName === SupportedChainName.Algorand ? (
-                        <OptInButton />
+                        <>
+                            <Spacer y={4} />
+                            <OptInButton />
+                        </>
+                            
                     ) : null}
                 </div>
                 <div>
-                    <Card shadow="none" className="border border-divider">
-                        <CardBody className="p-4 gap-1">
-                            <div className="text-foreground-500 text-sm font-semibold">
-                                {chainNameToTokenIdName[selectedChainName]}
-                            </div>
-                            <Link
-                                color="foreground"
-                                showAnchorIcon
-                                isExternal
-                                className="font-semibold"
-                                as="button"
-                            >
-                                {tokenAddress}
-                            </Link>
-                        </CardBody>
-                    </Card>
-                    <Spacer y={4} />
                     <div className="grid gap-4">
                         {items.map(({ key, name, value }) => (
                             <div key={key} className="flex gap-4 text-sm">
-                                <div className="text-foreground-500  min-w-[120px] font-semibold">
+                                <div className="min-w-[120px] font-semibold">
                                     {name}
                                 </div>
-                                <div>{value} </div>
+                                {value}
                             </div>
                         ))}
                     </div>

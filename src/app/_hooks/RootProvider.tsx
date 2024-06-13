@@ -3,7 +3,7 @@ import React, { ReactNode, createContext, useEffect, useMemo } from "react"
 import { RootAction, RootState, useRootReducer } from "./useRootReducer"
 import { useSearchParams } from "next/navigation"
 import { Chain, isChain } from "@wormhole-foundation/sdk-base"
-import { defaultSupportedChainName, tryMapChainNameToSupportedChainName } from "@services"
+import { defaultSupportedChainName, mapChainNameToSupportedChainName } from "@services"
 
 export interface RootContextValue {
     reducer: [RootState, React.Dispatch<RootAction>]
@@ -25,7 +25,7 @@ export const RootProvider = ({ children }: { children: ReactNode }) => {
     const searchParams = useSearchParams()
 
     const _chainName = searchParams.get("chainName") as Chain ?? defaultSupportedChainName
-    const chainName = isChain(_chainName) ? tryMapChainNameToSupportedChainName(_chainName) : defaultSupportedChainName
+    const chainName = isChain(_chainName) ? mapChainNameToSupportedChainName(_chainName) : defaultSupportedChainName
 
     useEffect(() => {
         dispatch({

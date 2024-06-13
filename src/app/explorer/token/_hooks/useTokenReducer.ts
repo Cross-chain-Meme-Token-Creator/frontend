@@ -28,9 +28,11 @@ export interface TokenState {
     tokenAddress?: string
     bridgedChainInfos: Array<BridgedChainInfo>
     keys: {
+        refreshBalanceKey?: string
         refreshWrappedTokensKey?: string
-    },
+    }
     isNotFound: boolean
+    balance?: number
 }
 
 export interface SetTokenAddressAction {
@@ -71,11 +73,21 @@ export interface UpdateBalanceAction {
 }
 
 export interface SetRefreshWrappedTokensKeyAction {
-    type: "SET_REFRESH_WRAPPED_TOKENS_KEY_ACTION"
+    type: "SET_REFRESH_WRAPPED_TOKENS_KEY"
 }
+
+export interface SetRefreshBalanceKeyAction {
+    type: "SET_REFRESH_BALANCE_KEY"
+}
+
 export interface SetIsNotFoundAction {
     type: "SET_IS_NOT_FOUND"
     payload: boolean
+}
+
+export interface SetBalanceAction {
+    type: "SET_BALANCE"
+    payload?: number
 }
 
 export type TokenAction =
@@ -88,6 +100,8 @@ export type TokenAction =
     | SetRefreshWrappedTokensKeyAction
     | SetIsLoadingAction
     | SetIsNotFoundAction
+    | SetBalanceAction
+    | SetRefreshBalanceKeyAction
 
 export const initialState: TokenState = {
     loadings: {
@@ -96,7 +110,7 @@ export const initialState: TokenState = {
     },
     bridgedChainInfos: [],
     keys: {},
-    isNotFound: false
+    isNotFound: false,
 }
 
 export const reducer = (
@@ -119,8 +133,8 @@ export const reducer = (
             ...state,
             loadings: {
                 ...state.loadings,
-                isWrappedTokensFetchLoading: action.payload
-            }
+                isWrappedTokensFetchLoading: action.payload,
+            },
         }
     case "SET_BRIDGED_CHAIN_INFOS": {
         const bridgedChainInfos = action.payload.map(
@@ -159,27 +173,45 @@ export const reducer = (
         }
     }
 
-    case "SET_REFRESH_WRAPPED_TOKENS_KEY_ACTION":
+    case "SET_REFRESH_WRAPPED_TOKENS_KEY":
         return {
             ...state,
             keys: {
                 ...state.keys,
-                refreshWrappedTokensKey: uuidv4()
-            }
+                refreshWrappedTokensKey: uuidv4(),
+            },
         }
+
+    case "SET_REFRESH_BALANCE_KEY":
+        return {
+            ...state,
+            keys: {
+                ...state.keys,
+                refreshBalanceKey: uuidv4(),
+            },
+        }
+
     case "SET_IS_LOADING":
         return {
             ...state,
             loadings: {
                 ...state.loadings,
-                isLoading: action.payload
-            }
+                isLoading: action.payload,
+            },
         }
-    case "SET_IS_NOT_FOUND": 
+
+    case "SET_IS_NOT_FOUND":
         return {
             ...state,
-            isNotFound: action.payload
+            isNotFound: action.payload,
         }
+
+    case "SET_BALANCE":
+        return {
+            ...state,
+            balance: action.payload,
+        }
+
     default:
         return state
     }

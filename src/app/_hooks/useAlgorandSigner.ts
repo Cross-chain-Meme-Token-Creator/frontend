@@ -23,9 +23,10 @@ export const useAlgorandSigner = () => {
             break
         }
         default:
+            setAddress(undefined)
             break
         }
-    }, [selectedSigner, peraAddress])
+    }, [ selectedSigner, peraAddress ])
 
     const connectPera = async () => {
         try {
@@ -58,6 +59,18 @@ export const useAlgorandSigner = () => {
         }
     }
 
+    const disconnect = async () => {
+        switch (selectedSigner) {
+        case "pera": {
+            disconnectPera()
+            return
+        }
+        default:
+            // nothing
+            return
+        }
+    }
+
     const signAndSend = async (txn: Transaction) => {
         const _getAlgodClient = getAlgodClient(network)
         switch (selectedSigner) {
@@ -83,6 +96,6 @@ export const useAlgorandSigner = () => {
         selectedSigner,
         signAndSend,
         connectPera,
-        disconnectPera,
+        disconnect,
     }
 }

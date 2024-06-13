@@ -6,7 +6,7 @@ import React, {
     useContext,
     useMemo,
 } from "react"
-import { SupportedChainName } from "@services"
+import { SupportedChainName, supportedChains } from "@services"
 import { createWrappedToken } from "@services"
 import { RootContext, useGenericSigner } from "../../../../../../_hooks"
 import { SetIsLoadingAction } from "../../../../_hooks"
@@ -16,9 +16,12 @@ import {
 } from "./useCreateWrappedTokenModalReducer"
 import * as Yup from "yup"
 import { deserialize } from "@wormhole-foundation/sdk-definitions"
-import { NotificationModalContext } from "../../../../../../_components"
-import { Link } from "@nextui-org/react"
-import { truncateString } from "@common"
+import {
+    NotificationModalContext,
+    SignTransactionModalContext,
+    TransactionToastContext,
+    WalletConnectionRequiredModalContext,
+} from "../../../../../../_components"
 
 interface FormikValue {
     targetChainName: SupportedChainName
@@ -80,6 +83,25 @@ export const CreateWrappedTokenModalProvider = ({
     const { functions } = useContext(NotificationModalContext)!
     const { openModal } = functions
 
+    const { functions: signTransactionModalFunctions } = useContext(
+        SignTransactionModalContext
+    )!
+    const {
+        openModal: openSignTransactionModal,
+        closeModal: closeSignTransactionModal,
+    } = signTransactionModalFunctions
+
+    const { functions: walletConnectionRequiredModalFunctions } = useContext(
+        WalletConnectionRequiredModalContext
+    )!
+    const { openModal: openWalletConnectionRequiredModal } =
+        walletConnectionRequiredModalFunctions
+
+    const { functions: transactionToastFunctions } = useContext(
+        TransactionToastContext
+    )!
+    const { notify } = transactionToastFunctions
+
     return (
         <Formik
             initialValues={initialValues}
@@ -87,42 +109,66 @@ export const CreateWrappedTokenModalProvider = ({
                 passphrase: Yup.string().required(),
             })}
             onSubmit={async ({ targetChainName, passphrase }) => {
+                const signer = getGenericSigner(targetChainName)
+                if (!signer) {
+                    openWalletConnectionRequiredModal({
+                        chainName: targetChainName,
+                    })
+                    return
+                }
+
                 switch (targetChainName) {
                 case SupportedChainName.Sui: {
                     return
                 }
                 default: {
-                    const vaa = deserialize(
-                        "TokenBridge:AttestMeta",
-                        Uint8Array.from(Buffer.from(passphrase, "base64"))
-                    )
+                    try {
+                        openSignTransactionModal({
+                            chainName: targetChainName,
+                        })
 
-                    const signer = getGenericSigner(targetChainName)
-                    const txId = await createWrappedToken({
-                        network,
-                        targetChainName,
-                        vaa,
-                        signer
-                    })
+                        const vaa = deserialize(
+                            "TokenBridge:AttestMeta",
+                            Uint8Array.from(
+                                Buffer.from(passphrase, "base64")
+                            )
+                        )
 
-                    openModal({
-                        title: "Create Wrapped Token Successfully",
-                        innerHtml: (
-                            <div>
+                        const txHash = await createWrappedToken({
+                            network,
+                            targetChainName,
+                            vaa,
+                            signer,
+                        })
+
+                        openModal({
+                            title: "Create Wrapped Token Successfully",
+                            innerHtml: (
                                 <div className="text-sm">
-                                        Create wrapped token successfully.
+                                        Congratulations! A wrapped token has
+                                        been successfully created on the{" "}
+                                    <span className="font-semibold">
+                                            
+                                        {
+                                            supportedChains[targetChainName]
+                                                .name
+                                        }
+                                    </span>{" "}
+                                        blockchain. You can now receive the
+                                        token here.
                                 </div>
-                                <div className="flex gap-1">
-                                    <div className="text-sm">
-                                            Transaction hash:
-                                    </div>
-                                    <Link size="sm">  {truncateString(txId)}</Link>
-                                </div>
-                            </div>
-                        ),
-                    })
+                            ),
+                        })
 
-                    return
+                        notify({
+                            chainName: targetChainName,
+                            txHash,
+                        })
+                    } catch (ex) {
+                        console.log(ex)
+                    } finally {
+                        closeSignTransactionModal()
+                    }
                 }
                 }
             }}

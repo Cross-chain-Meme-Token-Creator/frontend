@@ -1,6 +1,7 @@
 import {
     SignAndSendSigner,
     TokenAddress,
+    VAA,
     toNative,
 } from "@wormhole-foundation/sdk-definitions"
 import { getWormhole } from "./base.wormhole"
@@ -21,6 +22,11 @@ export interface TransferParams<
     signer: SignAndSendSigner<N, SourceChainName>
 }
 
+interface TransferResult {
+    vaa: VAA<"TokenBridge:Transfer"> | null,
+    txHash: string
+}
+
 export const transfer = async <
     N extends Network,
     SourceChainName extends Chain,
@@ -33,7 +39,7 @@ export const transfer = async <
     sourceChainName,
     targetChainName,
     signer,
-}: TransferParams<N, SourceChainName, TargetChainName>) => {
+}: TransferParams<N, SourceChainName, TargetChainName>) : Promise<TransferResult> => {
     const wormhole = await getWormhole(network)
 
     const sourceChain = wormhole.getChain(sourceChainName)
@@ -61,7 +67,5 @@ export const transfer = async <
         60_000
     )
 
-    if (!vaa) return null
-
-    return vaa
+    return { vaa, txHash: txid }
 }

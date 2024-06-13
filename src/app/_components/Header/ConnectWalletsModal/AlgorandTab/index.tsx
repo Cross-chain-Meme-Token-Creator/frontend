@@ -18,7 +18,7 @@ import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline"
 
 export const AlgorandTab = () => {
     const { reducer } = useContext(AlgorandSignerContext)!
-    const { connectPera, disconnectPera, address } = useAlgorandSigner()
+    const { connectPera, disconnect, address } = useAlgorandSigner()
 
     const [state] = reducer
     const { selectedSigner } = state
@@ -73,7 +73,7 @@ export const AlgorandTab = () => {
                     <Link
                         className="text-sm"
                         as="button"
-                        onPress={() => disconnectPera()}
+                        onPress={disconnect}
                     >
                         Disconnect
                     </Link>

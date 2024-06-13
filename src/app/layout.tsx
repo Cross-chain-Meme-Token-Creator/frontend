@@ -9,10 +9,11 @@ import {
     Header,
     Navbar,
     SuspenseScreen,
-    SigningTransactionModalProvider,
+    SignTransactionModalProvider,
     ErrorToastProvider,
     NotificationModalProvider,
     WalletConnectionRequiredModalProvider,
+    TransactionToastProvider,
 } from "./_components"
 import { MetaMaskProvider } from "@metamask/sdk-react-ui"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
@@ -24,6 +25,7 @@ import {
     RootProvider,
     ConnectWalletProvider
 } from "./_hooks"
+import { PassphraseAndQRCodeModalProvider } from "./_components/PassphraseAndQRCodeModalProvider"
 
 const font = Open_Sans({ subsets: ["latin"] })
 
@@ -51,19 +53,23 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                                                         },
                                                     }}
                                                 >
-                                                    <SigningTransactionModalProvider>
-                                                        <WalletConnectionRequiredModalProvider>
-                                                            <NotificationModalProvider>
-                                                                <ErrorToastProvider>
-                                                                    <GoogleAnalytics gaId="G-XYZ" />
+                                                    <TransactionToastProvider>
+                                                        <SignTransactionModalProvider>
+                                                            <WalletConnectionRequiredModalProvider>
+                                                                <PassphraseAndQRCodeModalProvider>
+                                                                    <NotificationModalProvider>
+                                                                        <ErrorToastProvider>
+                                                                            <GoogleAnalytics gaId="G-XYZ" />
 
-                                                                    <Header />
-                                                                    <Navbar />
-                                                                    {children}
-                                                                </ErrorToastProvider>
-                                                            </NotificationModalProvider>
-                                                        </WalletConnectionRequiredModalProvider>
-                                                    </SigningTransactionModalProvider>
+                                                                            <Header />
+                                                                            <Navbar />
+                                                                            {children}
+                                                                        </ErrorToastProvider>
+                                                                    </NotificationModalProvider>
+                                                                </PassphraseAndQRCodeModalProvider>
+                                                            </WalletConnectionRequiredModalProvider>
+                                                        </SignTransactionModalProvider>
+                                                    </TransactionToastProvider>
                                                 </MetaMaskProvider>
                                             </WalletProvider>
                                         </AlgorandSignerProvider>

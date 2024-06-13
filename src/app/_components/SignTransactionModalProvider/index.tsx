@@ -1,44 +1,44 @@
 "use client"
 import React, { ReactNode, createContext, useCallback, useMemo } from "react"
 import {
-    SigningTransactionModalAction,
-    SigningTransactionModalState,
-    useSigningTransactionModalReducer,
-} from "./useSigningTransactionModalReducer"
+    SignTransactionModalAction,
+    SignTransactionModalState,
+    useSignTransactionModalReducer,
+} from "./useSignTransactionModalReducer"
 import { useDisclosure } from "@nextui-org/react"
 import { DisclosureType } from "@common"
-import { SigningTransactionModal } from "./SigningTransactionModal"
+import { SignTransactionModal } from "./SignTransactionModal"
 
-export interface SigningTransactionModalContextValue {
+export interface SignTransactionModalContextValue {
     reducer: [
-        SigningTransactionModalState,
-        React.Dispatch<SigningTransactionModalAction>
+        SignTransactionModalState,
+        React.Dispatch<SignTransactionModalAction>
     ]
     discloresures: {
         baseDiscloresure: DisclosureType
     }
     functions: {
-        openModal: (params?: SigningTransactionModalState) => void
+        openModal: (params?: SignTransactionModalState) => void
         closeModal: () => void
     }
 }
 
-export const SigningTransactionModalContext =
-    createContext<SigningTransactionModalContextValue | null>(null)
+export const SignTransactionModalContext =
+    createContext<SignTransactionModalContextValue | null>(null)
 
-export const SigningTransactionModalProvider = ({
+export const SignTransactionModalProvider = ({
     children,
 }: {
     children: ReactNode
 }) => {
-    const reducer = useSigningTransactionModalReducer()
+    const reducer = useSignTransactionModalReducer()
     const [, dispatch] = reducer
 
     const baseDiscloresure = useDisclosure()
     const { onOpen, onClose } = baseDiscloresure
 
     const openModal = useCallback(
-        (params?: SigningTransactionModalState) => {
+        (params?: SignTransactionModalState) => {
             if (params) {
                 dispatch({
                     type: "OPEN",
@@ -57,7 +57,7 @@ export const SigningTransactionModalProvider = ({
         onClose()
     }, [reducer, baseDiscloresure])
 
-    const SigningTransactionModalContextValue: SigningTransactionModalContextValue =
+    const signTransactionModalContextValue: SignTransactionModalContextValue =
         useMemo(
             () => ({
                 reducer,
@@ -73,11 +73,11 @@ export const SigningTransactionModalProvider = ({
         )
 
     return (
-        <SigningTransactionModalContext.Provider
-            value={SigningTransactionModalContextValue}
+        <SignTransactionModalContext.Provider
+            value={signTransactionModalContextValue}
         >
-            <SigningTransactionModal />
+            <SignTransactionModal />
             {children}
-        </SigningTransactionModalContext.Provider>
+        </SignTransactionModalContext.Provider>
     )
 }

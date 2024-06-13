@@ -11,7 +11,7 @@ export enum SupportedChainName {
 export const defaultSupportedChainName = SupportedChainName.Sui
 export const defaultSupportedPlatform = chainToPlatform(defaultSupportedChainName) as SupportedPlatform
 
-export const tryMapChainNameToSupportedChainName = (
+export const mapChainNameToSupportedChainName = (
     chainName: Chain
 ): SupportedChainName => {
     const supportedChainNames: Array<SupportedChainName> =
@@ -31,7 +31,7 @@ export enum SupportedPlatform {
     Solana = "Solana",
 }
 
-export const mapChainToSupportedPlatform = (
+export const mapPlatformToSupportedPlatform = (
     platform: Platform
 ): SupportedPlatform => {
     const supportedPlatforms: Array<SupportedPlatform> =
@@ -73,7 +73,7 @@ export const supportedChains: Record<SupportedChainName, SupportedChainInfo> = {
         platform: chainToPlatform("Celo") as SupportedPlatform,
     },
     [SupportedChainName.Bsc]: {
-        name: "Bsc",
+        name: "Binance Smart Chain",
         imageUrl: "/icons/bsc.png",
         chainId: 4,
         platform: chainToPlatform("Bsc") as SupportedPlatform,

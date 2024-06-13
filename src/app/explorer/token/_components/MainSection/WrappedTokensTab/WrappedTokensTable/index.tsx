@@ -14,15 +14,17 @@ import {
     Card,
     CardBody,
     Button,
+    Link,
 } from "@nextui-org/react"
 import { chainToChainId } from "@wormhole-foundation/sdk-base"
-import { supportedChains, SupportedChainName } from "@services"
+import { supportedChains } from "@services"
 import { BalanceInfo } from "./BalanceInfo"
 import { ArrowPathIcon } from "@heroicons/react/24/outline"
+import { truncateString } from "@common"
 
 export const WrappedTokensTable = () => {
     const { reducer } = useContext(TokenContext)!
-    const [ state, dispatch ] = reducer
+    const [state, dispatch] = reducer
     const { bridgedChainInfos, loadings } = state
     const { isWrappedTokensFetchLoading } = loadings
 
@@ -34,9 +36,11 @@ export const WrappedTokensTable = () => {
                 <div className="flex items-center justify-between">
                     <div className="font-bold"> Wrapped Tokens </div>
                     <Button
-                        onPress={() => dispatch({
-                            type: "SET_REFRESH_WRAPPED_TOKENS_KEY_ACTION"
-                        })}
+                        onPress={() =>
+                            dispatch({
+                                type: "SET_REFRESH_WRAPPED_TOKENS_KEY",
+                            })
+                        }
                         startContent={<ArrowPathIcon className="w-5 h-5" />}
                         color="primary"
                     >
@@ -68,18 +72,29 @@ export const WrappedTokensTable = () => {
                                             className="w-10 h-10"
                                             alt="chain"
                                             src={
-                                                supportedChains[
-                                                    chainName as SupportedChainName
-                                                ].imageUrl
+                                                supportedChains[chainName]
+                                                    .imageUrl
                                             }
                                         />
-                                        <div className="font-bold">{chainName}</div>
+                                        <div className="font-bold">
+                                            {supportedChains[chainName].name}
+                                        </div>
                                     </div>
                                 </TableCell>
                                 <TableCell>
                                     {chainToChainId(chainName)}
                                 </TableCell>
-                                <TableCell>{wrappedAddress}</TableCell>
+                                <TableCell>
+                                    <Link
+                                        size="sm"
+                                        color="foreground"
+                                        isExternal
+                                        as="button"
+                                        showAnchorIcon
+                                    >
+                                        {truncateString(wrappedAddress)}
+                                    </Link>
+                                </TableCell>
                                 <TableCell>
                                     <BalanceInfo chainName={chainName} />
                                 </TableCell>
