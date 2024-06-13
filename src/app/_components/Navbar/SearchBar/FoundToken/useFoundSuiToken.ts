@@ -1,11 +1,7 @@
 "use client"
 import { useContext, useEffect } from "react"
 import { RootContext } from "../../../../_hooks"
-import {
-    SuiObjectTokenContent,
-    SupportedChainName,
-    getSuiClient,
-} from "@services"
+import { SupportedChainName, getSuiTokenInfo } from "@services"
 import { appConfig } from "@config"
 import { FoundTokenContext } from "./FoundTokenProvider"
 
@@ -14,45 +10,25 @@ export const useFoundSuiToken = () => {
     const [state] = reducer
     const { selectedChainName, network, searchValue } = state
 
-    const suiClient = getSuiClient(network)
-
     const { reducer: foundTokenReducer } = useContext(FoundTokenContext)!
     const [, foundTokenDispatch] = foundTokenReducer
 
-    useEffect(() => { 
+    useEffect(() => {
         if (selectedChainName !== SupportedChainName.Sui) return
         if (searchValue) {
             foundTokenDispatch({
                 type: "SET_IS_LOADING",
-                payload: true
+                payload: true,
             })
         }
 
         const handleEffect = async () => {
             try {
-                const { data } = await suiClient.getObject({
-                    id: searchValue,
-                    options: {
-                        showContent: true,
-                    },
-                })
-                if (!data) throw Error()
-
-                const { content } = data
-                if (!content) throw Error()
-
-                const { fields } =
-                    content as unknown as SuiObjectTokenContent
-
-                const {
-                    decimals,
-                    name,
-                    description,
-                    icon_url: iconUrl,
-                    symbol,
-                } = fields
-
-                console.log(decimals)
+                const { decimals, name, description, iconUrl, symbol } =
+                    await getSuiTokenInfo({
+                        coinType: searchValue,
+                        network,
+                    })
 
                 foundTokenDispatch({
                     type: "SET_FOUND_TOKEN_INFO",
@@ -71,7 +47,7 @@ export const useFoundSuiToken = () => {
             } finally {
                 foundTokenDispatch({
                     type: "SET_IS_LOADING",
-                    payload: false
+                    payload: false,
                 })
             }
         }
