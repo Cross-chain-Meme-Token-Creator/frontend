@@ -4,7 +4,6 @@ import React, { useContext } from "react"
 import {
     useGenericSigner,
     RootContext,
-    useAlgorandSigner,
 } from "../../../../../_hooks"
 import { TokenContext } from "../../../_hooks"
 import { SupportedChainName, createAttestation } from "@services"
@@ -20,8 +19,7 @@ import { VAA } from "@wormhole-foundation/sdk-definitions"
 export const CreateAttestationTab = () => {
     const { reducer } = useContext(TokenContext)!
     const [state] = reducer
-    const { tokenInfo, tokenAddress } = state
-    const { tokenType } = { ...tokenInfo }
+    const { tokenAddress } = state
 
     const { getGenericSigner } = useGenericSigner()
 
@@ -31,8 +29,6 @@ export const CreateAttestationTab = () => {
 
     const { functions } = useContext(PassphraseAndQRCodeModalContext)!
     const { openModal } = functions
-
-    const { address } = useAlgorandSigner()
 
     const { functions: signTransactionModalFunctions } = useContext(
         SignTransactionModalContext
@@ -57,8 +53,9 @@ export const CreateAttestationTab = () => {
         openModal({
             title: "Create Attestation Successfully",
             vaa,
-            passphraseNote : "Keep the passphrase securely for creating wrapped tokens on other chains",
-            qrNote : "Scan the QR code to get the passphrase"
+            passphraseNote:
+                "Keep the passphrase securely for creating wrapped tokens on other chains",
+            qrNote: "Scan the QR code to get the passphrase",
         })
 
     return (
@@ -72,46 +69,51 @@ export const CreateAttestationTab = () => {
                             openWalletConnectionRequiredModal()
                             return
                         }
+                        if (!tokenAddress) return
 
                         switch (selectedChainName) {
                         case SupportedChainName.Sui: {
-                            // try {
-                            //     if (!tokenType) return
-
-                            //     const vaa = await createAttestation({
-                            //         network,
-                            //         chainName: selectedChainName,
-                            //         tokenAddress:
-                            //                 getInnerType(tokenType) ?? "",
-                            //         signer: chainSigner,
-                            //     })
-
-                            //     if (!vaa) return
-                            //     openModalWithVaa(vaa)
-                            // } catch (ex) {
-                            //     console.log(ex)
-                            // }
-                            break
-                        }
-                        case SupportedChainName.Algorand: {
-                            if (!tokenAddress) return
-                            if (!address) return
-
                             try {
                                 openSignTransactionModal()
-                                const { vaa, txHash } = await createAttestation({
-                                    network,
-                                    chainName: selectedChainName,
-                                    tokenAddress,
-                                    signer: chainSigner,
-                                })
+                                const { txHash, vaa } =
+                                        await createAttestation({
+                                            network,
+                                            chainName: selectedChainName,
+                                            tokenAddress,
+                                            signer: chainSigner,
+                                        })
 
                                 if (!vaa) return
                                 openModalWithVaa(vaa)
 
                                 notify({
                                     chainName: selectedChainName,
-                                    txHash: txHash
+                                    txHash: txHash,
+                                })
+                            } catch (ex) {
+                                console.log(ex)
+                            } finally {
+                                closeSignTransactionModal()
+                            }
+                            break
+                        }
+                        case SupportedChainName.Algorand: {
+                            try {
+                                openSignTransactionModal()
+                                const { vaa, txHash } =
+                                        await createAttestation({
+                                            network,
+                                            chainName: selectedChainName,
+                                            tokenAddress,
+                                            signer: chainSigner,
+                                        })
+
+                                if (!vaa) return
+                                openModalWithVaa(vaa)
+
+                                notify({
+                                    chainName: selectedChainName,
+                                    txHash: txHash,
                                 })
                             } catch (ex) {
                                 console.log(ex)

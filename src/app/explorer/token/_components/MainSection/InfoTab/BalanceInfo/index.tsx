@@ -4,18 +4,17 @@ import React, { useContext, useEffect } from "react"
 import { TokenContext } from "../../../../_hooks"
 import { RootContext, useAlgorandSigner } from "../../../../../../_hooks"
 import {
+    SupportedChainName,
     getAlgorandBalance,
     getSuiBalance,
 } from "@services"
 import { useWallet } from "@suiet/wallet-kit"
 import { Link } from "@nextui-org/react"
-import { formatNumber } from "@common"
 
 export const BalanceInfo = () => {
     const { reducer } = useContext(TokenContext)!
     const [state, dispatch] = reducer
-    const { tokenAddress, balance, tokenInfo, keys } = state
-    const { tokenType } = { ...tokenInfo }
+    const { tokenAddress, balance, keys } = state
     const { refreshBalanceKey } = keys
 
     const { reducer: rootReducer } = useContext(RootContext)!
@@ -26,6 +25,8 @@ export const BalanceInfo = () => {
     const { address: algorandAddress } = useAlgorandSigner()
 
     useEffect(() => {
+        if (selectedChainName !== SupportedChainName.Algorand) return
+        
         const handleEffect = async () => {
             if (!algorandAddress) return
             if (!tokenAddress) return
@@ -45,28 +46,29 @@ export const BalanceInfo = () => {
     }, [selectedChainName, tokenAddress, algorandAddress, refreshBalanceKey])
 
     useEffect(() => {
-        const handleEffect = async () => {
-            if (!algorandAddress) return
-            if (!tokenAddress) return
+        if (selectedChainName !== SupportedChainName.Sui) return
 
+        const handleEffect = async () => {
             if (!suiAddress) return
             if (!tokenAddress) return
-            if (!tokenType) return
+
             const _balance = await getSuiBalance({
                 network,
                 accountAddress: suiAddress,
-                tokenType,
+                coinType: tokenAddress,
             })
             dispatch({
                 type: "SET_BALANCE",
                 payload: _balance,
             })
+
+            console.log(_balance)
         }
         handleEffect()
     }, [selectedChainName, tokenAddress, suiAddress, refreshBalanceKey])
 
     return balance !== undefined ? (
-        <div> {formatNumber(balance)} </div>
+        <div> {balance} </div>
     ) : (
         <Link size="sm" as="button">
             Connect Wallet

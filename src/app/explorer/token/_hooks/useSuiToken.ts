@@ -2,9 +2,8 @@
 import { useContext, useEffect } from "react"
 import { RootContext } from "../../../_hooks"
 import {
-    SuiObjectTokenContent,
     SupportedChainName,
-    getSuiClient,
+    getSuiTokenInfo,
 } from "@services"
 import { TokenContext } from "."
 
@@ -12,8 +11,6 @@ export const useSuiToken = () => {
     const { reducer } = useContext(RootContext)!
     const [state] = reducer
     const { selectedChainName, network } = state
-
-    const suiClient = getSuiClient(network)
 
     const { reducer: tokenReducer } = useContext(TokenContext)!
     const [ tokenState, tokenDispatch ] = tokenReducer
@@ -31,27 +28,10 @@ export const useSuiToken = () => {
 
         const handleEffect = async () => {
             try {
-                const { data } = await suiClient.getObject({
-                    id: tokenAddress.toString(),
-                    options: {
-                        showContent: true,
-                    },
+                const { objectId, decimals, name, description, iconUrl, symbol } = await getSuiTokenInfo({
+                    coinType: tokenAddress,
+                    network
                 })
-                if (!data) throw Error()
-
-                const { content } = data
-                if (!content) throw Error()
-
-                const { fields, type : tokenType } =
-                    content as unknown as SuiObjectTokenContent
-
-                const {
-                    decimals,
-                    name,
-                    description,
-                    icon_url: iconUrl,
-                    symbol,
-                } = fields
 
                 tokenDispatch({
                     type: "SET_TOKEN_INFO",
@@ -61,7 +41,7 @@ export const useSuiToken = () => {
                         description,
                         iconUrl,
                         symbol,
-                        tokenType
+                        objectId,
                     },
                 })
                 tokenDispatch({

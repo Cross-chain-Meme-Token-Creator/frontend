@@ -1,5 +1,6 @@
-import { SupportedNetwork } from "@common"
+import { SupportedNetwork, computeDenomination } from "@common"
 import { getAlgodClient } from "./constants.algorand"
+import { getAlgorandTokenInfo } from "./get-token-info.algorand"
 
 interface GetAlgorandBalanceParams {
     network: SupportedNetwork
@@ -22,7 +23,10 @@ export const getAlgorandBalance = async ({
     const accountInfo = await algodClient
         .accountInformation(accountAddress)
         .do()
+        
     const assets = accountInfo.assets as Array<AlgorandAsset>
     const foundAsset = assets.find((asset) => asset["asset-id"] === assetId)
-    return foundAsset?.amount ?? 0
+    const { decimals } = await getAlgorandTokenInfo({ network, assetId })
+
+    return computeDenomination(BigInt(foundAsset?.amount ?? 0), decimals)
 }

@@ -2,7 +2,7 @@ import { Form, Formik, FormikProps } from "formik"
 import React, { ReactNode, createContext, useContext, useMemo } from "react"
 import { SupportedChainName, transfer } from "@services"
 import { Chain } from "@wormhole-foundation/sdk-base"
-import { computeRaw, getInnerType } from "@common"
+import { computeRaw } from "@common"
 import { TokenContext } from "../../../../_hooks"
 import {
     PassphraseAndQRCodeModalContext,
@@ -53,7 +53,7 @@ export const TransferCardProvider = ({ children }: { children: ReactNode }) => {
     const { reducer } = useContext(TokenContext)!
     const [state] = reducer
     const { tokenInfo, tokenAddress } = state
-    const { tokenType, decimals } = { ...tokenInfo }
+    const { decimals } = { ...tokenInfo }
 
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
@@ -107,31 +107,12 @@ export const TransferCardProvider = ({ children }: { children: ReactNode }) => {
                 }
 
                 switch (selectedChainName) {
-                case SupportedChainName.Sui: {
-                    if (!tokenType || !decimals) return
-                    const { vaa, txHash } = await transfer({
-                        network,
-                        transferAmount: computeRaw(
-                            transferAmount,
-                            decimals
-                        ),
-                        recipientAddress,
-                        sourceChainName: selectedChainName as Chain,
-                        targetChainName: targetChainName as Chain,
-                        tokenAddress: toNative(
-                            selectedChainName,
-                            getInnerType(tokenType) ?? ""
-                        ),
-                        signer,
-                    })
-                    break
-                }
                 default: {
                     if (!tokenAddress) return
 
                     try {
                         openSignTransactionModal()
-                        
+
                         const { vaa, txHash } = await transfer({
                             network,
                             transferAmount: computeRaw(

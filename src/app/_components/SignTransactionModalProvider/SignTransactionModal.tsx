@@ -13,12 +13,12 @@ import React, {
 import { RootContext, useAlgorandSigner, useEvmSigner } from "../../_hooks"
 import {
     SupportedPlatform,
-    defaultSupportedChainName,
     supportedChains,
 } from "@services"
 import { chainToPlatform } from "@wormhole-foundation/sdk-base"
 import { publicConfig } from "@config"
 import { SignTransactionModalContext } from "./index"
+import { useWallet } from "@suiet/wallet-kit"
 
 export const SignTransactionModal = () => {
     const { discloresures } = useContext(SignTransactionModalContext)!
@@ -38,6 +38,7 @@ export const SignTransactionModal = () => {
 
     const { selectedSigner: evmSelectedSigner } = useEvmSigner()
     const { selectedSigner: algorandSelectedSigner } = useAlgorandSigner()
+    const { name, configuredWallets } = useWallet()
 
     let walletImageUrl: string = ""
     switch (chainToPlatform(_chainName)) {
@@ -57,6 +58,9 @@ export const SignTransactionModal = () => {
         break
     }
     case SupportedPlatform.Sui: {
+        walletImageUrl =
+                configuredWallets.find(({ name: _name }) => _name === name)
+                    ?.iconUrl ?? ""
         break
     }
     }
@@ -77,7 +81,7 @@ export const SignTransactionModal = () => {
                         <Avatar
                             isBordered
                             classNames={{
-                                base: "ring-0",
+                                base: "ring-0 bg-background",
                             }}
                             className="-bottom-2 -right-2 w-8 h-8 absolute z-20"
                             src={supportedChains[_chainName].imageUrl}

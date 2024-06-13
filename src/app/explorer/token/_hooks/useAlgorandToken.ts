@@ -1,16 +1,15 @@
 "use client"
 import { useContext, useEffect } from "react"
-import { AlgorandAsset, SupportedChainName, getAlgodClient } from "@services"
+import { SupportedChainName } from "@services"
 import { appConfig } from "@config"
 import { TokenContext } from "./TokenProvider"
 import { RootContext } from "../../../_hooks"
+import { getAlgorandTokenInfo } from "@services"
 
 export const useAlgorandToken = () => {
     const { reducer } = useContext(RootContext)!
     const [state] = reducer
     const { selectedChainName, network } = state
-
-    const algodClient = getAlgodClient(network)
 
     const { reducer: tokenReducer } = useContext(TokenContext)!
     const [tokenState, tokenDispatch] = tokenReducer
@@ -25,21 +24,14 @@ export const useAlgorandToken = () => {
             type: "SET_IS_LOADING",
             payload: true,
         })
-        console.log(tokenAddress, selectedChainName)
+
         const handleEffect = async () => {
             try {
-                const asset = (await algodClient
-                    .getAssetByID(Number.parseInt(tokenAddress))
-                    .do()) as AlgorandAsset
-                console.log(asset)
-
-                const { params } = asset
-                const {
-                    decimals,
-                    name,
-                    "unit-name": symbol,
-                    url: iconUrl,
-                } = params
+                const { decimals, name, iconUrl, symbol } =
+                    await getAlgorandTokenInfo({
+                        assetId: Number.parseInt(tokenAddress),
+                        network,
+                    })
 
                 tokenDispatch({
                     type: "SET_TOKEN_INFO",
@@ -52,7 +44,7 @@ export const useAlgorandToken = () => {
                 })
                 tokenDispatch({
                     type: "SET_IS_NOT_FOUND",
-                    payload: false
+                    payload: false,
                 })
             } catch (ex) {
                 tokenDispatch({
@@ -60,7 +52,7 @@ export const useAlgorandToken = () => {
                 })
                 tokenDispatch({
                     type: "SET_IS_NOT_FOUND",
-                    payload: true
+                    payload: true,
                 })
             } finally {
                 tokenDispatch({

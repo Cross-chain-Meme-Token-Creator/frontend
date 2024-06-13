@@ -1,4 +1,6 @@
 import {
+    BridgedChainInfo,
+    SupportedChainName,
     getBridgedChainInfos,
     mapChainNameToSupportedChainName,
 } from "@services"
@@ -9,7 +11,9 @@ import { TokenContext } from "./TokenProvider"
 export const useBridgedTokenInfos = () => {
     const { reducer } = useContext(TokenContext)!
     const [state, dispatch] = reducer
-    const { tokenAddress, keys } = state
+    const { tokenAddress, tokenInfo, keys } = state
+    const { objectId } = { ...tokenInfo }
+
     const { refreshWrappedTokensKey } = keys
 
     const { reducer: rootReducer } = useContext(RootContext)!
@@ -26,11 +30,28 @@ export const useBridgedTokenInfos = () => {
                 payload: true,
             })
 
-            const _bridgedChainInfos = await getBridgedChainInfos({
-                network,
-                mainChainName: selectedChainName,
-                tokenAddress,
-            })
+            let _bridgedChainInfos: Array<BridgedChainInfo>
+
+            switch (selectedChainName) {
+            case SupportedChainName.Sui: {
+                if (!objectId) return
+                    
+                _bridgedChainInfos = await getBridgedChainInfos({
+                    network,
+                    mainChainName: selectedChainName,
+                    tokenAddress: objectId,
+                })
+                    
+                break
+            } 
+            default: {
+                _bridgedChainInfos = await getBridgedChainInfos({
+                    network,
+                    mainChainName: selectedChainName,
+                    tokenAddress,
+                })
+            }
+            }
 
             const bridgedChainInfos = _bridgedChainInfos.map(
                 ({ nativeWrappedAddress, chainName }) => ({

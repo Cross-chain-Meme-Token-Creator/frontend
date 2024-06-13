@@ -52,7 +52,7 @@ export interface SupportedChainInfo {
 }
 
 export const chainNameToTokenIdName: Record<SupportedChainName, string> = {
-    [SupportedChainName.Sui]: "Object ID",
+    [SupportedChainName.Sui]: "Coin Type",
     [SupportedChainName.Algorand]: "Asset Id",
     [SupportedChainName.Solana]: "Contract Address",
     [SupportedChainName.Bsc]: "Contract Address",

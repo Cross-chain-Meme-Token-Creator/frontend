@@ -8,8 +8,9 @@ export interface TokenInfo {
     description?: string
     iconUrl?: string
     symbol: string
+
     //sui only
-    tokenType?: string
+    objectId?: string
 }
 
 export interface BridgedChainInfo {
@@ -32,7 +33,7 @@ export interface TokenState {
         refreshWrappedTokensKey?: string
     }
     isNotFound: boolean
-    balance?: number
+    balance?: string
 }
 
 export interface SetTokenAddressAction {
@@ -87,7 +88,7 @@ export interface SetIsNotFoundAction {
 
 export interface SetBalanceAction {
     type: "SET_BALANCE"
-    payload?: number
+    payload?: string
 }
 
 export type TokenAction =

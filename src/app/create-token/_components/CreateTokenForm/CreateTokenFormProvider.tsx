@@ -17,7 +17,12 @@ import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
 import { useDisclosure } from "@nextui-org/react"
 import useSwr, { SWRResponse } from "swr"
 import * as Yup from "yup"
-import { DisclosureType, computeNumberMultipeBigInt, computePow } from "@common"
+import {
+    DisclosureType,
+    computeNumberMultipeBigInt,
+    computePow,
+    getInnerType,
+} from "@common"
 import { RootContext, useAlgorandSigner } from "../../../_hooks"
 import { useWallet } from "@suiet/wallet-kit"
 import {
@@ -196,19 +201,23 @@ export const CreateTokenFormProvider = ({
                                     },
                                 })
 
-                        const metadataObject = (
-                                objectChanges as Array<SuiObjectChangeCreated>
-                        ).find(({ objectType }) =>
-                            objectType.includes("0x2::coin::CoinMetadata")
-                        )
-                        if (!metadataObject) return
-
-                        const { objectId } = metadataObject
+                        console.log(objectChanges)
+                        
+                        const coinType =
+                                getInnerType(
+                                    (
+                                        objectChanges as Array<SuiObjectChangeCreated>
+                                    ).find(({ objectType }) =>
+                                        objectType.includes(
+                                            "0x2::coin::CoinMetadata"
+                                        )
+                                    )?.objectType as ""
+                                ) ?? ""
 
                         dispatch({
                             type: "SET_TEMP_TOKEN_INFO",
                             payload: {
-                                tokenAddress: objectId,
+                                tokenAddress: coinType,
                             },
                         })
 
@@ -241,18 +250,17 @@ export const CreateTokenFormProvider = ({
                             ),
                         })
                         const response = (await signAndSend(txn)) as
-                            | AlgorandCreateAssetResponse
-                            | undefined
+                                | AlgorandCreateAssetResponse
+                                | undefined
                         if (!response) return
                         dispatch({
                             type: "SET_TEMP_TOKEN_INFO",
                             payload: {
                                 tokenAddress:
-                                    response["asset-index"].toString(),
+                                        response["asset-index"].toString(),
                             },
                         })
 
-                    
                         notify({
                             chainName: selectedChainName,
                             txHash: txn.txID(),

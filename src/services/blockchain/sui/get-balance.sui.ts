@@ -1,22 +1,32 @@
-import { SupportedNetwork, getInnerType } from "@common"
+import { SupportedNetwork, computeDenomination } from "@common"
 import { getSuiClient } from "./constants.sui"
+import { getSuiTokenInfo } from "./get-token-info.sui"
 
 interface GetSuiBalanceParams {
     network: SupportedNetwork
     accountAddress: string
-    tokenType: string
+    coinType: string
 }
 
 export const getSuiBalance = async ({
     network,
     accountAddress,
-    tokenType,
+    coinType,
 }: GetSuiBalanceParams) => {
     const suiClient = getSuiClient(network)
-    const coins = await suiClient.getCoins({
+    const { data } = await suiClient.getCoins({
         owner: accountAddress,
-        coinType: getInnerType(tokenType)
+        coinType
     })
-    console.log(coins)
-    return 0
+
+    let totalBalance: bigint = BigInt(0)
+    for (const { balance } of data) {
+        totalBalance += BigInt(balance)
+    }
+
+    const { decimals } = await getSuiTokenInfo({
+        network,
+        coinType
+    })
+    return computeDenomination(totalBalance, decimals)
 }
