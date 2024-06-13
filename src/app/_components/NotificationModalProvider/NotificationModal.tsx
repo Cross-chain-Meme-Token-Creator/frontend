@@ -1,6 +1,6 @@
 "use client"
 import { useContext } from "react"
-import { NotificationModalContext } from "./NotificationModalProvider"
+import { NotificationModalContext } from "."
 import React, {
     Button,
     Modal,
@@ -9,9 +9,6 @@ import React, {
     ModalFooter,
     ModalHeader,
 } from "@nextui-org/react"
-
-export * from "./NotificationModalProvider"
-export * from "./useNotificationModalReducer"
 
 export const NotificationModal = () => {
     const { reducer, discloresures } = useContext(NotificationModalContext)!

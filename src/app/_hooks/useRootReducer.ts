@@ -20,7 +20,7 @@ export interface RootState {
     }
     selectedChainName: SupportedChainName
     searchValue: string
-    network: SupportedNetwork
+    network: SupportedNetwork,
 }
 
 export interface SetPeraWalletAddressAction {

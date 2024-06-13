@@ -25,6 +25,7 @@ import {
     SetCreateTokenFormAddressAction,
     useCreateTokenFormReducer,
 } from "./useCreateTokenFormReducer"
+import { SigningTransactionModalContext } from "../../../_components"
 
 interface FormikValue {
     symbol: string
@@ -140,6 +141,9 @@ export const CreateTokenFormProvider = ({
     const reducer = useCreateTokenFormReducer()
     const [, dispatch] = reducer
 
+    const { functions } = useContext(SigningTransactionModalContext)!
+    const { openModal, closeModal } = functions
+
     return (
         <Formik
             initialValues={initialValues}
@@ -157,82 +161,88 @@ export const CreateTokenFormProvider = ({
                 iconUrl,
                 totalSupply,
             }) => {
-                switch (selectedChainName) {
-                case SupportedChainName.Sui: {
-                    if (!suiAddress) {
-                        await select("Suiet")
-                        return
+                try {
+                    switch (selectedChainName) {
+                    case SupportedChainName.Sui: {
+                        if (!suiAddress) {
+                            await select("Suiet")
+                            return
+                        }
+
+                        const transactionBlock =
+                                await getCreateSuiTokenTransactionBlock({
+                                    decimals,
+                                    description,
+                                    name,
+                                    symbol,
+                                    iconUrl,
+                                    totalSupply: computeNumberMultipeBigInt(
+                                        totalSupply,
+                                        computePow(decimals)
+                                    ),
+                                })
+                        const { objectChanges } =
+                                await signAndExecuteTransactionBlock({
+                                    transactionBlock,
+                                    options: {
+                                        showObjectChanges: true,
+                                    },
+                                })
+
+                        const metadataObject = (
+                                objectChanges as Array<SuiObjectChangeCreated>
+                        ).find(({ objectType }) =>
+                            objectType.includes("0x2::coin::CoinMetadata")
+                        )
+                        if (!metadataObject) return
+
+                        const { objectId } = metadataObject
+
+                        dispatch({
+                            type: "SET_TEMP_TOKEN_INFO",
+                            payload: {
+                                tokenAddress: objectId,
+                            },
+                        })
+                        break
                     }
+                    case SupportedChainName.Algorand: {
+                        if (!algorandAddress) {
+                            connectPera()
+                            return
+                        }
 
-                    const transactionBlock =
-                            await getCreateSuiTokenTransactionBlock({
-                                decimals,
-                                description,
-                                name,
-                                symbol,
-                                iconUrl,
-                                totalSupply: computeNumberMultipeBigInt(
-                                    totalSupply,
-                                    computePow(decimals)
-                                ),
-                            })
-                    const { objectChanges } =
-                            await signAndExecuteTransactionBlock({
-                                transactionBlock,
-                                options: {
-                                    showObjectChanges: true,
-                                },
-                            })
+                        openModal()
 
-                    const metadataObject = (
-                            objectChanges as Array<SuiObjectChangeCreated>
-                    ).find(({ objectType }) =>
-                        objectType.includes("0x2::coin::CoinMetadata")
-                    )
-                    if (!metadataObject) return
-
-                    const { objectId } = metadataObject
-
-                    dispatch({
-                        type: "SET_TEMP_TOKEN_INFO",
-                        payload: {
-                            tokenAddress: objectId,
-                        },
-                    })
-                    break
-                }
-                case SupportedChainName.Algorand: {
-                    if (!algorandAddress) {
-                        connectPera()
-                        return
+                        const txn = await getMakeAlgorandAssetTransaction({
+                            fromAddress: algorandAddress,
+                            decimals,
+                            name,
+                            symbol,
+                            iconUrl,
+                            totalSupply: computeNumberMultipeBigInt(
+                                totalSupply,
+                                computePow(decimals)
+                            ),
+                        })
+                        const response = (await signAndSend(txn)) as
+                                | AlgorandCreateAssetResponse
+                                | undefined
+                        if (!response) return
+                        dispatch({
+                            type: "SET_TEMP_TOKEN_INFO",
+                            payload: {
+                                tokenAddress:
+                                        response["asset-index"].toString(),
+                            },
+                        })
+                        break
                     }
-
-                    const txn = await getMakeAlgorandAssetTransaction({
-                        fromAddress: algorandAddress,
-                        decimals,
-                        name,
-                        symbol,
-                        iconUrl,
-                        totalSupply: computeNumberMultipeBigInt(
-                            totalSupply,
-                            computePow(decimals)
-                        ),
-                    })
-                    const response = (await signAndSend(txn)) as
-                            | AlgorandCreateAssetResponse
-                            | undefined
-                    if (!response) return
-                    dispatch({
-                        type: "SET_TEMP_TOKEN_INFO",
-                        payload: {
-                            tokenAddress:
-                                    response["asset-index"].toString(),
-                        },
-                    })
-                    break
+                    }
+                    onOpen()
+                } finally {
+                    closeModal()
                 }
-                }
-                onOpen()
             }}
         >
             {(formik) =>

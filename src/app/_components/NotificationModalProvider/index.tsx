@@ -7,6 +7,7 @@ import {
 } from "./useNotificationModalReducer"
 import { useDisclosure } from "@nextui-org/react"
 import { DisclosureType } from "@common"
+import { NotificationModal } from "./NotificationModal"
 
 export interface NotificationModalContextValue {
     reducer: [NotificationModalState, React.Dispatch<NotificationModalAction>]
@@ -70,6 +71,7 @@ export const NotificationModalProvider = ({
         <NotificationModalContext.Provider
             value={notificationModalContextValue}
         >
+            <NotificationModal/>
             {children}
         </NotificationModalContext.Provider>
     )

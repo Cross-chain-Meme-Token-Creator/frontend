@@ -20,8 +20,8 @@ const WrappedSearchBar = () => {
     const { searchValue } = state
 
     const { discloresures } = useContext(SearchBarContext)!
-    const { originDiscloresure } = discloresures
-    const { onOpenChange, onOpen, isOpen } = originDiscloresure
+    const { baseDiscloresure } = discloresures
+    const { onOpenChange, onOpen, isOpen } = baseDiscloresure
 
     return (
         <>

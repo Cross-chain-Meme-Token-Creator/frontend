@@ -9,6 +9,7 @@ export enum SupportedChainName {
 }
 
 export const defaultSupportedChainName = SupportedChainName.Sui
+export const defaultSupportedPlatform = chainToPlatform(defaultSupportedChainName) as SupportedPlatform
 
 export const tryMapChainNameToSupportedChainName = (
     chainName: Chain

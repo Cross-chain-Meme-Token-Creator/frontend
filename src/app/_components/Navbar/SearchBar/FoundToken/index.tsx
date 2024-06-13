@@ -18,8 +18,8 @@ const WrappedFoundToken = () => {
     const { searchValue, selectedChainName } = rootState
 
     const { discloresures } = useContext(SearchBarContext)!
-    const { originDiscloresure } = discloresures
-    const { onClose } = originDiscloresure
+    const { baseDiscloresure } = discloresures
+    const { onClose } = baseDiscloresure
 
     useFoundSuiToken()
     useFoundAlgorandToken()

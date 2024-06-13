@@ -1,11 +1,10 @@
-import React from "react"
+import React, { useContext } from "react"
 import {
     Modal,
     ModalContent,
     ModalHeader,
     ModalBody,
     ModalFooter,
-    useDisclosure,
     Tabs,
     Tab,
 } from "@nextui-org/react"
@@ -14,9 +13,14 @@ import { SuiTab } from "./SuiTab"
 import { EvmTab } from "./EvmTab"
 import { AlgorandTab } from "./AlgorandTab"
 import { SupportedPlatform } from "@services"
+import { ConnectWalletContext } from "../../../_hooks"
 
 export const ConnectWalletsModal = () => {
-    const { isOpen, onOpen, onOpenChange } = useDisclosure()
+    const { discloresures, reducer } = useContext(ConnectWalletContext)!
+    const { baseDiscloresure } = discloresures
+    const { isOpen, onOpen, onOpenChange } = baseDiscloresure
+    const [state, dispatch] = reducer
+    const { platform } = state
 
     interface Tab {
         key: SupportedPlatform
@@ -47,9 +51,13 @@ export const ConnectWalletsModal = () => {
             <Button color="primary" onPress={onOpen}>
                 Connect Wallets
             </Button>
-            <Modal classNames={{
-            
-            }} isOpen={isOpen} size="xl" onOpenChange={onOpenChange} isDismissable={false}>
+            <Modal
+                classNames={{}}
+                isOpen={isOpen}
+                size="xl"
+                onOpenChange={onOpenChange}
+                isDismissable={false}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
@@ -58,12 +66,20 @@ export const ConnectWalletsModal = () => {
                             </ModalHeader>
                             <ModalBody className="p-4">
                                 <Tabs
+                                    selectedKey={platform}
+                                    onSelectionChange={(platform) =>
+                                        dispatch({
+                                            type: "SET_PLATFORM",
+                                            payload:
+                                                platform as SupportedPlatform,
+                                        })
+                                    }
                                     variant="underlined"
                                     classNames={{
                                         panel: "px-0",
                                         tabList: "px-0",
                                         tab: "px-4",
-                                        cursor: "w-full bg-primary"
+                                        cursor: "w-full bg-primary",
                                     }}
                                 >
                                     {tabs.map(({ key, title, content }) => (

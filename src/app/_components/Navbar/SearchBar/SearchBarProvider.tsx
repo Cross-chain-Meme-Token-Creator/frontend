@@ -6,7 +6,7 @@ import { useDisclosure } from "@nextui-org/react"
 
 export interface SearchBarContextValue {
     discloresures: {
-        originDiscloresure: DisclosureType
+        baseDiscloresure: DisclosureType
     }
 }
 
@@ -15,15 +15,15 @@ export const SearchBarContext = createContext<SearchBarContextValue | null>(
 )
 
 export const SearchBarProvider = ({ children }: { children: ReactNode }) => {
-    const originDiscloresure = useDisclosure()
+    const baseDiscloresure = useDisclosure()
 
     const searchBarContextValue: SearchBarContextValue = useMemo(
         () => ({
             discloresures: {
-                originDiscloresure,
+                baseDiscloresure,
             },
         }),
-        [originDiscloresure]
+        [baseDiscloresure]
     )
     return (
         <SearchBarContext.Provider value={searchBarContextValue}>
