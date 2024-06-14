@@ -21,7 +21,7 @@ import { TokenCreatedSuccesfullyModal } from "./TokenCreatedSuccesfullyModal"
 
 const WrappedCreateTokenForm = () => {
     const { formik, swrs } = useContext(CreateTokenFormContext)!
-    const { iconUrlSwr } = swrs
+    const { iconUrlSwrMutation } = swrs
 
     return (
         <>
@@ -85,11 +85,9 @@ const WrappedCreateTokenForm = () => {
                             }}
                             onDrop={async (acceptedFiles: Array<File>) => {
                                 console.log("Called")
-                                const file = acceptedFiles.at(0)
-                                if (!file) return
-                                console.log(file)
-                                formik.setFieldValue("iconFile", file)
-                                iconUrlSwr.mutate()
+                                const iconFile = acceptedFiles.at(0)
+                                if (!iconFile) return
+                                iconUrlSwrMutation.trigger({ iconFile })
                             }}
                         >
                             {({ getRootProps, getInputProps }) => (
@@ -112,8 +110,8 @@ const WrappedCreateTokenForm = () => {
                                 </section>
                             )}
                         </Dropzone>
-                        {formik.values.iconUrl ? (
-                            !iconUrlSwr.isValidating ? (
+                        {
+                            !iconUrlSwrMutation.isMutating ? (
                                 <Link
                                     showAnchorIcon
                                     isExternal
@@ -135,7 +133,7 @@ const WrappedCreateTokenForm = () => {
                                 Loading
                                 </Spinner>
                             )
-                        ) : null}
+                        }
                     </div>
                     <Input
                         id="totalSupply"

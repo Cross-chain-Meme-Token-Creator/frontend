@@ -15,7 +15,7 @@ import {
 } from "@services"
 import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
 import { useDisclosure } from "@nextui-org/react"
-import useSwr, { SWRResponse } from "swr"
+import useSWRMutation, { SWRMutationResponse } from "swr/mutation"
 import * as Yup from "yup"
 import {
     DisclosureType,
@@ -41,14 +41,20 @@ interface FormikValue {
     name: string
     description: string
     decimals: number
-    iconFile?: File
     iconUrl: string
     totalSupply: number
 }
 
 interface CreateTokenFormContextValue {
     swrs: {
-        iconUrlSwr: SWRResponse
+        iconUrlSwrMutation: SWRMutationResponse<
+            void,
+            unknown,
+            "/api",
+            {
+                iconFile: File
+            }
+        >
     }
     formik: FormikProps<FormikValue>
     discloresures: {
@@ -58,8 +64,8 @@ interface CreateTokenFormContextValue {
 }
 
 const initialValues: FormikValue = {
-    symbol: "USDT",
-    name: "UST Tether",
+    symbol: "CPP",
+    name: "Ci PEPE",
     description: "",
     decimals: 8,
     iconUrl: "",
@@ -82,21 +88,23 @@ const renderBody = (
 ) => {
     const { tokenCreatedSuccesfullyModalDiscloresure, reducer } = others
 
-    const iconUrlSwr = useSwr(
-        "ICON_URL",
-        async () => {
-            const iconFile = formik.values.iconFile
-            if (!iconFile) return
+    const iconUrlSwrMutation = useSWRMutation(
+        "/api",
+        async (
+            url,
+            {
+                arg,
+            }: {
+                arg: {
+                    iconFile: File
+                }
+            }
+        ) => {
+            const { iconFile } = arg
             const formData = new FormData()
             formData.append("file", iconFile)
-            const { data } = await baseAxios.post<string>("/api", formData)
+            const { data } = await baseAxios.post<string>(url, formData)
             formik.setFieldValue("iconUrl", data)
-        },
-        {
-            revalidateOnMount: false,
-            revalidateOnFocus: false,
-            revalidateIfStale: false,
-            revalidateOnReconnect: false,
         }
     )
 
@@ -104,14 +112,19 @@ const renderBody = (
         () => ({
             formik,
             swrs: {
-                iconUrlSwr,
+                iconUrlSwrMutation,
             },
             discloresures: {
                 tokenCreatedSuccesfullyModalDiscloresure,
             },
             reducer,
         }),
-        [formik, iconUrlSwr, reducer, tokenCreatedSuccesfullyModalDiscloresure]
+        [
+            formik,
+            iconUrlSwrMutation,
+            reducer,
+            tokenCreatedSuccesfullyModalDiscloresure,
+        ]
     )
 
     return (
