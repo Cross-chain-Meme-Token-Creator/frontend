@@ -8,7 +8,7 @@ export interface AlgorandAsset {
         name: string
         total: number
         "unit-name": string
-        url: string
+        url: string 
     }
 }
 
