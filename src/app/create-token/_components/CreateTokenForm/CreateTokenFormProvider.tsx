@@ -201,17 +201,20 @@ export const CreateTokenFormProvider = ({
                                     },
                                 })
 
+                        if (!objectChanges) return
                         console.log(objectChanges)
-                        
+
                         const coinType =
                                 getInnerType(
                                     (
                                         objectChanges as Array<SuiObjectChangeCreated>
-                                    ).find(({ objectType }) =>
-                                        objectType.includes(
+                                    ).find((objectChange) => {
+                                        const { objectType } = objectChange
+                                        if (!objectType) return false
+                                        return objectType.includes(
                                             "0x2::coin::CoinMetadata"
                                         )
-                                    )?.objectType as ""
+                                    })?.objectType ?? ""
                                 ) ?? ""
 
                         dispatch({

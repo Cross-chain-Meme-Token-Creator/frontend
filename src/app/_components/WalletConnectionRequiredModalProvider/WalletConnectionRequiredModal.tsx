@@ -46,7 +46,7 @@ export const WalletConnectionRequiredModal = () => {
                         <Avatar
                             isBordered
                             classNames={{
-                                base: "ring-0",
+                                base: "ring-0 bg-background",
                             }}
                             className="-bottom-2 -right-2 w-8 h-8 absolute z-20"
                             src={supportedChains[selectedChainName].imageUrl}
