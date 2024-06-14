@@ -70,5 +70,5 @@ export const useBridgedTokenInfos = () => {
             })
         }
         handleEffect()
-    }, [tokenAddress, refreshWrappedTokensKey])
+    }, [tokenAddress, refreshWrappedTokensKey, objectId])
 }

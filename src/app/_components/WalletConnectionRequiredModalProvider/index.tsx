@@ -38,6 +38,7 @@ export const WalletConnectionRequiredModalProvider = ({
 
     const openModal = useCallback(
         (params?: WalletConnectionRequiredModalState) => {
+            console.log(params)
             if (params) {
                 dispatch({
                     type: "OPEN",
@@ -60,7 +61,7 @@ export const WalletConnectionRequiredModalProvider = ({
                     openModal,
                 },
             }),
-            [baseDiscloresure]
+            [baseDiscloresure, reducer]
         )
 
     return (

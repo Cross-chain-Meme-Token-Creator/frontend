@@ -62,10 +62,10 @@ export const WalletConnectionRequiredModal = () => {
                         color="primary"
                         fullWidth
                         onPress={() => {
-                            if (!chainName) return
+                            const _chainName = chainName ?? selectedChainName
                             connectWallet({
                                 platform: mapPlatformToSupportedPlatform(
-                                    chainToPlatform(chainName)
+                                    chainToPlatform(_chainName)
                                 ),
                             })
                             onClose()
