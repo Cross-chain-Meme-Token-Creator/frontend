@@ -50,7 +50,7 @@ interface CreateTokenFormContextValue {
         iconUrlSwrMutation: SWRMutationResponse<
             void,
             unknown,
-            "/api",
+            "ICON_URL",
             {
                 iconFile: File
             }
@@ -89,9 +89,9 @@ const renderBody = (
     const { tokenCreatedSuccesfullyModalDiscloresure, reducer } = others
 
     const iconUrlSwrMutation = useSWRMutation(
-        "/api",
+        "ICON_URL",
         async (
-            url,
+            _,
             {
                 arg,
             }: {
@@ -103,7 +103,7 @@ const renderBody = (
             const { iconFile } = arg
             const formData = new FormData()
             formData.append("file", iconFile)
-            const { data } = await baseAxios.post<string>(url, formData)
+            const { data } = await baseAxios.post<string>("/api", formData)
             formik.setFieldValue("iconUrl", data)
         }
     )

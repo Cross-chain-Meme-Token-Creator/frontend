@@ -22,6 +22,7 @@ import { TokenCreatedSuccesfullyModal } from "./TokenCreatedSuccesfullyModal"
 const WrappedCreateTokenForm = () => {
     const { formik, swrs } = useContext(CreateTokenFormContext)!
     const { iconUrlSwrMutation } = swrs
+    const { trigger, isMutating } = iconUrlSwrMutation
 
     return (
         <>
@@ -111,7 +112,7 @@ const WrappedCreateTokenForm = () => {
                                 console.log("Called")
                                 const iconFile = acceptedFiles.at(0)
                                 if (!iconFile) return
-                                iconUrlSwrMutation.trigger({ iconFile })
+                                trigger({ iconFile })
                             }}
                         >
                             {({ getRootProps, getInputProps }) => (
@@ -135,7 +136,7 @@ const WrappedCreateTokenForm = () => {
                                 </section>
                             )}
                         </Dropzone>
-                        {!iconUrlSwrMutation.isMutating ? (
+                        {!isMutating ? (
                             formik.values.iconUrl ? (
                                 <Link
                                     showAnchorIcon
