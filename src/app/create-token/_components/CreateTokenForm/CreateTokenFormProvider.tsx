@@ -9,6 +9,7 @@ import React, {
 import {
     AlgorandCreateAssetResponse,
     SupportedChainName,
+    TokenFactoryContract,
     baseAxios,
     getCreateSuiTokenTransactionBlock,
     getMakeAlgorandAssetTransaction,
@@ -23,7 +24,7 @@ import {
     computePow,
     getInnerType,
 } from "@common"
-import { RootContext, useAlgorandSigner } from "../../../_hooks"
+import { RootContext, useAlgorandSigner, useEvmSigner } from "../../../_hooks"
 import { useWallet } from "@suiet/wallet-kit"
 import {
     CreateTokenFormState,
@@ -148,12 +149,15 @@ export const CreateTokenFormProvider = ({
 
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
-    const { selectedChainName } = rootState
+    const { selectedChainName, network } = rootState
+
+    const { address: evmAddress, metamaskWallet } = useEvmSigner()
+    const { provider } = metamaskWallet
 
     const { address: algorandAddress, signAndSend } = useAlgorandSigner()
 
     const reducer = useCreateTokenFormReducer()
-    const [, dispatch] = reducer
+    const [, dispatch ] = reducer
 
     const { functions } = useContext(SignTransactionModalContext)!
     const { openModal, closeModal } = functions
@@ -280,6 +284,42 @@ export const CreateTokenFormProvider = ({
                         notify({
                             chainName: selectedChainName,
                             txHash: txn.txID(),
+                        })
+                        onOpen()
+                    } finally {
+                        closeModal()
+                    }
+                    break
+                }
+                case SupportedChainName.Celo: {
+                    if (!evmAddress) {
+                        openWalletConnectionRequiredModal()
+                        return
+                    }
+                    try {
+                        openModal()
+                        if (!provider) return
+                        const contract = new TokenFactoryContract(network, provider, evmAddress)
+                        
+                        const { transactionHash, logs } = await contract.createToken({
+                            name,
+                            symbol,
+                            decimals,
+                            totalSupply: BigInt(totalSupply)
+                        }).send()
+                        
+                        console.log(logs)
+                        // dispatch({
+                        //     type: "SET_TEMP_TOKEN_INFO",
+                        //     payload: {
+                        //         tokenAddress:
+                        //                 response["asset-index"].toString(),
+                        //     },
+                        // })
+
+                        notify({
+                            chainName: selectedChainName,
+                            txHash: transactionHash,
                         })
                         onOpen()
                     } finally {

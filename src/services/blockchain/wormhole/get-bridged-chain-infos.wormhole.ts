@@ -6,7 +6,7 @@ import {
     toNative,
     toUniversal,
 } from "@wormhole-foundation/sdk-definitions"
-import { supportedChains } from "./constants.wormhole"
+import { supportedChains } from "../constants.blockchain"
 import { AlgorandAddress } from "@wormhole-foundation/sdk-algorand"
 import { SuiAddress } from "@wormhole-foundation/sdk-sui"
 

@@ -40,3 +40,12 @@ export const web3HttpObject = <C extends SupportedEvmChains>(
     network: SupportedNetwork = "Testnet",
     chainName: C
 ) => new Web3(httpProvider(network, chainName))
+
+export const TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS =
+    "0x98b01f5269104E5acae6F3440ca785D043d76c79"
+export const MAINNET_TOKEN_FACTORY_CONTRACT_ADDRESS = ""
+
+export const factoryContractAddress = (network: SupportedNetwork) =>
+    network === "Testnet"
+        ? TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS
+        : MAINNET_TOKEN_FACTORY_CONTRACT_ADDRESS
