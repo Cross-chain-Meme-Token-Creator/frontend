@@ -32,3 +32,5 @@ export interface CreateTokenParams {
     decimals: number;
     totalSupply: bigint;
 }
+
+export const CREATE_TOKEN_TOPIC = "0x6596c1670eb3390048d23721809c3da5d3f531375ac0e2cab0f77a808ed64331"

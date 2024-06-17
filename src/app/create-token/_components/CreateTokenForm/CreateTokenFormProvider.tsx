@@ -8,11 +8,14 @@ import React, {
 } from "react"
 import {
     AlgorandCreateAssetResponse,
+    CREATE_TOKEN_TOPIC,
     SupportedChainName,
     TokenFactoryContract,
     baseAxios,
     getCreateSuiTokenTransactionBlock,
     getMakeAlgorandAssetTransaction,
+    getTokenFactoryContractAddress,
+    web3HttpObject,
 } from "@services"
 import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
 import { useDisclosure } from "@nextui-org/react"
@@ -36,6 +39,7 @@ import {
     TransactionToastContext,
     WalletConnectionRequiredModalContext,
 } from "../../../_components"
+import Web3 from "web3"
 
 interface FormikValue {
     symbol: string
@@ -157,7 +161,7 @@ export const CreateTokenFormProvider = ({
     const { address: algorandAddress, signAndSend } = useAlgorandSigner()
 
     const reducer = useCreateTokenFormReducer()
-    const [, dispatch ] = reducer
+    const [, dispatch] = reducer
 
     const { functions } = useContext(SignTransactionModalContext)!
     const { openModal, closeModal } = functions
@@ -191,14 +195,14 @@ export const CreateTokenFormProvider = ({
                 totalSupply,
             }) => {
                 switch (selectedChainName) {
-                case SupportedChainName.Sui: {
-                    if (!suiAddress) {
-                        openWalletConnectionRequiredModal()
-                        return
-                    }
-                    try {
-                        openModal()
-                        const transactionBlock =
+                    case SupportedChainName.Sui: {
+                        if (!suiAddress) {
+                            openWalletConnectionRequiredModal()
+                            return
+                        }
+                        try {
+                            openModal()
+                            const transactionBlock =
                                 await getCreateSuiTokenTransactionBlock({
                                     decimals,
                                     description,
@@ -210,7 +214,7 @@ export const CreateTokenFormProvider = ({
                                         computePow(decimals)
                                     ),
                                 })
-                        const { objectChanges, digest } =
+                            const { objectChanges, digest } =
                                 await signAndExecuteTransactionBlock({
                                     transactionBlock,
                                     options: {
@@ -218,10 +222,10 @@ export const CreateTokenFormProvider = ({
                                     },
                                 })
 
-                        if (!objectChanges) return
-                        console.log(objectChanges)
+                            if (!objectChanges) return
+                            console.log(objectChanges)
 
-                        const coinType =
+                            const coinType =
                                 getInnerType(
                                     (
                                         objectChanges as Array<SuiObjectChangeCreated>
@@ -234,99 +238,130 @@ export const CreateTokenFormProvider = ({
                                     })?.objectType ?? ""
                                 ) ?? ""
 
-                        dispatch({
-                            type: "SET_TEMP_TOKEN_INFO",
-                            payload: {
-                                tokenAddress: coinType,
-                            },
-                        })
+                            dispatch({
+                                type: "SET_TEMP_TOKEN_INFO",
+                                payload: {
+                                    tokenAddress: coinType,
+                                },
+                            })
 
-                        notify({
-                            chainName: selectedChainName,
-                            txHash: digest,
-                        })
-                        onOpen()
-                    } finally {
-                        closeModal()
+                            notify({
+                                chainName: selectedChainName,
+                                txHash: digest,
+                            })
+                            onOpen()
+                        } finally {
+                            closeModal()
+                        }
+                        break
                     }
-                    break
-                }
-                case SupportedChainName.Algorand: {
-                    if (!algorandAddress) {
-                        openWalletConnectionRequiredModal()
-                        return
-                    }
-                    try {
-                        openModal()
-                        const txn = await getMakeAlgorandAssetTransaction({
-                            fromAddress: algorandAddress,
-                            decimals,
-                            name,
-                            symbol,
-                            iconUrl,
-                            totalSupply: computeNumberMultipeBigInt(
-                                totalSupply,
-                                computePow(decimals)
-                            ),
-                        })
-                        const response = (await signAndSend(txn)) as
+                    case SupportedChainName.Algorand: {
+                        if (!algorandAddress) {
+                            openWalletConnectionRequiredModal()
+                            return
+                        }
+                        try {
+                            openModal()
+                            const txn = await getMakeAlgorandAssetTransaction({
+                                fromAddress: algorandAddress,
+                                decimals,
+                                name,
+                                symbol,
+                                iconUrl,
+                                totalSupply: computeNumberMultipeBigInt(
+                                    totalSupply,
+                                    computePow(decimals)
+                                ),
+                            })
+                            const response = (await signAndSend(txn)) as
                                 | AlgorandCreateAssetResponse
                                 | undefined
-                        if (!response) return
-                        dispatch({
-                            type: "SET_TEMP_TOKEN_INFO",
-                            payload: {
-                                tokenAddress:
+                            if (!response) return
+                            dispatch({
+                                type: "SET_TEMP_TOKEN_INFO",
+                                payload: {
+                                    tokenAddress:
                                         response["asset-index"].toString(),
-                            },
-                        })
+                                },
+                            })
 
-                        notify({
-                            chainName: selectedChainName,
-                            txHash: txn.txID(),
-                        })
-                        onOpen()
-                    } finally {
-                        closeModal()
+                            notify({
+                                chainName: selectedChainName,
+                                txHash: txn.txID(),
+                            })
+                            onOpen()
+                        } finally {
+                            closeModal()
+                        }
+                        break
                     }
-                    break
-                }
-                case SupportedChainName.Celo: {
-                    if (!evmAddress) {
-                        openWalletConnectionRequiredModal()
-                        return
-                    }
-                    try {
-                        openModal()
-                        if (!provider) return
-                        const contract = new TokenFactoryContract(network, provider, evmAddress)
-                        
-                        const { transactionHash, logs } = await contract.createToken({
-                            name,
-                            symbol,
-                            decimals,
-                            totalSupply: BigInt(totalSupply)
-                        }).send()
-                        
-                        console.log(logs)
-                        // dispatch({
-                        //     type: "SET_TEMP_TOKEN_INFO",
-                        //     payload: {
-                        //         tokenAddress:
-                        //                 response["asset-index"].toString(),
-                        //     },
-                        // })
+                    case SupportedChainName.Celo: {
+                        if (!evmAddress) {
+                            openWalletConnectionRequiredModal()
+                            return
+                        }
+                        try {
+                            openModal()
+                            if (!provider) return
+                            const contract = new TokenFactoryContract(
+                                getTokenFactoryContractAddress(network),
+                                provider,
+                                evmAddress
+                            )
 
-                        notify({
-                            chainName: selectedChainName,
-                            txHash: transactionHash,
-                        })
-                        onOpen()
-                    } finally {
-                        closeModal()
+                            const { transactionHash, logs } = await contract
+                                .createToken({
+                                    name,
+                                    symbol,
+                                    decimals,
+                                    totalSupply: BigInt(totalSupply),
+                                })
+                                .send()
+
+                            const { topics, data } = {
+                                ...logs.find(
+                                    ({ topics }) =>
+                                        topics?.at(0) === CREATE_TOKEN_TOPIC
+                                ),
+                            }
+                            if (!data || !topics) return
+
+                            const decoded = web3HttpObject(
+                                network,
+                                selectedChainName
+                            ).eth.abi.decodeLog(
+                                [
+                                    {
+                                        type: "string",
+                                        name: "topic",
+                                    },
+                                    {
+                                        type: "address",
+                                        name: "tokenAddress",
+                                        indexed: true,
+                                    },
+                                ],
+                                data,
+                                topics
+                            )
+                            dispatch({
+                                type: "SET_TEMP_TOKEN_INFO",
+                                payload: {
+                                    tokenAddress:
+                                        decoded.tokenAddress as string,
+                                },
+                            })
+
+                            notify({
+                                chainName: selectedChainName,
+                                txHash: transactionHash,
+                            })
+                            onOpen()
+                        } finally {
+                            closeModal()
+                        }
+                        break
                     }
-                    break
-                }
                 }
             }}
         >

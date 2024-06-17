@@ -1,5 +1,5 @@
 import { SupportedNetwork } from "@common"
-import Web3, { HttpProvider } from "web3"
+import web3, { HttpProvider } from "web3"
 
 export const CELO_MAINNET_RPC_URL = "https://forno.celo.org/"
 export const CELO_TESTNET_RPC_URL = "https://alfajores-forno.celo-testnet.org"
@@ -39,13 +39,12 @@ export const httpProvider = <C extends SupportedEvmChains>(
 export const web3HttpObject = <C extends SupportedEvmChains>(
     network: SupportedNetwork = "Testnet",
     chainName: C
-) => new Web3(httpProvider(network, chainName))
+) => new web3(httpProvider(network, chainName))
 
-export const TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS =
-    "0x98b01f5269104E5acae6F3440ca785D043d76c79"
+export const TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS ="0x98b01f5269104E5acae6F3440ca785D043d76c79"
 export const MAINNET_TOKEN_FACTORY_CONTRACT_ADDRESS = ""
 
-export const factoryContractAddress = (network: SupportedNetwork) =>
+export const getTokenFactoryContractAddress = (network: SupportedNetwork) =>
     network === "Testnet"
-        ? TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS
-        : MAINNET_TOKEN_FACTORY_CONTRACT_ADDRESS
+        ? web3.utils.toChecksumAddress(TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS)
+        : web3.utils.toChecksumAddress(MAINNET_TOKEN_FACTORY_CONTRACT_ADDRESS)
