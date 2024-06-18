@@ -1,6 +1,12 @@
 import { Link } from "@nextui-org/react"
 import { chainToPlatform } from "@wormhole-foundation/sdk-base"
-import { ERC20Contract, SupportedChainName, SupportedEvmChains, httpProvider } from "@services"
+import {
+    ERC20Contract,
+    SupportedChainName,
+    SupportedEvmChainName,
+    httpProvider,
+    mapSupportedChainNameToSupportedEvmChainName,
+} from "@services"
 import React, { useContext, useEffect } from "react"
 import { TokenContext } from "../../../../../_hooks"
 import { RootContext, useEvmSigner } from "../../../../../../../_hooks"
@@ -15,7 +21,7 @@ export const BalanceInfo = (props: BalanceInfoProps) => {
 
     const { reducer, functions } = useContext(TokenContext)!
     const { getBridgedChainInfo } = functions
-    const [ state, dispatch ] = reducer
+    const [state, dispatch] = reducer
     const { keys } = state
     const { refreshWrappedTokensKey } = keys
 
@@ -32,33 +38,37 @@ export const BalanceInfo = (props: BalanceInfoProps) => {
 
         const handleEffect = async () => {
             switch (chainToPlatform(chainName)) {
-            case "Evm": {
-                const erc20Contract = new ERC20Contract(
-                    wrappedAddress,
-                    httpProvider(network, chainName as SupportedEvmChains)
-                )
+                case "Evm": {
+                    const erc20Contract = new ERC20Contract(
+                        wrappedAddress,
+                        httpProvider(
+                            network,
+                            mapSupportedChainNameToSupportedEvmChainName(
+                                chainName
+                            )
+                        )
+                    )
 
-                if (!evmAddress) return
-                const balance = await erc20Contract
-                    .balanceOf(evmAddress)
-                    .call()
-                const decimals = await erc20Contract.decimals().call()
-                
-                dispatch({
-                    type: "UPDATE_BALANCE",
-                    payload: {
-                        chainName,
-                        balance: computeDenomination(balance, decimals)
-                    }
-                })
+                    if (!evmAddress) return
+                    const balance = await erc20Contract
+                        .balanceOf(evmAddress)
+                        .call()
+                    const decimals = await erc20Contract.decimals().call()
 
-                return
-            }
+                    dispatch({
+                        type: "UPDATE_BALANCE",
+                        payload: {
+                            chainName,
+                            balance: computeDenomination(balance, decimals),
+                        },
+                    })
+
+                    return
+                }
             }
         }
         handleEffect()
-    }
-    , [evmAddress, refreshWrappedTokensKey])
+    }, [evmAddress, refreshWrappedTokensKey])
 
     return balance ? (
         <div> {balance} </div>
