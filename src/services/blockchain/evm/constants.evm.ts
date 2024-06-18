@@ -6,11 +6,6 @@ import {
     supportedChains,
 } from "../constants.blockchain"
 
-type Networks = {
-    mainnet: string
-    testnet: string
-}
-
 export const httpProvider = <C extends SupportedEvmChainName>(
     network: SupportedNetwork = "Testnet",
     chainName: C
