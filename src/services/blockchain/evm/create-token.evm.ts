@@ -1,5 +1,5 @@
 import { SupportedEvmChainName, mapSupportedChainNameToSupportedEvmChainName } from "../constants.blockchain"
-import { SupportedNetwork } from "@common"
+import { SupportedNetwork, computeRaw } from "@common"
 import { getTokenFactoryContractAddress, web3HttpObject } from "./constants.evm"
 import { CREATE_TOKEN_TOPIC, TokenFactoryContract } from "./contracts"
 import { SupportedProviders, EthExecutionAPI } from "web3"
@@ -9,7 +9,7 @@ export type CreateEvmTokenParams = {
     decimals: number
     name: string
     symbol: string
-    totalSupply: bigint,
+    totalSupply: number,
     provider: SupportedProviders<EthExecutionAPI>
     network: SupportedNetwork,
     chainName: SupportedEvmChainName
@@ -44,7 +44,7 @@ export const createEvmToken = async ({
             name,
             symbol,
             decimals,
-            totalSupply,
+            totalSupply: computeRaw(totalSupply, decimals),
         })
         .send()
 

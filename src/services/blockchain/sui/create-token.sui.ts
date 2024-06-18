@@ -1,6 +1,7 @@
 import { bcs } from "@mysten/sui.js/bcs"
 import { getTokenByteCode } from "../../backend"
 import { TransactionBlock } from "@mysten/sui.js/transactions"
+import { computeRaw } from "@common"
 
 export type CreateSuiTokenParams = {
     decimals: number
@@ -8,7 +9,7 @@ export type CreateSuiTokenParams = {
     symbol: string
     description: string
     iconUrl: string
-    totalSupply: bigint
+    totalSupply: number
 }
 
 export const getCreateSuiTokenTransactionBlock = async ({
@@ -25,7 +26,7 @@ export const getCreateSuiTokenTransactionBlock = async ({
         iconUrl,
         name,
         symbol,
-        totalSupply: totalSupply.toString(),
+        totalSupply: computeRaw(totalSupply, decimals).toString(),
     })
     const tx = new TransactionBlock()
     const [upgradeCap] = tx.publish({

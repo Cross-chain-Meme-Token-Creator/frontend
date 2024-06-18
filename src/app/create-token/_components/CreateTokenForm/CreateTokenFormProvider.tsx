@@ -8,28 +8,18 @@ import React, {
 } from "react"
 import {
     AlgorandCreateAssetResponse,
-    CREATE_TOKEN_TOPIC,
     SupportedChainName,
-    TokenFactoryContract,
     baseAxios,
     createEvmToken,
     getCreateSuiTokenTransactionBlock,
     getMakeAlgorandAssetTransaction,
-    getTokenFactoryContractAddress,
     mapSupportedChainNameToSupportedEvmChainName,
-    web3HttpObject,
 } from "@services"
 import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
 import { useDisclosure } from "@nextui-org/react"
 import useSWRMutation, { SWRMutationResponse } from "swr/mutation"
 import * as Yup from "yup"
-import {
-    DisclosureType,
-    computeNumberMultipeBigInt,
-    computePow,
-    computeRaw,
-    getInnerType,
-} from "@common"
+import { DisclosureType, computeRaw, getInnerType } from "@common"
 import { RootContext, useAlgorandSigner, useEvmSigner } from "../../../_hooks"
 import { useWallet } from "@suiet/wallet-kit"
 import {
@@ -211,10 +201,7 @@ export const CreateTokenFormProvider = ({
                                     name,
                                     symbol,
                                     iconUrl,
-                                    totalSupply: computeNumberMultipeBigInt(
-                                        totalSupply,
-                                        computePow(decimals)
-                                    ),
+                                    totalSupply
                                 })
                             const { objectChanges, digest } =
                                 await signAndExecuteTransactionBlock({
@@ -270,10 +257,7 @@ export const CreateTokenFormProvider = ({
                                 name,
                                 symbol,
                                 iconUrl,
-                                totalSupply: computeNumberMultipeBigInt(
-                                    totalSupply,
-                                    computePow(decimals)
-                                ),
+                                totalSupply,
                             })
                             const response = (await signAndSend(txn)) as
                                 | AlgorandCreateAssetResponse
@@ -318,7 +302,7 @@ export const CreateTokenFormProvider = ({
                                 network,
                                 provider,
                                 symbol,
-                                totalSupply: computeRaw(totalSupply, decimals),
+                                totalSupply,
                             })
                             if (!response) return
 

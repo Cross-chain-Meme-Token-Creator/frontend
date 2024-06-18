@@ -11,7 +11,7 @@ export type GetMakeAlgorandAssetTransactionParams = {
     name: string
     symbol: string
     iconUrl: string
-    totalSupply: bigint
+    totalSupply: number
 }
 
 export const getMakeAlgorandAssetTransaction = async (
