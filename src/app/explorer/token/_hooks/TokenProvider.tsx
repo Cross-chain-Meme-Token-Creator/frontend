@@ -17,6 +17,7 @@ import { useBridgedTokenInfos } from "./useBridgedTokenInfos"
 import { useSuiToken } from "./useSuiToken"
 import { SupportedChainName } from "@services"
 import { useAlgorandToken } from "./useAlgorandToken"
+import { useEvmToken } from "./useEvmToken"
 
 export interface TokenContextValue {
     reducer: [TokenState, React.Dispatch<TokenAction>]
@@ -32,6 +33,7 @@ export const TokenContext = createContext<TokenContextValue | null>(null)
 const WrappedTokenProvider = ({ children }: { children: ReactNode }) => {
     
     useSuiToken()
+    useEvmToken()
     useAlgorandToken()
     useBridgedTokenInfos()
 

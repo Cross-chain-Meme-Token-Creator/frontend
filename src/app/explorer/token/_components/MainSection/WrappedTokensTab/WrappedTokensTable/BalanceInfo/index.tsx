@@ -4,7 +4,7 @@ import {
     ERC20Contract,
     SupportedChainName,
     SupportedEvmChainName,
-    httpProvider,
+    getHttpProvider,
     mapSupportedChainNameToSupportedEvmChainName,
 } from "@services"
 import React, { useContext, useEffect } from "react"
@@ -41,7 +41,7 @@ export const BalanceInfo = (props: BalanceInfoProps) => {
                 case "Evm": {
                     const erc20Contract = new ERC20Contract(
                         wrappedAddress,
-                        httpProvider(
+                        getHttpProvider(
                             network,
                             mapSupportedChainNameToSupportedEvmChainName(
                                 chainName

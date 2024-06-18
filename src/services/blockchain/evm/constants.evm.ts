@@ -6,7 +6,7 @@ import {
     supportedChains,
 } from "../constants.blockchain"
 
-export const httpProvider = <C extends SupportedEvmChainName>(
+export const getHttpProvider = <C extends SupportedEvmChainName>(
     network: SupportedNetwork = "Testnet",
     chainName: C
 ) =>
@@ -21,7 +21,7 @@ export const httpProvider = <C extends SupportedEvmChainName>(
 export const web3HttpObject = <C extends SupportedEvmChainName>(
     network: SupportedNetwork = "Testnet",
     chainName: C
-) => new web3(httpProvider(network, chainName))
+) => new web3(getHttpProvider(network, chainName))
 
 export const TESTNET_KLAYTN_TOKEN_FACTORY_CONTRACT_ADDRESS =
     "0x195E769b6ac5C72dC9205a103eB02e13251a25d6"

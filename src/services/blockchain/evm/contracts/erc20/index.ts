@@ -16,10 +16,22 @@ export class ERC20Contract {
     balanceOf = (address: string) => ({
         call: async () => {
             return await this.contract.methods.balanceOf(address).call<bigint>()
-        }
+        },
+
     })
 
     decimals = () => ({
-        call: async () => Number(await this.contract.methods.decimals().call())
+        call: async () => Number(await this.contract.methods.decimals().call()),
+        abi : this.contract.methods.decimals().encodeABI()
+    })
+
+    name = () => ({
+        call: async () => Number(await this.contract.methods.decimals().call()),
+        abi : this.contract.methods.name().encodeABI()
+    })
+
+    symbol = () => ({
+        call: async () => Number(await this.contract.methods.symbol().call()),
+        abi : this.contract.methods.symbol().encodeABI()
     })
 }

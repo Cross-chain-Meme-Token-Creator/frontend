@@ -12,6 +12,7 @@ import {
     SupportedChainName,
     TokenFactoryContract,
     baseAxios,
+    createEvmToken,
     getCreateSuiTokenTransactionBlock,
     getMakeAlgorandAssetTransaction,
     getTokenFactoryContractAddress,
@@ -26,6 +27,7 @@ import {
     DisclosureType,
     computeNumberMultipeBigInt,
     computePow,
+    computeRaw,
     getInnerType,
 } from "@common"
 import { RootContext, useAlgorandSigner, useEvmSigner } from "../../../_hooks"
@@ -304,65 +306,34 @@ export const CreateTokenFormProvider = ({
                         try {
                             openModal()
                             if (!provider) return
-                            const contract = new TokenFactoryContract(
-                                getTokenFactoryContractAddress(
-                                    network,
+
+                            const response = await createEvmToken({
+                                chainName:
                                     mapSupportedChainNameToSupportedEvmChainName(
                                         selectedChainName
-                                    )
-                                ),
-                                provider,
-                                evmAddress
-                            )
-
-                            const { transactionHash, logs } = await contract
-                                .createToken({
-                                    name,
-                                    symbol,
-                                    decimals,
-                                    totalSupply: BigInt(totalSupply),
-                                })
-                                .send()
-
-                            const { topics, data } = {
-                                ...logs.find(
-                                    ({ topics }) =>
-                                        topics?.at(0) === CREATE_TOKEN_TOPIC
-                                ),
-                            }
-                            if (!data || !topics) return
-
-                            const decoded = web3HttpObject(
+                                    ),
+                                decimals,
+                                fromAddress: evmAddress,
+                                name,
                                 network,
-                                mapSupportedChainNameToSupportedEvmChainName(
-                                    selectedChainName
-                                )
-                            ).eth.abi.decodeLog(
-                                [
-                                    {
-                                        type: "string",
-                                        name: "topic",
-                                    },
-                                    {
-                                        type: "address",
-                                        name: "tokenAddress",
-                                        indexed: true,
-                                    },
-                                ],
-                                data,
-                                topics
-                            )
+                                provider,
+                                symbol,
+                                totalSupply: computeRaw(totalSupply, decimals),
+                            })
+                            if (!response) return
+
+                            const { tokenAddress, txHash } = response
+
                             dispatch({
                                 type: "SET_TEMP_TOKEN_INFO",
                                 payload: {
-                                    tokenAddress:
-                                        decoded.tokenAddress as string,
+                                    tokenAddress,
                                 },
                             })
 
                             notify({
                                 chainName: selectedChainName,
-                                txHash: transactionHash,
+                                txHash,
                             })
                             onOpen()
                         } finally {

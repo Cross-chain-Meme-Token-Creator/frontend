@@ -1,3 +1,5 @@
 export * from "./contracts"
 export * from "./constants.evm"
 export * from "./metamask-api"
+export * from "./create-token.evm"
+export * from "./get-token-info.evm"
