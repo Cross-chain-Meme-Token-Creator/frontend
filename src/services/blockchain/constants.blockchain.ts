@@ -177,7 +177,7 @@ export const supportedChains: Record<SupportedChainName, SupportedChainInfo> = {
     },
     [SupportedChainName.Klaytn]: {
         name: "Klaytn",
-        imageUrl: "/icons/klaytn.png",
+        imageUrl: "/icons/klaytn.svg",
         chainId: 13,
         platform: chainToPlatform("Klaytn") as SupportedPlatform,
         evmProps: {

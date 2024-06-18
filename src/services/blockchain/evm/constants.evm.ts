@@ -1,50 +1,75 @@
 import { SupportedNetwork } from "@common"
 import web3, { HttpProvider } from "web3"
-
-export const CELO_MAINNET_RPC_URL = "https://forno.celo.org/"
-export const CELO_TESTNET_RPC_URL = "https://alfajores-forno.celo-testnet.org"
-
-export const BSC_MAINNET_RPC_URL = "https://bsc-dataseed1.binance.org/"
-export const BSC_TESTNET_RPC_URL =
-    "https://data-seed-prebsc-1-s1.binance.org:8545/"
+import {
+    SupportedChainName,
+    SupportedEvmChainName,
+    supportedChains,
+} from "../constants.blockchain"
 
 type Networks = {
     mainnet: string
     testnet: string
 }
 
-export type SupportedEvmChains = "Bsc" | "Celo"
-
-export const evmChainToRpc: Record<SupportedEvmChains, Networks> = {
-    Celo: {
-        mainnet: CELO_MAINNET_RPC_URL,
-        testnet: CELO_TESTNET_RPC_URL,
-    },
-    Bsc: {
-        mainnet: BSC_MAINNET_RPC_URL,
-        testnet: BSC_TESTNET_RPC_URL,
-    },
-}
-
-export const httpProvider = <C extends SupportedEvmChains>(
+export const httpProvider = <C extends SupportedEvmChainName>(
     network: SupportedNetwork = "Testnet",
     chainName: C
 ) =>
-        new HttpProvider(
-            network == "Testnet"
-                ? evmChainToRpc[chainName].testnet
-                : evmChainToRpc[chainName].mainnet
-        )
+    new HttpProvider(
+        network == "Testnet"
+            ? (supportedChains[chainName as unknown as SupportedChainName]
+                  .evmProps?.testnet.rpcUrl as string)
+            : (supportedChains[chainName as unknown as SupportedChainName]
+                  .evmProps?.mainnet.rpcUrl as string)
+    )
 
-export const web3HttpObject = <C extends SupportedEvmChains>(
+export const web3HttpObject = <C extends SupportedEvmChainName>(
     network: SupportedNetwork = "Testnet",
     chainName: C
 ) => new web3(httpProvider(network, chainName))
 
-export const TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS ="0x98b01f5269104E5acae6F3440ca785D043d76c79"
-export const MAINNET_TOKEN_FACTORY_CONTRACT_ADDRESS = ""
+export const TESTNET_KLAYTN_TOKEN_FACTORY_CONTRACT_ADDRESS =
+    "0x195E769b6ac5C72dC9205a103eB02e13251a25d6"
+export const MAINNET_KLAYTN_TOKEN_FACTORY_CONTRACT_ADDRESS = ""
 
-export const getTokenFactoryContractAddress = (network: SupportedNetwork) =>
-    network === "Testnet"
-        ? web3.utils.toChecksumAddress(TESTNET_TOKEN_FACTORY_CONTRACT_ADDRESS)
-        : web3.utils.toChecksumAddress(MAINNET_TOKEN_FACTORY_CONTRACT_ADDRESS)
+export const TESTNET_CELO_TOKEN_FACTORY_CONTRACT_ADDRESS =
+    "0xc6F8B932672AB4633Ce1918eeB97559E20Be0b6f"
+export const MAINNET_CELO_TOKEN_FACTORY_CONTRACT_ADDRESS = ""
+
+export const TESTNET_BSC_TOKEN_FACTORY_CONTRACT_ADDRESS = ""
+export const MAINNET_BSC_TOKEN_FACTORY_CONTRACT_ADDRESS = ""
+
+export const getTokenFactoryContractAddress = (
+    network: SupportedNetwork,
+    evmChainName: SupportedEvmChainName
+) => {
+    switch (evmChainName) {
+        case SupportedEvmChainName.Klaytn: {
+            return network === "Testnet"
+                ? web3.utils.toChecksumAddress(
+                      TESTNET_KLAYTN_TOKEN_FACTORY_CONTRACT_ADDRESS
+                  )
+                : web3.utils.toChecksumAddress(
+                      MAINNET_KLAYTN_TOKEN_FACTORY_CONTRACT_ADDRESS
+                  )
+        }
+        case SupportedEvmChainName.Celo: {
+            return network === "Testnet"
+                ? web3.utils.toChecksumAddress(
+                      TESTNET_CELO_TOKEN_FACTORY_CONTRACT_ADDRESS
+                  )
+                : web3.utils.toChecksumAddress(
+                      MAINNET_CELO_TOKEN_FACTORY_CONTRACT_ADDRESS
+                  )
+        }
+        case SupportedEvmChainName.Bsc: {
+            return network === "Testnet"
+                ? web3.utils.toChecksumAddress(
+                      TESTNET_BSC_TOKEN_FACTORY_CONTRACT_ADDRESS
+                  )
+                : web3.utils.toChecksumAddress(
+                      MAINNET_BSC_TOKEN_FACTORY_CONTRACT_ADDRESS
+                  )
+        }
+    }
+}

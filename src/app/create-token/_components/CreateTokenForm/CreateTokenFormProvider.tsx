@@ -15,6 +15,7 @@ import {
     getCreateSuiTokenTransactionBlock,
     getMakeAlgorandAssetTransaction,
     getTokenFactoryContractAddress,
+    mapSupportedChainNameToSupportedEvmChainName,
     web3HttpObject,
 } from "@services"
 import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
@@ -39,7 +40,6 @@ import {
     TransactionToastContext,
     WalletConnectionRequiredModalContext,
 } from "../../../_components"
-import Web3 from "web3"
 
 interface FormikValue {
     symbol: string
@@ -295,7 +295,8 @@ export const CreateTokenFormProvider = ({
                         }
                         break
                     }
-                    case SupportedChainName.Celo: {
+                    case SupportedChainName.Celo:
+                    case SupportedChainName.Klaytn: {
                         if (!evmAddress) {
                             openWalletConnectionRequiredModal()
                             return
@@ -304,7 +305,12 @@ export const CreateTokenFormProvider = ({
                             openModal()
                             if (!provider) return
                             const contract = new TokenFactoryContract(
-                                getTokenFactoryContractAddress(network),
+                                getTokenFactoryContractAddress(
+                                    network,
+                                    mapSupportedChainNameToSupportedEvmChainName(
+                                        selectedChainName
+                                    )
+                                ),
                                 provider,
                                 evmAddress
                             )
@@ -328,7 +334,9 @@ export const CreateTokenFormProvider = ({
 
                             const decoded = web3HttpObject(
                                 network,
-                                selectedChainName
+                                mapSupportedChainNameToSupportedEvmChainName(
+                                    selectedChainName
+                                )
                             ).eth.abi.decodeLog(
                                 [
                                     {
