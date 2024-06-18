@@ -44,7 +44,7 @@ export const createEvmToken = async ({
             name,
             symbol,
             decimals,
-            totalSupply: BigInt(totalSupply),
+            totalSupply,
         })
         .send()
 
