@@ -53,6 +53,8 @@ export const createEvmToken = async ({
     }
     if (!log) return null
     const { data, topics } = log
+    if (!data) return null
+    if (!topics) return null 
     
     const decoded = web3HttpObject(
         network,
