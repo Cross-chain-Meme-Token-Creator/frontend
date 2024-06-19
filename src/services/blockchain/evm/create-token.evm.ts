@@ -48,11 +48,12 @@ export const createEvmToken = async ({
         })
         .send()
 
-    const { topics, data } = {
+    const log = {
         ...logs.find(({ topics }) => topics?.at(0) === CREATE_TOKEN_TOPIC),
     }
-    if (!data || !topics) return null
-
+    if (!log) return null
+    const { data, topics } = log
+    
     const decoded = web3HttpObject(
         network,
         chainName
