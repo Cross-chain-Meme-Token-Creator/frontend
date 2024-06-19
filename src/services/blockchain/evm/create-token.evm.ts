@@ -15,7 +15,7 @@ export type CreateEvmTokenParams = {
     chainName: SupportedEvmChainName
 }
 
-export type CreateEvmTokenReturn = {
+export type CreateEvmTokenResult = {
     txHash: string,
     tokenAddress: string
 }
@@ -29,7 +29,7 @@ export const createEvmToken = async ({
     provider,
     network,
     chainName
-}: CreateEvmTokenParams): Promise<CreateEvmTokenReturn | null> => {
+}: CreateEvmTokenParams): Promise<CreateEvmTokenResult | null> => {
     const contract = new TokenFactoryContract(
         getTokenFactoryContractAddress(
             network,
