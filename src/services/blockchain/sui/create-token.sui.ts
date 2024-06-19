@@ -3,7 +3,7 @@ import { getTokenByteCode } from "../../backend"
 import { TransactionBlock } from "@mysten/sui.js/transactions"
 import { computeRaw } from "@common"
 
-export type CreateSuiTokenParams = {
+export interface CreateSuiTokenParams {
     decimals: number
     name: string
     symbol: string

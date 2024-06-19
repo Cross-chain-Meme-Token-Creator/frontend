@@ -4,7 +4,7 @@ import { getTokenFactoryContractAddress, web3HttpObject } from "./constants.evm"
 import { CREATE_TOKEN_TOPIC, TokenFactoryContract } from "./contracts"
 import { SupportedProviders, EthExecutionAPI } from "web3"
 
-export type CreateEvmTokenParams = {
+export interface CreateEvmTokenParams {
     fromAddress: string
     decimals: number
     name: string
@@ -15,7 +15,7 @@ export type CreateEvmTokenParams = {
     chainName: SupportedEvmChainName
 }
 
-export type CreateEvmTokenResult = {
+export interface CreateEvmTokenResult {
     txHash: string,
     tokenAddress: string
 }

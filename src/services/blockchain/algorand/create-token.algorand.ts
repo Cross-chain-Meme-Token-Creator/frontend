@@ -5,7 +5,7 @@ import {
     makeAssetCreateTxnWithSuggestedParamsFromObject,
 } from "algosdk"
 
-export type GetMakeAlgorandAssetTransactionParams = {
+export interface GetMakeAlgorandAssetTransactionParams {
     fromAddress: string
     decimals: number
     name: string
