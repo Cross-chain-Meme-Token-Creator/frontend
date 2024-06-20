@@ -6,34 +6,22 @@ import React, {
     useContext,
     useMemo,
 } from "react"
-import {
-    AlgorandCreateAssetResponse,
-    SupportedChainName,
-    baseAxios,
-    createEvmToken,
-    getCreateSuiTokenTransactionBlock,
-    getMakeAlgorandAssetTransaction,
-    mapSupportedChainNameToSupportedEvmChainName,
-} from "@services"
-import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
+import { SupportedChainName, baseAxios } from "@services"
 import { useDisclosure } from "@nextui-org/react"
 import useSWRMutation, { SWRMutationResponse } from "swr/mutation"
 import * as Yup from "yup"
-import { DisclosureType, computeRaw, getInnerType } from "@common"
-import { RootContext, useAlgorandSigner, useEvmSigner } from "../../../_hooks"
-import { useWallet } from "@suiet/wallet-kit"
+import { DisclosureType } from "@common"
+import { RootContext } from "../../../_hooks"
 import {
     CreateTokenFormState,
     SetCreateTokenFormAddressAction,
     useCreateTokenFormReducer,
 } from "./useCreateTokenFormReducer"
-import {
-    SignTransactionModalContext,
-    TransactionToastContext,
-    WalletConnectionRequiredModalContext,
-} from "../../../_components"
+import { useCreateSuiToken } from "./useCreateSuiToken"
+import { useCreateAlgorandToken } from "./useCreateAlgorandToken"
+import { useCreateEvmToken } from "./useCreateEvmToken"
 
-interface FormikValue {
+export interface FormikValue {
     symbol: string
     name: string
     description: string
@@ -138,36 +126,17 @@ export const CreateTokenFormProvider = ({
 }: {
     children: ReactNode
 }) => {
-    const { address: suiAddress, signAndExecuteTransactionBlock } = useWallet()!
-
     const tokenCreatedSuccesfullyModalDiscloresure = useDisclosure()
-    const { onOpen } = tokenCreatedSuccesfullyModalDiscloresure
 
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
-    const { selectedChainName, network } = rootState
-
-    const { address: evmAddress, metamaskWallet } = useEvmSigner()
-    const { provider } = metamaskWallet
-
-    const { address: algorandAddress, signAndSend } = useAlgorandSigner()
+    const { selectedChainName } = rootState
 
     const reducer = useCreateTokenFormReducer()
-    const [, dispatch] = reducer
 
-    const { functions } = useContext(SignTransactionModalContext)!
-    const { openModal, closeModal } = functions
-
-    const { functions: walletConnectionRequiredModalFunctions } = useContext(
-        WalletConnectionRequiredModalContext
-    )!
-    const { openModal: openWalletConnectionRequiredModal } =
-        walletConnectionRequiredModalFunctions
-
-    const { functions: transactionToastFunctions } = useContext(
-        TransactionToastContext
-    )!
-    const { notify } = transactionToastFunctions
+    const { trigger: suiTrigger } = useCreateSuiToken()
+    const { trigger: algorandTrigger } = useCreateAlgorandToken()
+    const { trigger: evmTrigger } = useCreateEvmToken()
 
     return (
         <Formik
@@ -178,152 +147,20 @@ export const CreateTokenFormProvider = ({
                 decimals: Yup.number().min(3).max(20).integer(),
                 totalSupply: Yup.number().min(0),
             })}
-            onSubmit={async ({
-                name,
-                symbol,
-                decimals,
-                description,
-                iconUrl,
-                totalSupply,
-            }) => {
+            onSubmit={async (values) => {
                 switch (selectedChainName) {
                     case SupportedChainName.Sui: {
-                        if (!suiAddress) {
-                            openWalletConnectionRequiredModal()
-                            return
-                        }
-                        try {
-                            openModal()
-                            const transactionBlock =
-                                await getCreateSuiTokenTransactionBlock({
-                                    decimals,
-                                    description,
-                                    name,
-                                    symbol,
-                                    iconUrl,
-                                    totalSupply
-                                })
-                            const { objectChanges, digest } =
-                                await signAndExecuteTransactionBlock({
-                                    transactionBlock,
-                                    options: {
-                                        showObjectChanges: true,
-                                    },
-                                })
-
-                            if (!objectChanges) return
-                            console.log(objectChanges)
-
-                            const coinType =
-                                getInnerType(
-                                    (
-                                        objectChanges as Array<SuiObjectChangeCreated>
-                                    ).find((objectChange) => {
-                                        const { objectType } = objectChange
-                                        if (!objectType) return false
-                                        return objectType.includes(
-                                            "0x2::coin::CoinMetadata"
-                                        )
-                                    })?.objectType ?? ""
-                                ) ?? ""
-
-                            dispatch({
-                                type: "SET_TEMP_TOKEN_INFO",
-                                payload: {
-                                    tokenAddress: coinType,
-                                },
-                            })
-
-                            notify({
-                                chainName: selectedChainName,
-                                txHash: digest,
-                            })
-                            onOpen()
-                        } finally {
-                            closeModal()
-                        }
-                        break
+                        await suiTrigger(values)
+                        return
                     }
                     case SupportedChainName.Algorand: {
-                        if (!algorandAddress) {
-                            openWalletConnectionRequiredModal()
-                            return
-                        }
-                        try {
-                            openModal()
-                            const txn = await getMakeAlgorandAssetTransaction({
-                                fromAddress: algorandAddress,
-                                decimals,
-                                name,
-                                symbol,
-                                iconUrl,
-                                totalSupply,
-                            })
-                            const response = (await signAndSend(txn)) as
-                                | AlgorandCreateAssetResponse
-                                | undefined
-                            if (!response) return
-                            dispatch({
-                                type: "SET_TEMP_TOKEN_INFO",
-                                payload: {
-                                    tokenAddress:
-                                        response["asset-index"].toString(),
-                                },
-                            })
-
-                            notify({
-                                chainName: selectedChainName,
-                                txHash: txn.txID(),
-                            })
-                            onOpen()
-                        } finally {
-                            closeModal()
-                        }
-                        break
+                        await algorandTrigger(values)
+                        return
                     }
                     case SupportedChainName.Celo:
                     case SupportedChainName.Klaytn: {
-                        if (!evmAddress) {
-                            openWalletConnectionRequiredModal()
-                            return
-                        }
-                        try {
-                            openModal()
-                            if (!provider) return
-
-                            const response = await createEvmToken({
-                                chainName:
-                                    mapSupportedChainNameToSupportedEvmChainName(
-                                        selectedChainName
-                                    ),
-                                decimals,
-                                fromAddress: evmAddress,
-                                name,
-                                network,
-                                provider,
-                                symbol,
-                                totalSupply,
-                            })
-                            if (!response) return
-
-                            const { tokenAddress, txHash } = response
-
-                            dispatch({
-                                type: "SET_TEMP_TOKEN_INFO",
-                                payload: {
-                                    tokenAddress,
-                                },
-                            })
-
-                            notify({
-                                chainName: selectedChainName,
-                                txHash,
-                            })
-                            onOpen()
-                        } finally {
-                            closeModal()
-                        }
-                        break
+                        await evmTrigger(values)
+                        return
                     }
                 }
             }}
