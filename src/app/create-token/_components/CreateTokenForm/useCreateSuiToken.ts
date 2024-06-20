@@ -4,7 +4,10 @@ import { useWallet } from "@suiet/wallet-kit"
 import { SuiObjectChangeCreated } from "@mysten/sui.js/client"
 import { useContext } from "react"
 import { getInnerType } from "../../../../common/utils"
-import { SupportedChainName, getCreateSuiTokenTransactionBlock } from "../../../../services/blockchain"
+import {
+    SupportedChainName,
+    getCreateSuiTokenTransactionBlock,
+} from "../../../../services/blockchain"
 import {
     SignTransactionModalContext,
     TransactionToastContext,
@@ -19,7 +22,7 @@ export const useCreateSuiToken = () => {
 
     const tokenCreatedSuccesfullyModalDiscloresure = useDisclosure()
     const { onOpen } = tokenCreatedSuccesfullyModalDiscloresure
-    
+
     const { functions } = useContext(SignTransactionModalContext)!
     const { openModal, closeModal } = functions
 
@@ -42,84 +45,71 @@ export const useCreateSuiToken = () => {
     )!
     const { notify } = transactionToastFunctions
 
-    const swrMutation = useSWRMutation(
-        "CREATE_SUI_TOKEN",
-        async (
-            _: string,
-            {
-                arg,
-            }: {
-                arg: FormikValue
-            }
-        ) => {
-            if (selectedChainName !== SupportedChainName.Sui) return
+    const createToken = async ({
+        decimals,
+        description,
+        name,
+        symbol,
+        iconUrl,
+        totalSupply,
+    }: FormikValue) => {
+        if (selectedChainName !== SupportedChainName.Sui) return
 
-            if (!address) {
-                openWalletConnectionRequiredModal()
-                return
-            }
+        if (!address) {
+            openWalletConnectionRequiredModal()
+            return
+        }
 
-            const {
+        try {
+            openModal()
+            const transactionBlock = await getCreateSuiTokenTransactionBlock({
                 decimals,
                 description,
                 name,
                 symbol,
                 iconUrl,
                 totalSupply,
-            } = arg
-            
-            try {
-                openModal()
-                const transactionBlock =
-                    await getCreateSuiTokenTransactionBlock({
-                        decimals,
-                        description,
-                        name,
-                        symbol,
-                        iconUrl,
-                        totalSupply,
-                    })
-                const { objectChanges, digest } =
-                    await signAndExecuteTransactionBlock({
-                        transactionBlock,
-                        options: {
-                            showObjectChanges: true,
-                        },
-                    })
-
-                if (!objectChanges) return
-                console.log(objectChanges)
-
-                const coinType =
-                    getInnerType(
-                        (objectChanges as Array<SuiObjectChangeCreated>).find(
-                            (objectChange) => {
-                                const { objectType } = objectChange
-                                if (!objectType) return false
-                                return objectType.includes(
-                                    "0x2::coin::CoinMetadata"
-                                )
-                            }
-                        )?.objectType ?? ""
-                    ) ?? ""
-
-                dispatch({
-                    type: "SET_TEMP_TOKEN_INFO",
-                    payload: {
-                        tokenAddress: coinType,
+            })
+            const { objectChanges, digest } =
+                await signAndExecuteTransactionBlock({
+                    transactionBlock,
+                    options: {
+                        showObjectChanges: true,
                     },
                 })
 
-                notify({
-                    chainName: selectedChainName,
-                    txHash: digest,
-                })
-                onOpen()
-            } finally {
-                closeModal()
-            }
-        }
-    )
+            if (!objectChanges) return
+            console.log(objectChanges)
 
-    return swrMutation
+            const coinType =
+                getInnerType(
+                    (objectChanges as Array<SuiObjectChangeCreated>).find(
+                        (objectChange) => {
+                            const { objectType } = objectChange
+                            if (!objectType) return false
+                            return objectType.includes(
+                                "0x2::coin::CoinMetadata"
+                            )
+                        }
+                    )?.objectType ?? ""
+                ) ?? ""
+
+            dispatch({
+                type: "SET_TEMP_TOKEN_INFO",
+                payload: {
+                    tokenAddress: coinType,
+                },
+            })
+
+            notify({
+                chainName: selectedChainName,
+                txHash: digest,
+            })
+            onOpen()
+        } finally {
+            closeModal()
+        }
+    }
+
+    return createToken
 }

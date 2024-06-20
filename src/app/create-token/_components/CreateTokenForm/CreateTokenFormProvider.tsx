@@ -134,9 +134,9 @@ export const CreateTokenFormProvider = ({
 
     const reducer = useCreateTokenFormReducer()
 
-    const { trigger: suiTrigger } = useCreateSuiToken()
-    const { trigger: algorandTrigger } = useCreateAlgorandToken()
-    const { trigger: evmTrigger } = useCreateEvmToken()
+    const createSuiToken = useCreateSuiToken()
+    const createAlgorandToken = useCreateAlgorandToken()
+    const createEvmToken = useCreateEvmToken()
 
     return (
         <Formik
@@ -150,16 +150,16 @@ export const CreateTokenFormProvider = ({
             onSubmit={async (values) => {
                 switch (selectedChainName) {
                     case SupportedChainName.Sui: {
-                        await suiTrigger(values)
+                        await createSuiToken(values)
                         return
                     }
                     case SupportedChainName.Algorand: {
-                        await algorandTrigger(values)
+                        await createAlgorandToken(values)
                         return
                     }
                     case SupportedChainName.Celo:
                     case SupportedChainName.Klaytn: {
-                        await evmTrigger(values)
+                        await createEvmToken(values)
                         return
                     }
                 }

@@ -1,4 +1,3 @@
-import useSWRMutation from "swr/mutation"
 import { FormikValue } from "./CreateTokenFormProvider"
 import { useContext } from "react"
 import {
@@ -43,62 +42,50 @@ export const useCreateAlgorandToken = () => {
     )!
     const { notify } = transactionToastFunctions
 
-    const swrMutation = useSWRMutation(
-        "CREATE_ALGORAND_TOKEN",
-        async (
-            _: string,
-            {
-                arg,
-            }: {
-                arg: FormikValue
-            }
-        ) => {
-            if (selectedChainName !== SupportedChainName.Algorand) return
+    const createToken = async ({
+        decimals,
+        name,
+        symbol,
+        iconUrl,
+        totalSupply,
+    }: FormikValue) => {
+        if (selectedChainName !== SupportedChainName.Algorand) return
 
-            if (!address) {
-                openWalletConnectionRequiredModal()
-                return
-            }
+        if (!address) {
+            openWalletConnectionRequiredModal()
+            return
+        }
 
-            const {
+        try {
+            openModal()
+            const txn = await getMakeAlgorandAssetTransaction({
+                fromAddress: address,
                 decimals,
                 name,
                 symbol,
                 iconUrl,
                 totalSupply,
-            } = arg
+            })
+            const response = (await signAndSend(txn)) as
+                | AlgorandCreateAssetResponse
+                | undefined
+            if (!response) return
+            dispatch({
+                type: "SET_TEMP_TOKEN_INFO",
+                payload: {
+                    tokenAddress: response["asset-index"].toString(),
+                },
+            })
 
-            try {
-                openModal()
-                const txn = await getMakeAlgorandAssetTransaction({
-                    fromAddress: address,
-                    decimals,
-                    name,
-                    symbol,
-                    iconUrl,
-                    totalSupply,
-                })
-                const response = (await signAndSend(txn)) as
-                    | AlgorandCreateAssetResponse
-                    | undefined
-                if (!response) return
-                dispatch({
-                    type: "SET_TEMP_TOKEN_INFO",
-                    payload: {
-                        tokenAddress: response["asset-index"].toString(),
-                    },
-                })
-
-                notify({
-                    chainName: selectedChainName,
-                    txHash: txn.txID(),
-                })
-                onOpen()
-            } finally {
-                closeModal()
-            }
+            notify({
+                chainName: selectedChainName,
+                txHash: txn.txID(),
+            })
+            onOpen()
+        } finally {
+            closeModal()
         }
-    )
+    }
 
-    return swrMutation
+    return createToken
 }

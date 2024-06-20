@@ -1,4 +1,3 @@
-import useSWRMutation from "swr/mutation"
 import { FormikValue } from "./CreateTokenFormProvider"
 import { useContext } from "react"
 import {
@@ -44,64 +43,57 @@ export const useCreateEvmToken = () => {
     )!
     const { notify } = transactionToastFunctions
 
-    const swrMutation = useSWRMutation(
-        "CREATE_ALGORAND_TOKEN",
-        async (
-            _: string,
-            {
-                arg,
-            }: {
-                arg: FormikValue
-            }
-        ) => {
-            if (!Object.keys(SupportedEvmChainName).includes(selectedChainName))
-                return
+    const createToken = async ({
+        decimals,
+        name,
+        symbol,
+        totalSupply,
+    }: FormikValue) => {
+        if (!Object.keys(SupportedEvmChainName).includes(selectedChainName))
+            return
 
-            if (!address) {
-                openWalletConnectionRequiredModal()
-                return
-            }
-
-            const { decimals, name, symbol, totalSupply } = arg
-
-            try {
-                openModal()
-                if (!provider) return
-
-                const response = await createEvmToken({
-                    chainName:
-                        mapSupportedChainNameToSupportedEvmChainName(
-                            selectedChainName
-                        ),
-                    decimals,
-                    fromAddress: address,
-                    name,
-                    network,
-                    provider,
-                    symbol,
-                    totalSupply,
-                })
-                if (!response) return
-
-                const { tokenAddress, txHash } = response
-
-                dispatch({
-                    type: "SET_TEMP_TOKEN_INFO",
-                    payload: {
-                        tokenAddress,
-                    },
-                })
-
-                notify({
-                    chainName: selectedChainName,
-                    txHash,
-                })
-                onOpen()
-            } finally {
-                closeModal()
-            }
+        if (!address) {
+            openWalletConnectionRequiredModal()
+            return
         }
-    )
 
-    return swrMutation
+        try {
+            openModal()
+            if (!provider) return
+
+            const response = await createEvmToken({
+                chainName:
+                    mapSupportedChainNameToSupportedEvmChainName(
+                        selectedChainName
+                    ),
+                decimals,
+                fromAddress: address,
+                name,
+                network,
+                provider,
+                symbol,
+                totalSupply,
+            })
+            if (!response) return
+
+            const { tokenAddress, txHash } = response
+
+            dispatch({
+                type: "SET_TEMP_TOKEN_INFO",
+                payload: {
+                    tokenAddress,
+                },
+            })
+
+            notify({
+                chainName: selectedChainName,
+                txHash,
+            })
+            onOpen()
+        } finally {
+            closeModal()
+        }
+    }
+
+    return createToken
 }
