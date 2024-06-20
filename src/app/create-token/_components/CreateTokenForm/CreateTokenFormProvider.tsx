@@ -135,13 +135,16 @@ export const CreateTokenFormProvider = ({
     const reducer = useCreateTokenFormReducer()
 
     const createSuiToken = useCreateSuiToken(
-        tokenCreatedSuccesfullyModalDiscloresure
+        tokenCreatedSuccesfullyModalDiscloresure,
+        reducer
     )
     const createAlgorandToken = useCreateAlgorandToken(
-        tokenCreatedSuccesfullyModalDiscloresure
+        tokenCreatedSuccesfullyModalDiscloresure,
+        reducer
     )
     const createEvmToken = useCreateEvmToken(
-        tokenCreatedSuccesfullyModalDiscloresure
+        tokenCreatedSuccesfullyModalDiscloresure,
+        reducer
     )
 
     return (

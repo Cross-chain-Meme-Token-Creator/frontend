@@ -1,4 +1,3 @@
-
 import { FormikValue } from "./CreateTokenFormProvider"
 import { useContext } from "react"
 import {
@@ -12,10 +11,19 @@ import {
     WalletConnectionRequiredModalContext,
 } from "../../../_components"
 import { RootContext, useAlgorandSigner } from "../../../_hooks"
-import { useCreateTokenFormReducer } from "./useCreateTokenFormReducer"
+import {
+    CreateTokenFormState,
+    SetCreateTokenFormAddressAction,
+} from "./useCreateTokenFormReducer"
 import { DisclosureType } from "@common"
 
-export const useCreateAlgorandToken = ({ onOpen }: DisclosureType) => {
+export const useCreateAlgorandToken = (
+    { onOpen }: DisclosureType,
+    [, dispatch]: [
+        CreateTokenFormState,
+        React.Dispatch<SetCreateTokenFormAddressAction>
+    ]
+) => {
     const { address, signAndSend } = useAlgorandSigner()
 
     const { functions } = useContext(SignTransactionModalContext)!
@@ -31,9 +39,6 @@ export const useCreateAlgorandToken = ({ onOpen }: DisclosureType) => {
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
     const { selectedChainName } = rootState
-
-    const reducer = useCreateTokenFormReducer()
-    const [, dispatch] = reducer
 
     const { functions: transactionToastFunctions } = useContext(
         TransactionToastContext

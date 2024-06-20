@@ -11,11 +11,19 @@ import {
     WalletConnectionRequiredModalContext,
 } from "../../../_components"
 import { RootContext, useEvmSigner } from "../../../_hooks"
-import { useCreateTokenFormReducer } from "./useCreateTokenFormReducer"
-import { useDisclosure } from "@nextui-org/react"
+import {
+    CreateTokenFormState,
+    SetCreateTokenFormAddressAction,
+} from "./useCreateTokenFormReducer"
 import { DisclosureType } from "@common"
 
-export const useCreateEvmToken = ({ onOpen }: DisclosureType) => {
+export const useCreateEvmToken = (
+    { onOpen }: DisclosureType,
+    [, dispatch]: [
+        CreateTokenFormState,
+        React.Dispatch<SetCreateTokenFormAddressAction>
+    ]
+) => {
     const { address, metamaskWallet } = useEvmSigner()
     const { provider } = metamaskWallet
 
@@ -32,9 +40,6 @@ export const useCreateEvmToken = ({ onOpen }: DisclosureType) => {
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
     const { selectedChainName, network } = rootState
-
-    const reducer = useCreateTokenFormReducer()
-    const [, dispatch] = reducer
 
     const { functions: transactionToastFunctions } = useContext(
         TransactionToastContext

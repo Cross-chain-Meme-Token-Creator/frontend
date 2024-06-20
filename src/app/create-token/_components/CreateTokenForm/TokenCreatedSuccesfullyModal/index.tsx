@@ -37,7 +37,6 @@ export const TokenCreatedSuccesfullyModal = () => {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    //later will fetch, not use from formik
     return (
         <Modal onOpenChange={onOpenChange} isOpen={isOpen} size="sm">
             <ModalContent>
@@ -74,68 +73,6 @@ export const TokenCreatedSuccesfullyModal = () => {
                         </div>  
                     </div>
                 </ModalBody>
-                {/* <ModalBody className="p-4">
-                    <div className="flex gap-4 items-center justify-between">
-                        <div className="grid">
-                            <Avatar
-                                className="w-12 h-12"
-                                src={formik.values.iconUrl}
-                                showFallback
-                                name={formik.values.symbol}
-                            />
-                            <Spacer y={2} />
-                            <div>{formik.values.name}</div>
-                            <div className="text-xs text-foreground-500">
-                                {formik.values.symbol}
-                            </div>
-                        </div>
-                        <div className="text-xs gap-1 grid">
-                            <div className="flex gap-4">
-                                <div className="text-foreground-500 w-[120px]">
-                                    Token Address
-                                </div>
-                                <Link
-                                    className="text-xs"
-                                    isExternal
-                                    showAnchorIcon
-                                    color="primary"
-                                >
-                                    {tokenAddress}
-                                </Link>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="text-foreground-500 w-[120px]">
-                                    Chain
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <Image
-                                        className="w-3 h-3"
-                                        removeWrapper
-                                        src={
-                                            supportedChains[selectedChainName]
-                                                .imageUrl
-                                        }
-                                    />
-                                    {selectedChainName}
-                                </div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="text-foreground-500 w-[120px]">
-                                    Decimals
-                                </div>
-                                <div>{formik.values.decimals}</div>
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="text-foreground-500 w-[120px]">
-                                    Total supply
-                                </div>
-                                <div>
-                                    {formatNumber(formik.values.totalSupply)}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </ModalBody> */}
                 <ModalFooter className="p-4 pt-0">
                     <Button
                         color="primary"

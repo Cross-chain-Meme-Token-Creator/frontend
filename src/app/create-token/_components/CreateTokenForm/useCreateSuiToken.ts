@@ -14,11 +14,19 @@ import {
     WalletConnectionRequiredModalContext,
 } from "../../../_components"
 import { RootContext } from "../../../_hooks"
-import { useCreateTokenFormReducer } from "./useCreateTokenFormReducer"
-import { useDisclosure } from "@nextui-org/react"
 import { DisclosureType } from "@common"
+import {
+    CreateTokenFormState,
+    SetCreateTokenFormAddressAction,
+} from "./useCreateTokenFormReducer"
 
-export const useCreateSuiToken = ({ onOpen }: DisclosureType) => {
+export const useCreateSuiToken = (
+    { onOpen }: DisclosureType,
+    [, dispatch]: [
+        CreateTokenFormState,
+        React.Dispatch<SetCreateTokenFormAddressAction>
+    ]
+) => {
     const { address, signAndExecuteTransactionBlock } = useWallet()
 
     const { functions } = useContext(SignTransactionModalContext)!
@@ -34,9 +42,6 @@ export const useCreateSuiToken = ({ onOpen }: DisclosureType) => {
     const { reducer: rootReducer } = useContext(RootContext)!
     const [rootState] = rootReducer
     const { selectedChainName } = rootState
-
-    const reducer = useCreateTokenFormReducer()
-    const [, dispatch] = reducer
 
     const { functions: transactionToastFunctions } = useContext(
         TransactionToastContext
