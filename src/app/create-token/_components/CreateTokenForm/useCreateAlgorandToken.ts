@@ -1,3 +1,4 @@
+
 import { FormikValue } from "./CreateTokenFormProvider"
 import { useContext } from "react"
 import {
@@ -12,13 +13,10 @@ import {
 } from "../../../_components"
 import { RootContext, useAlgorandSigner } from "../../../_hooks"
 import { useCreateTokenFormReducer } from "./useCreateTokenFormReducer"
-import { useDisclosure } from "@nextui-org/react"
+import { DisclosureType } from "@common"
 
-export const useCreateAlgorandToken = () => {
+export const useCreateAlgorandToken = ({ onOpen }: DisclosureType) => {
     const { address, signAndSend } = useAlgorandSigner()
-
-    const tokenCreatedSuccesfullyModalDiscloresure = useDisclosure()
-    const { onOpen } = tokenCreatedSuccesfullyModalDiscloresure
 
     const { functions } = useContext(SignTransactionModalContext)!
     const { openModal, closeModal } = functions

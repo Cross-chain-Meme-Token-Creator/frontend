@@ -16,12 +16,10 @@ import {
 import { RootContext } from "../../../_hooks"
 import { useCreateTokenFormReducer } from "./useCreateTokenFormReducer"
 import { useDisclosure } from "@nextui-org/react"
+import { DisclosureType } from "@common"
 
-export const useCreateSuiToken = () => {
+export const useCreateSuiToken = ({ onOpen }: DisclosureType) => {
     const { address, signAndExecuteTransactionBlock } = useWallet()
-
-    const tokenCreatedSuccesfullyModalDiscloresure = useDisclosure()
-    const { onOpen } = tokenCreatedSuccesfullyModalDiscloresure
 
     const { functions } = useContext(SignTransactionModalContext)!
     const { openModal, closeModal } = functions
@@ -105,6 +103,7 @@ export const useCreateSuiToken = () => {
                 chainName: selectedChainName,
                 txHash: digest,
             })
+
             onOpen()
         } finally {
             closeModal()

@@ -13,13 +13,11 @@ import {
 import { RootContext, useEvmSigner } from "../../../_hooks"
 import { useCreateTokenFormReducer } from "./useCreateTokenFormReducer"
 import { useDisclosure } from "@nextui-org/react"
+import { DisclosureType } from "@common"
 
-export const useCreateEvmToken = () => {
+export const useCreateEvmToken = ({ onOpen }: DisclosureType) => {
     const { address, metamaskWallet } = useEvmSigner()
     const { provider } = metamaskWallet
-
-    const tokenCreatedSuccesfullyModalDiscloresure = useDisclosure()
-    const { onOpen } = tokenCreatedSuccesfullyModalDiscloresure
 
     const { functions } = useContext(SignTransactionModalContext)!
     const { openModal, closeModal } = functions

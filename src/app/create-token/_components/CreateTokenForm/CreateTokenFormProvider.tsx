@@ -134,9 +134,15 @@ export const CreateTokenFormProvider = ({
 
     const reducer = useCreateTokenFormReducer()
 
-    const createSuiToken = useCreateSuiToken()
-    const createAlgorandToken = useCreateAlgorandToken()
-    const createEvmToken = useCreateEvmToken()
+    const createSuiToken = useCreateSuiToken(
+        tokenCreatedSuccesfullyModalDiscloresure
+    )
+    const createAlgorandToken = useCreateAlgorandToken(
+        tokenCreatedSuccesfullyModalDiscloresure
+    )
+    const createEvmToken = useCreateEvmToken(
+        tokenCreatedSuccesfullyModalDiscloresure
+    )
 
     return (
         <Formik
