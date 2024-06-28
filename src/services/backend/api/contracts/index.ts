@@ -1,7 +1,7 @@
 import { baseAxios } from "../axios-instances"
 import { backendApiUrl } from "../constants.api"
 
-export interface GetTokenByteCodeRequestBody {
+export interface GetSuiPublishTokenBytecodeRequestBody {
     decimals: number
     name: string
     symbol: string
@@ -10,19 +10,19 @@ export interface GetTokenByteCodeRequestBody {
     totalSupply: string
 }
 
-export interface GetTokenByteCodeResponseData {
+export interface GetSuiPublishTokenBytecodeResponseData {
     modules: Array<string>
     dependencies: Array<string>
     digest: Array<number>
 }
 
-const baseUrl = `${backendApiUrl}/sui`
+const baseUrl = `${backendApiUrl}/contracts`
 
-export const getTokenByteCode = async (
-    body: GetTokenByteCodeRequestBody
-): Promise<GetTokenByteCodeResponseData> => {
+export const getSuiPublishTokenBytecode = async (
+    body: GetSuiPublishTokenBytecodeRequestBody
+): Promise<GetSuiPublishTokenBytecodeResponseData> => {
     const { data } = await baseAxios.post(
-        `${baseUrl}/get-token-byte-code`,
+        `${baseUrl}/get-sui-publish-token-bytecode`,
         body
     )
     return data

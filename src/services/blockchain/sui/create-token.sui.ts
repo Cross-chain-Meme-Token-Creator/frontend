@@ -1,5 +1,5 @@
 import { bcs } from "@mysten/sui.js/bcs"
-import { getTokenByteCode } from "../../backend"
+import { getSuiPublishTokenBytecode } from "../../backend"
 import { TransactionBlock } from "@mysten/sui.js/transactions"
 import { computeRaw } from "@common"
 
@@ -20,7 +20,7 @@ export const getCreateSuiTokenTransactionBlock = async ({
     symbol,
     totalSupply,
 }: CreateSuiTokenParams): Promise<TransactionBlock> => {
-    const { dependencies, modules } = await getTokenByteCode({
+    const { dependencies, modules } = await getSuiPublishTokenBytecode({
         decimals,
         description,
         iconUrl,

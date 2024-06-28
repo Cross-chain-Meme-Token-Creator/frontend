@@ -1,2 +1,2 @@
-export * from "./sui"
+export * from "./contracts"
 export * from "./axios-instances"
