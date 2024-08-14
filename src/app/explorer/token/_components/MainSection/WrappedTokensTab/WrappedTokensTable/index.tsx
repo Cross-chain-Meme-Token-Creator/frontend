@@ -92,7 +92,7 @@ export const WrappedTokensTable = () => {
                                         as="button"
                                         showAnchorIcon
                                     >
-                                        {truncateString(wrappedAddress)}
+                                        {wrappedAddress}
                                     </Link>
                                 </TableCell>
                                 <TableCell>
